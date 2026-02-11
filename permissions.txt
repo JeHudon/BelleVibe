@@ -1,0 +1,8 @@
+Employé							Superviseur						Admin (God)
+créer nouveaux clients					créer dossiers assignés			Peut créer, modifier, supprimer
+créer nouveaux comptes					créer nouveaux employés				sur chaque table	
+créer nouvelles notes					modifier clients
+modifier notes						modifier comptes
+créer nouvelles demandes				modifier dossiers assignés
+modifier demandes						
+créer nouveaux documents				
