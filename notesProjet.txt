@@ -1,0 +1,41 @@
+tout vérifier la maquette
+finir le document (tout mettre ensemble)
+double check avec tous diagrames
+
+
+
+
+idées
+Log in menu:
+drop down menu auto fill les credientials pour les differentes permissions (employé, superviseur, admin) (pour fins de demo seulement)
+
+Notes : relié a chaque client, cards ou liste (option a selectionner) montrant toutes les dernieres notes, boutton nouvelle note, filtre selon le type de note (plainte, commentaire, etc) selon la date asc/desc
+
+Documents : inlcus les factures, filtres selon le type 
+
+Demandes : onglet nav bar pour toutes les demandes, pas juste selon le client mais aussi depuis l'onglet du client. lien vers le dossier du client depuis la demande
+
+Services: internet/telephone/tv
+Menu qui te demande de choisir un client, lorsque cliqué demande un nouveau service, demande quel forfait, confirmation (comme maquette d'Andy)
+
+Nouveau Client: 
+Nom, Prénom, Code Postal, Adresse courriel
+
+Gestion des comptes:
+Onglet avec tous les comptes, lorsqu'on clique sur un client, on ouvre sa page de détails
+
+Comptes:
+Dashboard avec les services, solde du mois selon les services, derniere utilisation
+
+Dashboard:
+demandes ouvertes, comptes en attente, tâches en attente (highlight et liste en bas), activités récentes
+
+
+
+Vue superviseur:
+vue employé ++
+
+Dashboard:
+historique, demandes en retard
+Actions Rapides: Gestion des employés + Créer employé
+
