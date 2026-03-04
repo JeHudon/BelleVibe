@@ -3,3 +3,4 @@
 *.xlsx#
 ~$BelleVibe MatricePermissions.xlsx
 *.bkp
+/Code - BelleVibe/BackEnd/node_modules
