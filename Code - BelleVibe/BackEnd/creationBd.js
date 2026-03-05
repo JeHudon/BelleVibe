@@ -3,7 +3,7 @@ const knex = require('knex');
 
 /* Créé une instance de la base de données */
 const db = knex({
-    client: 'sqlite3',
+    client: 'better-sqlite3',
     connection: {
         filename: "./BelleVibe.sqlite3"
     },
@@ -22,7 +22,7 @@ async function createTables() {
             table.string("nomClient").notNullable();
             table.string("prenomClient").notNullable();
             table.string("courrielClient").notNullable();
-            table.integer("telephoneClient").notNullable();
+            table.integer("telephoneClient");
             table.string("adresseClient").notNullable();
             table.string("codePostalClient").notNullable();
             table.timestamps(true, true);
