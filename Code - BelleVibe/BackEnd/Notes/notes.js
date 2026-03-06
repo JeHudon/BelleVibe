@@ -1,5 +1,5 @@
-const { validerChamps } = require("./fonctionsCommunes");
-const { db } = require("./creationBd");
+const { validerChamps } = require("../fonctionsCommunes");
+const { db } = require("../BD/creationBd");
 
 const express = require("express");
 const router = express.Router();

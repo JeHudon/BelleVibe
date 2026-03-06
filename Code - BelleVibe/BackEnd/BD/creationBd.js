@@ -5,7 +5,7 @@ const knex = require('knex');
 const db = knex({
     client: 'better-sqlite3',
     connection: {
-        filename: "./BelleVibe.sqlite3"
+        filename: "./BD/BelleVibe.sqlite3"
     },
     useNullAsDefault: true
 });

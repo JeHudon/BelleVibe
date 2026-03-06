@@ -8,7 +8,7 @@ const crypto = require("crypto");
 const path = require("path");
 
 /* Importe la base de données de creationBd.js */
-const { db, createTables } = require("./creationBd");
+const { db, createTables } = require("./BD/creationBd");
 const { default: knex } = require("knex");
 
 app.use(express.json());
@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
     res.send("Serveur fonctionne");
 });
 
-app.use("/notes", require("./notes.js"));
+app.use("/notes", require("./Notes/notes.js"));
 
 createTables()
     .then(() => {
