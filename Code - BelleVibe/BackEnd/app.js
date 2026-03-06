@@ -1,5 +1,6 @@
 /////////////////////////////////////// Création du serveur ////////////////////////////////////////////
 
+// Importation des modules nécessaires
 const express = require("express");
 const app = express();
 const crypto = require("crypto");
@@ -10,8 +11,6 @@ const path = require("path");
 /* Importe la base de données de creationBd.js */
 const { db, createTables } = require("./BD/creationBd");
 const { default: knex } = require("knex");
-
-app.use(express.json());
 
 // Augmenter la limite pour les requêtes JSON (par défaut 100kb)
 app.use(express.json({ limit: "10mb" })); // accepte jusqu'à 10MB
@@ -30,12 +29,15 @@ app.use(express.static(path.join(__dirname, "../../"))); // client global
 app.use(express.static(path.join(__dirname, "../client"))); // client connexion-inscription
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // dossier pour les images uploadées
 
+
 app.get("/", (req, res) => {
     res.send("Serveur fonctionne");
 });
 
+// Importation des routes
 app.use("/notes", require("./Notes/notes.js"));
 
+// Initialisation de la base de données et démarrage du serveur
 createTables()
     .then(() => {
         const PORT = 3000;

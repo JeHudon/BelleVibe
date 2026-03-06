@@ -65,7 +65,6 @@ router.put("/:idNote", async (req, res) => {
         const verifNote = await db("notes")
             .where("idNote", idNote)
             .update({ idEmploye: idEmploye, typeNote: type, titreNote: titre, note: note });
-
         if (verifNote === 0) {
             return res.status(404).json({ error: "Note non trouvée" });
         }
@@ -85,8 +84,8 @@ router.delete("/:idNote", async (req, res) => {
     try {
         const { idNote } = req.params;
 
+        // Vérification que la note existe avant de la supprimer
         const verifNote = await db("notes").where("idNote", idNote).del();
-
         if (verifNote === 0) {
             return res.status(404).json({ error: "Note non trouvée" });
         }
