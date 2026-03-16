@@ -57,7 +57,8 @@ async function createTables() {
             table.increments("idDossier");
             table.integer("idClient").references("idClient").inTable("clients");
             table.integer("idEmploye").references("idEmploye").inTable("employes");
-            table.string("typeDossier").notNullable();            
+            table.string("typeDossier").notNullable(); 
+            // utiliser "actif" | "inactif" | "en attente"           
             table.string("statutDossier").notNullable();
             table.float("soldeDossier").notNullable();
             table.timestamps(true, true);
