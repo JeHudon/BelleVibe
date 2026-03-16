@@ -36,7 +36,7 @@ app.get("/", (req, res) => {
 
 // Importation des routes
 app.use("/notes", require("./Notes/notes.js"));
-
+app.use("/employes", require("./Employes/employes.js"))
 // Initialisation de la base de données et démarrage du serveur
 createTables()
     .then(() => {

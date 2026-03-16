@@ -36,6 +36,7 @@ async function createTables() {
     if (!employes) {
         await db.schema.createTable("employes", (table) => {
             table.increments("idEmploye");
+            // utiliser "commis", "superviseur", "admin"
             table.string("roleEmploye").notNullable();    
             // utiliser "actif", "inactif", "suspendu"
             table.string("statutEmploye").notNullable();        
@@ -45,6 +46,7 @@ async function createTables() {
             table.integer("telephoneEmploye").notNullable();
             table.string("adresseEmploye").notNullable();
             table.string("codePostalEmploye").notNullable();
+            table.string("motDePasse").notNullable();
             table.timestamps(true, true);
         });
         console.log("Table 'employes' créée. ")
