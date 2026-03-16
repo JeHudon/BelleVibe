@@ -1,3 +1,5 @@
 curl -X POST http://localhost:3000/employes/addEmploye `
 -H "Content-Type: application/json" `
 -d '{"role":"admin","nom":"Freaky","prenom":"Gab","courriel":"admin@bellevibe.com","telephone":"4501234567","adresse":"123 1e Avenue","codePostal":"A1A 1A1","mdp":"123456789"}'
+
+curl -X DELETE http://localhost:3000/employes/5

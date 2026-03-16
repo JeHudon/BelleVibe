@@ -6,6 +6,6 @@ curl -X PUT http://localhost:3000/notes/1 `
 -H "Content-Type: application/json" `
 -d '{"idDossier":"1","idEmploye":"1","type":"Modif Test","titre":"Titre 1","note":"Note 1"}'
 
-curl -X DELETE http://localhost:3000/notes/2 `
+curl -X DELETE http://localhost:3000/notes/3 `
 
 curl -X GET http://localhost:3000/notes/4 `

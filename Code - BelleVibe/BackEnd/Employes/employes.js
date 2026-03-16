@@ -97,7 +97,7 @@ router.post("/login", async (req, res) => {
             role: employe.roleEmploye
         }
         // création du token, peut modifier/enlever l'expiration si on veut
-        const token = jwt.sign(payload, jwt_mdp, {expiresIn: '2h'})
+        const token = jwt.sign(payload, jwt_mdp, { expiresIn: '2h' })
 
         res.json({
             message: "connexion réussie & sécurisée",
@@ -106,9 +106,29 @@ router.post("/login", async (req, res) => {
     }
     catch (error) {
         console.error("Erreur dans /login", error)
-        res.status(500).json({ error: "Erreur serveur"})
+        res.status(500).json({ error: "Erreur serveur" })
     }
 })
 
+// Route pour delete des employés
+router.delete("/:idEmploye", async (req, res) => {
+    try {
+        const { idEmploye } = req.params
+        // vérification que l'employé existe avant la suppression
+        const verifierEmp = await db("employes").where("idEmploye", idEmploye).del()
+        if (verifierEmp == 0) {
+            return res.status(404).json({ error: "Employé non trouvé dans la bd" })
+        }
+    
+        res.status(200).json({
+            message: "Employé supprimé avec succès",
+            idEmploye
+        })
+    }
+    catch (error) {
+        console.error("Erreur dans /deleteEmployé", error)
+        res.status(500).json({ error: "Erreur serveur", details: error})
+    }
+})
 
 module.exports = router;
