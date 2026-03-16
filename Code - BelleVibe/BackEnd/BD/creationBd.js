@@ -37,6 +37,7 @@ async function createTables() {
         await db.schema.createTable("employes", (table) => {
             table.increments("idEmploye");
             table.string("roleEmploye").notNullable();    
+            // utiliser "actif", "inactif", "suspendu"
             table.string("statutEmploye").notNullable();        
             table.string("nomEmploye").notNullable();
             table.string("prenomEmploye").notNullable();
