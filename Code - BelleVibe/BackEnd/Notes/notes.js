@@ -1,4 +1,4 @@
-const { validerChamps } = require("../fonctionsCommunes");
+const { validerChamps, authentifier } = require("../fonctionsCommunes");
 const { db } = require("../BD/creationBd");
 
 const express = require("express");
@@ -8,7 +8,7 @@ const router = express.Router();
 // Routes pour la table Notes
 
 // Get notes d'un dossier
-router.get("/:idDossier", async (req, res) => {
+router.get("/:idDossier", authentifier, async (req, res) => {
     const { idDossier } = req.params;
     try {
         const notes = await db("Notes").select("*").where("idDossier", idDossier);
@@ -20,7 +20,7 @@ router.get("/:idDossier", async (req, res) => {
 });
 
 // Ajouter une note à un dossier
-router.post("/:idDossier", async (req, res) => {
+router.post("/:idDossier", authentifier, async (req, res) => {
     try {
         console.log(req.body);
         const { idEmploye, type, titre, note } = req.body;
@@ -50,7 +50,7 @@ router.post("/:idDossier", async (req, res) => {
 });
 
 // Modifier une note d'un dossier
-router.put("/:idNote", async (req, res) => {
+router.put("/:idNote", authentifier, async (req, res) => {
     try {
         const { idNote } = req.params;
         const { idEmploye, type, titre, note, idDossier } = req.body;
@@ -80,7 +80,7 @@ router.put("/:idNote", async (req, res) => {
 });
 
 // Supprimer une note d'un dossier
-router.delete("/:idNote", async (req, res) => {
+router.delete("/:idNote", authentifier, async (req, res) => {
     try {
         const { idNote } = req.params;
 
