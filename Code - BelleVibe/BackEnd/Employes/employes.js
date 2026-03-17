@@ -119,7 +119,7 @@ router.delete("/:idEmploye", async (req, res) => {
         if (verifierEmp == 0) {
             return res.status(404).json({ error: "Employé non trouvé dans la bd" })
         }
-    
+
         res.status(200).json({
             message: "Employé supprimé avec succès",
             idEmploye
@@ -127,7 +127,51 @@ router.delete("/:idEmploye", async (req, res) => {
     }
     catch (error) {
         console.error("Erreur dans /deleteEmployé", error)
-        res.status(500).json({ error: "Erreur serveur", details: error})
+        res.status(500).json({ error: "Erreur serveur", details: error })
+    }
+})
+
+// Route pour modifier les infos de base d'un employé
+// peut etre callé par un superviseur ou admin
+// modifie nom, prenom, courriel, téléphone, adresse, code postal
+router.put("/:idEmploye", async (req, res) => {
+    try {
+        const { idEmploye } = req.params
+        const { nom, prenom, courriel, telephone, adresse, codePostal } = req.body
+        const validation = validerChamps({ nom, prenom, courriel, telephone, adresse, codePostal })
+        if (validation.error) {
+            return res.status(400).json({ message: validation.error })
+        }
+        const verifierEmp = await db("employes").where("idEmploye", idEmploye).update({
+            nomEmploye: nom,
+            prenomEmploye: prenom,
+            courrielEmploye: courriel,
+            telephoneEmploye: telephone,
+            adresseEmploye: adresse,
+            codePostalEmploye: codePostal
+        })
+        if (verifierEmp == 0) {
+            return res.status(404).json({ error: "Employé non trouvé dans la bd" })
+        }
+        res.status(200).json({ message: "Infos de l'employé(e) mis à jour avec succès", idEmploye })
+    }
+    catch (error) {
+        console.error("Erreur dans /updateEmployé", error)
+        res.status(500).json({ error: "Erreur serveur" })
+    }
+})
+
+// Route pour modifier infos critiques d'un employé (mdp, statut, role)
+// seulement utilisable par un admin
+router.put("/adminEdit/:idEmploye", async (req, res) => {
+    try {
+        const { idEmploye } = req.params
+        const { role, statut, mdp } = req.body
+
+    }
+    catch (error) {
+        console.error("Erreur dans /adminEdit/updateEmployé", error)
+        res.status(500).json({ error: "Erreur serveur" })
     }
 })
 
