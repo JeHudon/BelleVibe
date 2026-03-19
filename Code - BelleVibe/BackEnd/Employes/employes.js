@@ -41,7 +41,7 @@ router.get("/employes", async (req, res) => {
 })
 
 // ajouter un nouvel employé
-router.post("/addEmploye", async (req, res) => {
+router.post("/addEmploye", authentifier, async (req, res) => {
     try {
         const { role, nom, prenom, courriel, telephone, adresse, codePostal, mdp } = req.body
         const validation = validerChamps({ role, nom, prenom, courriel, telephone, adresse, codePostal, mdp })
@@ -68,6 +68,8 @@ router.post("/addEmploye", async (req, res) => {
             motDePasse: password
         }
         await db("employes").insert(data)
+        const id = await db("employes").where({ nomEmploye: nom, prenomEmploye: prenom }).select("idEmploye")
+        await log(req.user.id, "WRITE", "EMPLOYES", Number(id))
     }
     catch (error) {
         console.error("Erreur dans /addEmploye", error)
@@ -111,7 +113,7 @@ router.post("/login", async (req, res) => {
 })
 
 // Route pour delete des employés
-router.delete("/:idEmploye", async (req, res) => {
+router.delete("/:idEmploye", authentifier, async (req, res) => {
     try {
         const { idEmploye } = req.params
         // vérification que l'employé existe avant la suppression
@@ -124,6 +126,7 @@ router.delete("/:idEmploye", async (req, res) => {
             message: "Employé supprimé avec succès",
             idEmploye
         })
+        await log(req.user.id, "DELETE", "EMPLOYES", Number(idEmploye))
     }
     catch (error) {
         console.error("Erreur dans /deleteEmployé", error)
@@ -154,6 +157,7 @@ router.put("/:idEmploye", async (req, res) => {
             return res.status(404).json({ error: "Employé non trouvé dans la bd" })
         }
         res.status(200).json({ message: "Infos de l'employé(e) mis à jour avec succès", idEmploye })
+        await log(req.user.id, "EDIT", "EMPLOYES", Number(idEmploye))
     }
     catch (error) {
         console.error("Erreur dans /updateEmployé", error)
@@ -163,11 +167,24 @@ router.put("/:idEmploye", async (req, res) => {
 
 // Route pour modifier infos critiques d'un employé (mdp, statut, role)
 // seulement utilisable par un admin
-router.put("/adminEdit/:idEmploye", async (req, res) => {
+router.put("/adminEdit/:idEmploye", authentifier, async (req, res) => {
     try {
         const { idEmploye } = req.params
         const { role, statut, mdp } = req.body
-
+        const validation = validerChamps({ role, statut, mdp })
+        if (validation.error) {
+            return res.status(400).json({ message: validation.error })
+        }
+        const verifierEmp = await db("employes").where("idEmploye", idEmploye).update({
+            roleEmploye: role,
+            statutEmploye: statut,
+            motDePasse: mdp
+        })
+        if (verifierEmp == 0) {
+            return res.status(404).json({ error: "Employé non trouvé dans la bd" })
+        }
+        res.status(200).json({ message: "Infos de l'employé(e) mis à jour avec succès", idEmploye })
+        await log(req.user.id, "EDIT", "EMPLOYES", Number(idEmploye))
     }
     catch (error) {
         console.error("Erreur dans /adminEdit/updateEmployé", error)
