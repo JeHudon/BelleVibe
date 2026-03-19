@@ -20,6 +20,7 @@ function validerChamps(champs) {
 // vérifier ensuite que l'utilisateur a les permissions de faire l'action demandée
 // exemple d'utilisation:
 // app.get('/taRoute', authentifier, (req, res) => {stuff})
+// pour récupérer l'id ou le role => req.user.id / req.user.role
 const authentifier = (req, res, next) => {
     // récupère le header 'authorization'
     const authHeader = req.headers['authorization']
@@ -42,13 +43,11 @@ const authentifier = (req, res, next) => {
 }
 
 // fonction pour logger tous changements
-// idDossier représente le dossier du client qui à été modifié
 // action = EDIT | WRITE | DELETE
 // table = nom de la table où l'info à été modifiée
 // idTransaction = id de la ligne dans la table modifiée
-async function log(idDossier, idEmploye, action, table, idTransaction){
+async function log(idEmploye, action, table, idTransaction){
     const data = {
-        idDossier: idDossier,
         idEmploye: idEmploye,
         actionEntree: action,
         table: table,
