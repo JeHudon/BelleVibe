@@ -17,6 +17,31 @@ router.get("/getDossiers", async (req, res) => {
     }
 });
 
+// Get dossier spécifique
+router.get("/getDossier/:idDossier", async (req, res) => {
+    try {
+        const { idDossier } = req.params;
+
+        const validationResult = validerChamps({ idDossier });
+        if (validationResult.error) {
+            return res.status(400).json({ error: validationResult.error });
+        }
+
+        const dossier = await db("dossiers")
+            .where("idDossier", idDossier)
+            .first();
+
+        if (!dossier) {
+            return res.status(404).json({ error: "Dossier non trouvé." });
+        }
+
+        res.status(200).json(dossier);
+    } catch (error) {
+        console.error("Erreur /getDossier/:idDossier", error);
+        res.status(500).json({ error: "Erreur serveur." });
+    }
+});
+
 // Get dossiers en attente (pour dashboard)
 router.get("/getDossiersEnAttente", async (req, res) => {
     try {
