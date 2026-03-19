@@ -1,4 +1,4 @@
-const { validerChamps, authentifier, log } = require("../fonctionsCommunes");
+const { validerChamps, authentifier, authentifierSupp, authentifierAdmin, log } = require("../fonctionsCommunes");
 const { db } = require("../BD/creationBd");
 const express = require("express");
 const router = express.Router();
@@ -29,7 +29,7 @@ dans le but de faire des tests et démonstrations
 // Routes pour la table des employés
 
 // get tous les employés
-router.get("/employes", async (req, res) => {
+router.get("/employes", authentifierSupp, async (req, res) => {
     try {
         const reponse = await db("employes").select("*")
         res.status(200).json(reponse)
@@ -41,7 +41,7 @@ router.get("/employes", async (req, res) => {
 })
 
 // ajouter un nouvel employé
-router.post("/addEmploye", authentifier, async (req, res) => {
+router.post("/addEmploye", authentifierSupp, async (req, res) => {
     try {
         const { role, nom, prenom, courriel, telephone, adresse, codePostal, mdp } = req.body
         const validation = validerChamps({ role, nom, prenom, courriel, telephone, adresse, codePostal, mdp })
@@ -113,7 +113,7 @@ router.post("/login", async (req, res) => {
 })
 
 // Route pour delete des employés
-router.delete("/:idEmploye", authentifier, async (req, res) => {
+router.delete("/:idEmploye", authentifierAdmin, async (req, res) => {
     try {
         const { idEmploye } = req.params
         // vérification que l'employé existe avant la suppression
@@ -137,7 +137,7 @@ router.delete("/:idEmploye", authentifier, async (req, res) => {
 // Route pour modifier les infos de base d'un employé
 // peut etre callé par un superviseur ou admin
 // modifie nom, prenom, courriel, téléphone, adresse, code postal
-router.put("/:idEmploye", async (req, res) => {
+router.put("/:idEmploye", authentifierSupp, async (req, res) => {
     try {
         const { idEmploye } = req.params
         const { nom, prenom, courriel, telephone, adresse, codePostal } = req.body
@@ -167,7 +167,7 @@ router.put("/:idEmploye", async (req, res) => {
 
 // Route pour modifier infos critiques d'un employé (mdp, statut, role)
 // seulement utilisable par un admin
-router.put("/adminEdit/:idEmploye", authentifier, async (req, res) => {
+router.put("/adminEdit/:idEmploye", authentifierAdmin, async (req, res) => {
     try {
         const { idEmploye } = req.params
         const { role, statut, mdp } = req.body
