@@ -45,13 +45,13 @@ const authentifier = (req, res, next) => {
 // fonction pour logger tous changements
 // action = EDIT | WRITE | DELETE
 // table = nom de la table où l'info à été modifiée
-// idTransaction = id de la ligne dans la table modifiée
-async function log(idEmploye, action, table, idTransaction){
+// PK = primary key de la table / id de la ligne dans la table modifiée
+async function log(idEmploye, action, table, PK){
     const data = {
         idEmploye: idEmploye,
         actionEntree: action,
         table: table,
-        idTransaction: idTransaction
+        idTransaction: PK
     }
     await db("historiqueDossiers").insert(data)
 }
