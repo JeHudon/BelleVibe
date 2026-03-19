@@ -42,11 +42,57 @@ const authentifier = (req, res, next) => {
     }
 }
 
+// fonction pour authentifier les superviseurs ou les admins pour certaines routes nécéssitant plus de sécurité
+const authentifierSupp = (req, res, next) => {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if (!token) {
+        return res.status(401).json({ message: "Accès refusé. Token manquant." })
+    }
+    try {
+        const userDecoded = jwt.verify(token, jwt_mdp)
+        req.user = userDecoded
+        // si superviseur ou admin, refuse les employés standards ("commis")
+        if (req.user.role == "superviseur" || req.user.role == "admin") {
+            next()
+        }
+        else {
+            return res.status(401).json({ message: "Accès refusé. Permissions manquantes." })
+        }
+    }
+    catch (error) {
+        return res.status(403).json({ message: "Token invalide ou expiré" })
+    }
+}
+
+// fonction pour authentifier les admins, pour routes nécéssitant le plus haut niveau de sécurité
+const authentifierAdmin = (req, res, next) => {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if (!token) {
+        return res.status(401).json({ message: "Accès refusé. Token manquant." })
+    }
+    try {
+        const userDecoded = jwt.verify(token, jwt_mdp)
+        req.user = userDecoded
+        // si admin, refuse les employés standards ("commis") ou superviseurs 
+        if (req.user.role == "admin") {
+            next()
+        }
+        else {
+            return res.status(401).json({ message: "Accès refusé. Permissions manquantes." })
+        }
+    }
+    catch (error) {
+        return res.status(403).json({ message: "Token invalide ou expiré" })
+    }
+}
+
 // fonction pour logger tous changements
 // action = EDIT | WRITE | DELETE
 // table = nom de la table où l'info à été modifiée
 // PK = primary key de la table / id de la ligne dans la table modifiée
-async function log(idEmploye, action, table, PK){
+async function log(idEmploye, action, table, PK) {
     const data = {
         idEmploye: idEmploye,
         actionEntree: action,
@@ -58,4 +104,4 @@ async function log(idEmploye, action, table, PK){
 
 
 
-module.exports = { validerChamps, authentifier, log };
+module.exports = { validerChamps, authentifier, authentifierSupp, authentifierAdmin, log };
