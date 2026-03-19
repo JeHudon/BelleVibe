@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken')
 // clée ajoutée dans la logique de création des tokens 
 const jwt_mdp = "MECHANTE_belle_Vibe_2026"
+const { db } = require("./BD/creationBd.js")
+const express = require("express");
 
 // Fonction de validation générique pour les champs d'une note
 // Exemple d'utilisation : 

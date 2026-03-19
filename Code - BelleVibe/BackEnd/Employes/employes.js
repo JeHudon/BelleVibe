@@ -87,7 +87,7 @@ router.post("/login", async (req, res) => {
     try {
         // récupère l'employé avec le meme courriel, récupère tjrs le 1er
         const [utilisateurs] = await db("employes").select("*").where("courrielEmploye", email)
-        const employe = utilisateurs[0]
+        const employe = utilisateurs
         // compare le mdp à la valeur hashé dans la table
         const pwValidation = await bcrypt.compare(mdp, employe.motDePasse)
         if (!pwValidation) {

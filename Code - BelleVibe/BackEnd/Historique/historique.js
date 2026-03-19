@@ -1,4 +1,4 @@
-const { validerChamps, authentifier, authentifierSupp } = require("../fonctionsCommunes");
+const { authentifier, authentifierSupp } = require("../fonctionsCommunes");
 const { db } = require("../BD/creationBd");
 const express = require("express");
 const router = express.Router();

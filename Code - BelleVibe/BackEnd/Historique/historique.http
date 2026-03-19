@@ -1,0 +1,3 @@
+curl -X GET http://localhost:3000/historique/historique
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Niwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzczOTQ3NTQzLCJleHAiOjE3NzM5NTQ3NDN9.S-Moq1QTw0Ps8IpWU6Pk_-5z0FFJyKM3R4NoQ9JlItI"
+
