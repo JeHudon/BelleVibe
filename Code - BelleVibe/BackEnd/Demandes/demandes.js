@@ -1,4 +1,4 @@
-const { validerChamps } = require("../fonctionsCommunes");
+const { validerChamps, authentifier, log } = require("../fonctionsCommunes");
 const { db } = require("../BD/creationBd");
 
 const express = require("express");
@@ -87,6 +87,8 @@ router.post("/creerDemande/:idDossier", async (req, res) => {
 
         // On l'ajoute à la base de données et on le retourne
         await db("demandes").insert(demande)
+        const id = await db("demandes").where({idDossier : idDossier, typeDemande : typeDemande, statutDemande : statutDemande, noteInterne : noteInterne}).select("idDemande")
+        await log(req.user.id, "WRITE", "DEMANDES", Number(id))
         return res.status(201).json(demande)
 
     } catch (error) {
