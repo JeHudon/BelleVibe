@@ -75,7 +75,6 @@ async function createTables() {
     if (!historiqueDossiers) {
         await db.schema.createTable("historiqueDossiers", (table) => {
             table.increments("idHistorique");
-            table.integer("idDossier").references("idDossier").inTable("dossiers");
             table.integer("idEmploye").references("idEmploye").inTable("employes");
             table.string("actionEntree").notNullable();
             table.string("table").notNullable();
