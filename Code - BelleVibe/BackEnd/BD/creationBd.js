@@ -77,7 +77,11 @@ async function createTables() {
             table.increments("idHistorique");
             table.integer("idDossier").references("idDossier").inTable("dossiers");
             table.integer("idEmploye").references("idEmploye").inTable("employes");
-            table.string("actionEntree").notNullable();            
+            table.string("actionEntree").notNullable();
+            table.string("table").notNullable();
+            // store l'id de la transaction dans sa table
+            // pas mis en foreign key pour permettre les deletes
+            table.integer("idTransaction").notNullable();            
             table.timestamps(true, true);
         });
         console.log("Table 'historiqueDossiers' créée. ")
@@ -170,6 +174,7 @@ async function createTables() {
     }
 
 }
+
 
 /* Exporte l'instance db et la fonction createTables */
 module.exports = {
