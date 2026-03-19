@@ -41,7 +41,8 @@ router.post("/:idDossier", authentifier, async (req, res) => {
         };
 
         await db("notes").insert(data);
-
+        const id = await db("notes").where({idDossier: idDossier, idEmploye: idEmploye, typeNote: type, titreNote: titre, note: note}).select("idNote")
+        await log(req.user.id, "WRITE", "NOTES", Number(id))
         return res.status(201).json(data);
     } catch (err) {
         console.error("Erreur /addNote/:idDossier", err);
@@ -73,6 +74,7 @@ router.put("/:idNote", authentifier, async (req, res) => {
             message: `Note mise à jour avec succès.`,
             idNote,
         });
+        await log(req.user.id, "EDIT", "NOTES", Number(idNote))
     } catch (err) {
         console.error("Erreur /updateNote", err);
         res.status(500).json({ error: "Erreur serveur", details: err.message });
@@ -94,6 +96,7 @@ router.delete("/:idNote", authentifier, async (req, res) => {
             message: `Note supprimée avec succès.`,
             idNote,
         });
+        await log(req.user.id, "DELETE", "NOTES", Number(idNote))
     } catch (err) {
         console.error("Erreur /deleteNote", err);
         res.status(500).json({ error: "Erreur serveur", details: err.message });
