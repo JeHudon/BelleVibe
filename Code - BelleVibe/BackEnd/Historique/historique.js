@@ -1,10 +1,10 @@
-const { validerChamps, authentifier } = require("../fonctionsCommunes");
+const { validerChamps, authentifier, authentifierSupp } = require("../fonctionsCommunes");
 const { db } = require("../BD/creationBd");
 const express = require("express");
 const router = express.Router();
 
 // route pour obtenir tous l'historique, utilisable seulement par superviseur ++
-router.get("/allHistorique", authentifier, async (req, res) => {
+router.get("/allHistorique", authentifierSupp, async (req, res) => {
     try {
         const reponse = await db("historiqueDossiers").select("*")
         res.status(200).json(reponse)
