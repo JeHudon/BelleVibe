@@ -1,4 +1,4 @@
-const { validerChamps } = require("../fonctionsCommunes");
+const { validerChamps, authentifier, log } = require("../fonctionsCommunes");
 const { db } = require("../BD/creationBd");
 
 const express = require("express");
@@ -89,7 +89,8 @@ router.post("/creerDossier", async (req, res) => {
         };
 
         await db("dossiers").insert(dossier);
-
+        const id = await db("dossiers").where({ idClient: idClient, idEmploye: idEmploye, typeDossier: typeDossier, statutDossier: statutDossier, soldeDossier: soldeDossier}).select("idDossier")
+        await log(req.user.id, "WRITE", "DOSSIERS", Number(id))
         return res.status(201).json(dossier);
     } catch (error) {
         console.error("Erreur /creerDossier", error);
@@ -117,6 +118,7 @@ router.put("/modifierStatut/:idDossier", async (req, res) => {
         }
 
         res.status(200).json({ message: "Statut du dossier modifié avec succès.", idDossier });
+        await log(req.user.id, "EDIT", "DOSSIERS", Number(idDossier))
     } catch (error) {
         console.error("Erreur /modifierStatut/:idDossier", error);
         res.status(500).json({ error: "Erreur serveur.." });
@@ -134,6 +136,7 @@ router.delete("/:idDossier", async (req, res) => {
         }
 
         res.status(200).json({ message: "Dossier supprimé avec succès.", idDossier });
+        await log(req.user.id, "DELETE", "DOSSIERS", Number(idDossier))
     } catch (error) {
         console.error("Erreur /deleteDossier", error);
         res.status(500).json({ error: "Erreur serveur.." });
