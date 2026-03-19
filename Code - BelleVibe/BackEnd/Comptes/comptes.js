@@ -42,19 +42,17 @@ router.get("/getDossier/:idDossier", async (req, res) => {
     }
 });
 
-// Get dossiers en attente (pour dashboard)
-router.get("/getDossiersEnAttente", async (req, res) => {
+// get les dossiers en attente
+router.get('/dossiersAttente', async (req, res) => {
     try {
-        const dossiersEnAttente = await db("dossiers")
-            .select("*")
-            .whereRaw("lower(statutDossier) = ?", ["en attente"]);
-        res.status(200).json(dossiersEnAttente);
-    } catch (error) {
-        console.error("Erreur /getDossiersEnAttente", error);
-        res.status(500).json({ error: "Erreur serveur.." });
+        const reponse = await db("dossiers").select("*").where("en attente")
+        res.status(200).json(reponse)
     }
-});
-
+    catch (error) {
+        console.error("Erreur dans /dossiersAttente")
+        res.status(500).json({ error: "Erreur serveur" })
+    }
+})
 // Créer un dossier associé à un employé
 router.post("/creerDossier", async (req, res) => {
     try {
