@@ -41,7 +41,22 @@ const authentifier = (req, res, next) => {
     }
 }
 
+// fonction pour logger tous changements
+// idDossier représente le dossier du client qui à été modifié
+// action = EDIT | WRITE | DELETE
+// table = nom de la table où l'info à été modifiée
+// idTransaction = id de la ligne dans la table modifiée
+async function log(idDossier, idEmploye, action, table, idTransaction){
+    const data = {
+        idDossier: idDossier,
+        idEmploye: idEmploye,
+        actionEntree: action,
+        table: table,
+        idTransaction: idTransaction
+    }
+    await db("historiqueDossiers").insert(data)
+}
 
 
 
-module.exports = { validerChamps, authentifier };
+module.exports = { validerChamps, authentifier, log };
