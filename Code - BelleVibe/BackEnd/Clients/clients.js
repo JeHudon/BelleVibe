@@ -8,7 +8,7 @@ const router = express.Router();
 // --- Routes pour la table clients ---
 
 // Get tous les clients
-router.get("/getClients", async (req, res) => {
+router.get("/getClients", authentifier, async (req, res) => {
     try {
         const clients = await db("clients").select("*");
         res.status(200).json(clients);
@@ -19,7 +19,7 @@ router.get("/getClients", async (req, res) => {
 });
 
 // Get client specifique
-router.get("/getClient/:idClient", async (req, res) => {
+router.get("/getClient/:idClient", authentifier, async (req, res) => {
     try {
         const { idClient } = req.params;
         const client = await db("clients").select("*").where("idClient", idClient).first();
@@ -79,5 +79,42 @@ router.delete("/supprimerClient/:idClient", async (req, res) => {
         res.status(500).json({ error: "Erreur serveur.." });
     }
 });
+
+//  Mettre à jour un client
+
+router.put("/modifierClient/:idClient", async (req, res) => {
+    try {
+        const { idClient } = req.params;
+        const { nomClient, prenomClient, courrielClient, telephoneClient, adresseClient, codePostalClient } = req.body;
+
+        const validationResult = validerChamps({ nomClient, prenomClient, courrielClient, adresseClient, codePostalClient });
+        if (validationResult.error) {
+            return res.status(400).json({ error: validationResult.error });
+        }
+    
+
+        const client = await db("clients").where("idClient", idClient).first();
+        if (!client) {
+            return res.status(404).json({ error: "Client non trouvé." });
+        }
+
+        await db("clients").where("idClient", idClient).update({
+            nomClient,
+            prenomClient,
+            courrielClient,
+            telephoneClient,
+            adresseClient,
+            codePostalClient
+        });
+        res.status(200).json({ message: "Client modifié avec succès." });
+        await log(req.user.id, "EDIT", "CLIENTS", Number(idClient))
+    }
+        catch (error) {
+        console.error("Erreur /modifierClient/:idClient", error);
+        res.status(500).json({ error: "Erreur serveur.." });
+    } 
+});
+
+
 
 module.exports = router;

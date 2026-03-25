@@ -1,4 +1,4 @@
-const { validerChamps, authentifier, log } = require("../fonctionsCommunes");
+const { validerChamps, authentifier, authentifierSupp, log } = require("../fonctionsCommunes");
 const { db } = require("../BD/creationBd");
 
 const express = require("express");
@@ -7,7 +7,7 @@ const router = express.Router();
 // --- Routes pour la table dossiers ---
 
 // Get tous les dossiers
-router.get("/getDossiers", async (req, res) => {
+router.get("/getDossiers", authentifier, async (req, res) => {
     try {
         const dossiers = await db("dossiers").select("*");
         res.status(200).json(dossiers);
@@ -18,7 +18,7 @@ router.get("/getDossiers", async (req, res) => {
 });
 
 // Get dossier spécifique
-router.get("/getDossier/:idDossier", async (req, res) => {
+router.get("/getDossier/:idDossier", authentifier, async (req, res) => {
     try {
         const { idDossier } = req.params;
 
@@ -43,7 +43,7 @@ router.get("/getDossier/:idDossier", async (req, res) => {
 });
 
 // get les dossiers en attente
-router.get('/dossiersAttente', async (req, res) => {
+router.get('/dossiersAttente', authentifier, async (req, res) => {
     try {
         const reponse = await db("dossiers").select("*").where("en attente")
         res.status(200).json(reponse)
@@ -54,7 +54,7 @@ router.get('/dossiersAttente', async (req, res) => {
     }
 })
 // Créer un dossier associé à un employé
-router.post("/creerDossier", async (req, res) => {
+router.post("/creerDossier",authentifier, async (req, res) => {
     try {
         const { idClient, idEmploye, typeDossier, statutDossier, soldeDossier } = req.body;
 
@@ -99,7 +99,7 @@ router.post("/creerDossier", async (req, res) => {
 });
 
 // Modifier le statut d'un dossier
-router.put("/modifierStatut/:idDossier", async (req, res) => {
+router.put("/modifierStatut/:idDossier",authentifier, async (req, res) => {
     try {
         const { idDossier } = req.params;
         const { statutDossier } = req.body;
@@ -126,7 +126,7 @@ router.put("/modifierStatut/:idDossier", async (req, res) => {
 });
 
 // Supprimer un dossier
-router.delete("/:idDossier", async (req, res) => {
+router.delete("/:idDossier", authentifierSupp, async (req, res) => {
     try {
         const { idDossier } = req.params;
 
@@ -142,6 +142,7 @@ router.delete("/:idDossier", async (req, res) => {
         res.status(500).json({ error: "Erreur serveur.." });
     }
 });
+
 
 module.exports = router;
 
