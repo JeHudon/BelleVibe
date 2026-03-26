@@ -13,7 +13,7 @@ const jwt_mdp = "MECHANTE_belle_Vibe_2026"
 3 types d'employés pour faire les tests (log in creds):
 normal:
     email: employe@bellevibe.com
-    password: 123456789
+    password: 123456
 superviseur:
     email: superviseur@bellevibe.com
     password: 123456789

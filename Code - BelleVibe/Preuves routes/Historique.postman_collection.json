@@ -1,0 +1,95 @@
+{
+  "info": {
+    "_postman_id": "946a0c3b-56b4-4ce3-87da-302f4e31bc57",
+    "name": "Historique",
+    "description": "Démonstration des routes pour la table historique.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53455980",
+    "_collection_link": "https://go.postman.co/collection/53455980-946a0c3b-56b4-4ce3-87da-302f4e31bc57?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"admin@bellevibe.com\",\n    \"mdp\": \"123456789\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/employes/login",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "employes",
+            "login"
+          ]
+        },
+        "description": "pour login"
+      },
+      "response": []
+    },
+    {
+      "name": "/allHistorique",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/historique/allHistorique",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "historique",
+            "allHistorique"
+          ]
+        },
+        "description": "Obtenir l'historique complet, démontrant toutes les actions effectuées sur le projet par tous les employés.\n\nRequiert un token admin ou superviseur."
+      },
+      "response": []
+    },
+    {
+      "name": "/historique",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/historique/historique",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "historique",
+            "historique"
+          ]
+        },
+        "description": "Obtenir l'historique pour l'employé logged in.\n\nUtilisable par tous les employés"
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Niwicm9sZSI6ImFkbWluIiwic3RhdHV0IjoiYWN0aWYiLCJpYXQiOjE3NzQ1NjIxMzYsImV4cCI6MTc3NDU2OTMzNn0.7hlQeYDgw8-_lIvegvSumj6d1q955luASlKyXMef60M",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "info": {
+    "_postman_id": "48aa9409-b520-484e-88fa-557534b55c65",
+    "name": "Cas d'erreurs",
+    "description": "Démonstrations de cas d'erreurs voulus dûs aux restrictions de permissions des routes et de niveaux d'authentifications.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53455980",
+    "_collection_link": "https://go.postman.co/collection/53455980-48aa9409-b520-484e-88fa-557534b55c65?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"superviseur@bellevibe.com\",\n    \"mdp\": \"123456789\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/login",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "login"
+          ]
+        },
+        "description": "pour login"
+      },
+      "response": []
+    },
+    {
+      "name": "permissions non recontrées (sup+)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{tokenEmploye}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/employes",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "employes"
+          ]
+        },
+        "description": "La route appèle la fonction d'authentification _authentifierSupp_. Si l'on essaye d'appeller la route à l'aide d'un token d'employé on reçoit un message d'erreur pour manque de permissions comme voulu."
+      },
+      "response": []
+    },
+    {
+      "name": "permissions non rencontrées (admin)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{tokenSuperviseur}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/8",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "8"
+          ]
+        },
+        "description": "La route appèle la fonction d'authentification _authentifierAdmin_. Si l'on essaye d'appeller cette route sans avoir un token d'admin (superviseur ou encore employé), on reçoit un message d'erreur pour manque de permissions comme voulu."
+      },
+      "response": []
+    },
+    {
+      "name": "compte inactif",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{tokenInactif}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/employes",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "employes"
+          ]
+        },
+        "description": "Dans le token, le statut de l'employé est ajouté. On peut donc vérifier dans chaque route si l'employé est actif ou non, dans le cas où l'employé est statué comme étant inactif, suspendu, ou autres, toutes les routes lui sont bloqués."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000/employes",
+      "type": "string"
+    },
+    {
+      "key": "tokenInactif",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywicm9sZSI6ImFkbWluIiwic3RhdHV0IjoiaW5hY3RpZiIsImlhdCI6MTc3NDU2MzI0NywiZXhwIjoxNzc0NTcwNDQ3fQ.mNKjL-BR3EVXSEQLduIa1N3sWw6mj9IN5qIbItT4PMU",
+      "type": "string"
+    },
+    {
+      "key": "tokenEmploye",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImNvbW1pcyIsInN0YXR1dCI6ImFjdGlmIiwiaWF0IjoxNzc0NTYzMzA0LCJleHAiOjE3NzQ1NzA1MDR9.XMKyhse3URXL6PhP7TlwhZk4BnFYGUZN_Lpz5VdGnwM",
+      "type": "string"
+    },
+    {
+      "key": "tokenSuperviseur",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwicm9sZSI6InN1cGVydmlzZXVyIiwic3RhdHV0IjoiYWN0aWYiLCJpYXQiOjE3NzQ1NjMzNDQsImV4cCI6MTc3NDU3MDU0NH0.IyusGWLX6fXIkBeH2TFc370HrFfFH5fF5dN-MDMS1ik",
+      "type": "string"
+    }
+  ]
+}
