@@ -96,7 +96,8 @@ router.post("/login", async (req, res) => {
         // infos a mettre dans le token
         const payload = {
             id: employe.idEmploye,
-            role: employe.roleEmploye
+            role: employe.roleEmploye,
+            statut: employe.statutEmploye
         }
         // création du token, peut modifier/enlever l'expiration si on veut
         const token = jwt.sign(payload, jwt_mdp, { expiresIn: '2h' })
@@ -175,10 +176,14 @@ router.put("/adminEdit/:idEmploye", authentifierAdmin, async (req, res) => {
         if (validation.error) {
             return res.status(400).json({ message: validation.error })
         }
+        // pour re hasher le mdp
+        const salt = await bcrypt.genSalt(10)
+        const password = await bcrypt.hash(mdp, salt)
+
         const verifierEmp = await db("employes").where("idEmploye", idEmploye).update({
             roleEmploye: role,
             statutEmploye: statut,
-            motDePasse: mdp
+            motDePasse: password
         })
         if (verifierEmp == 0) {
             return res.status(404).json({ error: "Employé non trouvé dans la bd" })
