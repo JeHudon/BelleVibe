@@ -42,7 +42,7 @@ router.post("/:idDossier", authentifier, async (req, res) => {
 
         await db("notes").insert(data);
         const id = await db("notes").where({idDossier: idDossier, idEmploye: idEmploye, typeNote: type, titreNote: titre, note: note}).select("idNote")
-        await log(req.user.id, "WRITE", "NOTES", Number(id))
+        await log(req.user.id, "WRITE", "NOTES", Number(id[0].idNote))
         return res.status(201).json(data);
     } catch (err) {
         console.error("Erreur /addNote/:idDossier", err);

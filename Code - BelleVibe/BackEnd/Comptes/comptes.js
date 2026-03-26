@@ -90,7 +90,7 @@ router.post("/creerDossier",authentifier, async (req, res) => {
 
         await db("dossiers").insert(dossier);
         const id = await db("dossiers").where({ idClient: idClient, idEmploye: idEmploye, typeDossier: typeDossier, statutDossier: statutDossier, soldeDossier: soldeDossier}).select("idDossier")
-        await log(req.user.id, "WRITE", "DOSSIERS", Number(id))
+        await log(req.user.id, "WRITE", "DOSSIERS", Number(id[0].idDossier))
         return res.status(201).json(dossier);
     } catch (error) {
         console.error("Erreur /creerDossier", error);

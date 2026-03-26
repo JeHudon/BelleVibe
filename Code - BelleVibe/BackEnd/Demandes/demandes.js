@@ -88,7 +88,7 @@ router.post("/creerDemande/:idDossier", async (req, res) => {
         // On l'ajoute à la base de données et on le retourne
         await db("demandes").insert(demande)
         const id = await db("demandes").where({idDossier : idDossier, typeDemande : typeDemande, statutDemande : statutDemande, noteInterne : noteInterne}).select("idDemande")
-        await log(req.user.id, "WRITE", "DEMANDES", Number(id))
+        await log(req.user.id, "WRITE", "DEMANDES", Number(id[0].idDemande))
         return res.status(201).json(demande)
 
     } catch (error) {

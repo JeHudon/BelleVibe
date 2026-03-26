@@ -69,7 +69,8 @@ router.post("/addEmploye", authentifierSupp, async (req, res) => {
         }
         await db("employes").insert(data)
         const id = await db("employes").where({ nomEmploye: nom, prenomEmploye: prenom }).select("idEmploye")
-        await log(req.user.id, "WRITE", "EMPLOYES", Number(id))
+        await log(req.user.id, "WRITE", "EMPLOYES", Number(id[0].idEmploye))
+        return res.status(201).json(data)
     }
     catch (error) {
         console.error("Erreur dans /addEmploye", error)

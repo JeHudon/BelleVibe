@@ -54,7 +54,7 @@ router.post("/creerClient", async (req, res) => {
         });
         const id = await db("clients").where({ nomClient: nomClient, prenomClient: prenomClient, courrielClient: courrielClient,
              telephoneClient: telephoneClient, adresseClient: adresseClient, codePostalClient: codePostalClient }).select("idClient")
-        await log(req.user.id, "WRITE", "CLIENTS", Number(id))
+        await log(req.user.id, "WRITE", "CLIENTS", Number(id[0].idClient))
         res.status(201).json({ message: "Client créé avec succès.", idClient });
     } catch (error) {
         console.error("Erreur /creerClient", error);
