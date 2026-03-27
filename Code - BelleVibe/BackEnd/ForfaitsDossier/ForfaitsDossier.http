@@ -1,0 +1,7 @@
+curl -X POST http://localhost:3000/forfaitsDossier \
+-H "Content-Type: application/json" \
+-d '{"idDossier":1,"idForfait":2}'
+
+curl -X GET http://localhost:3000/forfaitsDossier/1
+
+curl -X DELETE http://localhost:3000/forfaitsDossier/1
