@@ -34,8 +34,10 @@ app.get("/", (req, res) => {
     res.send("Serveur fonctionne");
 });
 
+
 // Importation des routes
 app.use("/notes", require("./Notes/notes.js"));
+app.use("/documents", require("./Documents/documents.js"))
 app.use("/employes", require("./Employes/employes.js"))
 app.use("/historique", require("./Historique/historique.js"))
 app.use("/comptes", require("./Comptes/comptes.js"))
