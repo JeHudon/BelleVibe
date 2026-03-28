@@ -1,0 +1,384 @@
+{
+  "info": {
+    "_postman_id": "9e09f392-82e6-4add-adba-4a021d867674",
+    "name": "My Collection",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53497854",
+    "_collection_link": "https://go.postman.co/collection/53497854-9e09f392-82e6-4add-adba-4a021d867674?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Notes",
+      "item": [
+        {
+          "name": "getNotes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImNvbW1pcyIsInN0YXR1dCI6ImFjdGlmIiwiaWF0IjoxNzc0NzIwOTEwLCJleHAiOjE3NzQ3MjgxMTB9.giebV1OwHef2UDX29ncELMlmuTyOLmQHt7HA1Qnlhys",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/notes/:idDossier",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "notes",
+                ":idDossier"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idDossier",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "postNote",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImNvbW1pcyIsInN0YXR1dCI6ImFjdGlmIiwiaWF0IjoxNzc0NzIwOTEwLCJleHAiOjE3NzQ3MjgxMTB9.giebV1OwHef2UDX29ncELMlmuTyOLmQHt7HA1Qnlhys",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"idEmploye\": 1,\r\n    \"type\": \"Test\",\r\n    \"titre\": \"Test delete\",\r\n    \"note\": \"Exemple de note\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/notes/:idDossier",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "notes",
+                ":idDossier"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idDossier",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "putNotes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImNvbW1pcyIsInN0YXR1dCI6ImFjdGlmIiwiaWF0IjoxNzc0NzIwOTEwLCJleHAiOjE3NzQ3MjgxMTB9.giebV1OwHef2UDX29ncELMlmuTyOLmQHt7HA1Qnlhys",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"idDossier\": 1,\r\n    \"idEmploye\": 1,\r\n    \"type\": \"Test put\",\r\n    \"titre\": \"Test 1\",\r\n    \"note\": \"Changer la note avec put\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/notes/:idNote",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "notes",
+                ":idNote"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idNote",
+                  "value": "10",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteNote",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Niwicm9sZSI6ImFkbWluIiwic3RhdHV0IjoiYWN0aWYiLCJpYXQiOjE3NzQ3MjMzNzMsImV4cCI6MTc3NDczMDU3M30.GsrtQhLglF0xfG-IVkguP7wSL9p4ULqKhKKzw2XDF5c",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/notes/:idNote",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "notes",
+                ":idNote"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idNote",
+                  "value": "15",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "getDocuments",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImNvbW1pcyIsInN0YXR1dCI6ImFjdGlmIiwiaWF0IjoxNzc0NzI4OTE3LCJleHAiOjE3NzQ3MzYxMTd9.UWidxNftNYjP4aWmB0wvVwmkrsGw7DQHu1XjYyRIX58",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/documents/:idDossier",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "documents",
+                ":idDossier"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idDossier",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "postDocument",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImNvbW1pcyIsInN0YXR1dCI6ImFjdGlmIiwiaWF0IjoxNzc0NzI4OTE3LCJleHAiOjE3NzQ3MzYxMTd9.UWidxNftNYjP4aWmB0wvVwmkrsGw7DQHu1XjYyRIX58",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "fichier",
+                  "type": "file",
+                  "id": 0,
+                  "fileUploadError": "",
+                  "src": [
+                    "c:\\Users\\jerome\\Desktop\\Jérôme\\photo\\It Takes Two   2026-01-19 12_13_43 AM.png"
+                  ]
+                }
+              ],
+              "options": {
+                "formdata": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/documents/:idDossier/file",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "documents",
+                ":idDossier",
+                "file"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idDossier",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "putDocument",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImNvbW1pcyIsInN0YXR1dCI6ImFjdGlmIiwiaWF0IjoxNzc0NzI4OTE3LCJleHAiOjE3NzQ3MzYxMTd9.UWidxNftNYjP4aWmB0wvVwmkrsGw7DQHu1XjYyRIX58",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "fichier",
+                  "type": "file",
+                  "id": 0,
+                  "fileUploadError": "",
+                  "src": [
+                    "c:\\Users\\jerome\\Desktop\\Jérôme\\photo\\téléchargé (1).jpg"
+                  ]
+                },
+                {
+                  "key": "idDossier",
+                  "value": "1",
+                  "type": "text",
+                  "id": 1
+                }
+              ],
+              "options": {
+                "formdata": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/documents/:idDocument/file",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "documents",
+                ":idDocument",
+                "file"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idDocument",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteDocument",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImNvbW1pcyIsInN0YXR1dCI6ImFjdGlmIiwiaWF0IjoxNzc0NzMzMDY3LCJleHAiOjE3NzQ3NDAyNjd9.Soj5tYE5oyBwOvWVreVcZDcChYz_JSAo8bW6mEmuJYQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/documents/:idDocument",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "documents",
+                ":idDocument"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idDocument",
+                  "value": "4",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer"
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}
