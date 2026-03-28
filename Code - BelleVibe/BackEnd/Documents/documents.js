@@ -21,7 +21,6 @@ router.get("/:idDossier", authentifier, async (req, res) => {
     }
 });
 
-
 const storage = multer.diskStorage({
     // Destionation dynamique basée sur l'idDossier
     destination: async (req, file, cb) => {
@@ -71,7 +70,7 @@ router.post("/:idDossier/file", authentifier, upload.single("fichier"), async (r
         const [{ idDocument }] = await db("documents").insert(data).returning("idDocument");
 
         await log(req.user.id, "WRITE", "DOCUMENTS", idDocument);
-        return res.status(201).json({
+        res.status(201).json({
             message: `Document ajouté avec succès.`,
             idDocument: Number(idDocument),
         });
@@ -126,9 +125,10 @@ router.put("/:idDocument/file", authentifier, upload.single("fichier"), async (r
         }
 
         await log(req.user.id, "UPDATE", "DOCUMENTS", Number(idDocument));
-        return res
-            .status(200)
-            .json({ message: "Document mis à jour avec succès.", idDocument: Number(idDocument) });
+        res.status(200).json({
+            message: "Document mis à jour avec succès.",
+            idDocument: Number(idDocument),
+        });
     } catch (err) {
         console.error("Erreur PUT /:idDocument/file", err);
         res.status(500).json({ error: "Erreur serveur", err });
@@ -152,7 +152,7 @@ router.delete("/:idDocument", authentifierAdmin, async (req, res) => {
             return res.status(404).json({ error: "Document non trouvé" });
         }
 
-        // Supprimer le fichier du serveur seulement après avoir supprimé la ligne de la base de données 
+        // Supprimer le fichier du serveur seulement après avoir supprimé la ligne de la base de données
         if (existing?.cheminDocument) {
             fs.unlink(existing.cheminDocument, (err) => {
                 if (err) console.warn("Ancien fichier introuvable:", err.message);
@@ -160,7 +160,10 @@ router.delete("/:idDocument", authentifierAdmin, async (req, res) => {
         }
 
         await log(req.user.id, "DELETE", "DOCUMENTS", Number(idDocument));
-        return res.status(200).json({ message: "Document supprimé avec succès." });
+        res.status(200).json({
+            message: "Document supprimé avec succès.",
+            idDocument: Number(idDocument),
+        });
     } catch (err) {
         console.error("Erreur DELETE /:idDocument", err);
         res.status(500).json({ error: "Erreur serveur", err });

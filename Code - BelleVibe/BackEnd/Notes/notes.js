@@ -1,9 +1,8 @@
-const { validerChamps, authentifier } = require("../fonctionsCommunes");
+const { validerChamps, authentifier, authentifierAdmin, log } = require("../fonctionsCommunes.js");
 const { db } = require("../BD/creationBd");
 
 const express = require("express");
 const router = express.Router();
-
 
 // Routes pour la table Notes
 
@@ -22,7 +21,6 @@ router.get("/:idDossier", authentifier, async (req, res) => {
 // Ajouter une note à un dossier
 router.post("/:idDossier", authentifier, async (req, res) => {
     try {
-        console.log(req.body);
         const { idEmploye, type, titre, note } = req.body;
         const { idDossier } = req.params;
 
@@ -40,10 +38,9 @@ router.post("/:idDossier", authentifier, async (req, res) => {
             note: note,
         };
 
-        await db("notes").insert(data);
-        const id = await db("notes").where({idDossier: idDossier, idEmploye: idEmploye, typeNote: type, titreNote: titre, note: note}).select("idNote")
-        await log(req.user.id, "WRITE", "NOTES", Number(id[0].idNote))
-        return res.status(201).json(data);
+        const [{ idNote }] = await db("notes").insert(data).returning("idNote");
+        await log(req.user.id, "WRITE", "NOTES", Number(idNote));
+        res.status(201).json({ ...data, idNote: Number(idNote) });
     } catch (err) {
         console.error("Erreur /addNote/:idDossier", err);
         res.status(500).json({ error: "Erreur serveur", err });
@@ -70,11 +67,11 @@ router.put("/:idNote", authentifier, async (req, res) => {
             return res.status(404).json({ error: "Note non trouvée" });
         }
 
+        await log(req.user.id, "EDIT", "NOTES", Number(idNote));
         res.status(200).json({
             message: `Note mise à jour avec succès.`,
             idNote,
         });
-        await log(req.user.id, "EDIT", "NOTES", Number(idNote))
     } catch (err) {
         console.error("Erreur /updateNote", err);
         res.status(500).json({ error: "Erreur serveur", details: err.message });
@@ -82,7 +79,7 @@ router.put("/:idNote", authentifier, async (req, res) => {
 });
 
 // Supprimer une note d'un dossier
-router.delete("/:idNote", authentifier, async (req, res) => {
+router.delete("/:idNote", authentifierAdmin, async (req, res) => {
     try {
         const { idNote } = req.params;
 
@@ -92,11 +89,11 @@ router.delete("/:idNote", authentifier, async (req, res) => {
             return res.status(404).json({ error: "Note non trouvée" });
         }
 
+        await log(req.user.id, "DELETE", "NOTES", Number(idNote));
         res.status(200).json({
             message: `Note supprimée avec succès.`,
             idNote,
         });
-        await log(req.user.id, "DELETE", "NOTES", Number(idNote))
     } catch (err) {
         console.error("Erreur /deleteNote", err);
         res.status(500).json({ error: "Erreur serveur", details: err.message });
