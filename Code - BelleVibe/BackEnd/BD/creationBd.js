@@ -110,6 +110,7 @@ async function createTables() {
             table.integer("idDossier").references("idDossier").inTable("dossiers");
             table.string("typeDocument").notNullable();
             table.string("tailleDocument").notNullable();
+            table.string("nomDocument").notNullable();
             table.string("cheminDocument").notNullable();          
             table.timestamps(true, true);
         });
