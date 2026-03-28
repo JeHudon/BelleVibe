@@ -67,9 +67,9 @@ router.post("/:idDossier/file", authentifier, upload.single("fichier"), async (r
             cheminDocument: req.file.path,
         };
 
-        const [{ idDocument }] = await db("documents").insert(data).returning("idDocument");
+        const [idDocument] = await db("documents").insert(data);
 
-        await log(req.user.id, "WRITE", "DOCUMENTS", idDocument);
+        await log(req.user.id, "WRITE", "DOCUMENTS", Number(idDocument));
         res.status(201).json({
             message: `Document ajouté avec succès.`,
             idDocument: Number(idDocument),

@@ -38,7 +38,7 @@ router.post("/:idDossier", authentifier, async (req, res) => {
             note: note,
         };
 
-        const [{ idNote }] = await db("notes").insert(data).returning("idNote");
+        const [idNote] = await db("notes").insert(data);
         await log(req.user.id, "WRITE", "NOTES", Number(idNote));
         res.status(201).json({ ...data, idNote: Number(idNote) });
     } catch (err) {
