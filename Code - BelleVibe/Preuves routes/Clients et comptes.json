@@ -1,0 +1,279 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Clients & Dossiers",
+    "description": "Démonstration des routes pour les tables clients et dossiers.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53455980"
+  },
+  "item": [
+    {
+      "name": "Clients",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@bellevibe.com\",\n    \"mdp\": \"123456789\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/employes/login",
+              "host": ["{{url}}"],
+              "path": ["employes", "login"]
+            },
+            "description": "Pour se connecter et recevoir le token d'authentification."
+          },
+          "response": []
+        },
+        {
+          "name": "/getClients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/clients/getClients",
+              "host": ["{{url}}"],
+              "path": ["clients", "getClients"]
+            },
+            "description": "Obtenir la liste de tous les clients.\n\nRequiert un token valide (authentifier)."
+          },
+          "response": []
+        },
+        {
+          "name": "/getClient/:idClient",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/clients/getClient/1",
+              "host": ["{{url}}"],
+              "path": ["clients", "getClient", "1"]
+            },
+            "description": "Obtenir un client spécifique par son id.\n\nRequiert un token valide (authentifier)."
+          },
+          "response": []
+        },
+        {
+          "name": "/creerClient",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nomClient\": \"Tremblay\",\n    \"prenomClient\": \"Jean\",\n    \"courrielClient\": \"jean.tremblay@example.com\",\n    \"telephoneClient\": \"5141234567\",\n    \"adresseClient\": \"123 rue Principale\",\n    \"codePostalClient\": \"H1A 1A1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/clients/creerClient",
+              "host": ["{{url}}"],
+              "path": ["clients", "creerClient"]
+            },
+            "description": "Créer un nouveau client en saisissant ses informations.\n\nAucune authentification requise sur cette route."
+          },
+          "response": []
+        },
+        {
+          "name": "/modifierClient/:idClient",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nomClient\": \"Tremblay\",\n    \"prenomClient\": \"Jean\",\n    \"courrielClient\": \"jean.tremblay@example.com\",\n    \"telephoneClient\": \"5141234567\",\n    \"adresseClient\": \"456 avenue Nouvelle\",\n    \"codePostalClient\": \"H2B 2B2\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/clients/modifierClient/1",
+              "host": ["{{url}}"],
+              "path": ["clients", "modifierClient", "1"]
+            },
+            "description": "Modifier les informations d'un client existant.\n\nAucune authentification requise sur cette route."
+          },
+          "response": []
+        },
+        {
+          "name": "/supprimerClient/:idClient",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/clients/supprimerClient/1",
+              "host": ["{{url}}"],
+              "path": ["clients", "supprimerClient", "1"]
+            },
+            "description": "Supprimer un client à l'aide de son id.\n\nAucune authentification requise sur cette route."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dossiers",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@bellevibe.com\",\n    \"mdp\": \"123456789\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/employes/login",
+              "host": ["{{url}}"],
+              "path": ["employes", "login"]
+            },
+            "description": "Pour se connecter et recevoir le token d'authentification."
+          },
+          "response": []
+        },
+        {
+          "name": "/getDossiers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/dossiers/getDossiers",
+              "host": ["{{url}}"],
+              "path": ["dossiers", "getDossiers"]
+            },
+            "description": "Obtenir la liste de tous les dossiers.\n\nRequiert un token valide (authentifier)."
+          },
+          "response": []
+        },
+        {
+          "name": "/getDossier/:idDossier",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/dossiers/getDossier/1",
+              "host": ["{{url}}"],
+              "path": ["dossiers", "getDossier", "1"]
+            },
+            "description": "Obtenir un dossier spécifique par son id.\n\nRequiert un token valide (authentifier)."
+          },
+          "response": []
+        },
+        {
+          "name": "/dossiersAttente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/dossiers/dossiersAttente",
+              "host": ["{{url}}"],
+              "path": ["dossiers", "dossiersAttente"]
+            },
+            "description": "Obtenir tous les dossiers en attente.\n\nRequiert un token valide (authentifier)."
+          },
+          "response": []
+        },
+        {
+          "name": "/creerDossier",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"idClient\": 1,\n    \"idEmploye\": 5,\n    \"typeDossier\": \"Litige\",\n    \"statutDossier\": \"En cours\",\n    \"soldeDossier\": 1500.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/dossiers/creerDossier",
+              "host": ["{{url}}"],
+              "path": ["dossiers", "creerDossier"]
+            },
+            "description": "Créer un nouveau dossier associé à un client et un employé.\n\nRequiert un token valide (authentifier)."
+          },
+          "response": []
+        },
+        {
+          "name": "/modifierStatut/:idDossier",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"statutDossier\": \"Fermé\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/dossiers/modifierStatut/1",
+              "host": ["{{url}}"],
+              "path": ["dossiers", "modifierStatut", "1"]
+            },
+            "description": "Modifier le statut d'un dossier existant.\n\nRequiert un token valide (authentifier)."
+          },
+          "response": []
+        },
+        {
+          "name": "/:idDossier",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/dossiers/1",
+              "host": ["{{url}}"],
+              "path": ["dossiers", "1"]
+            },
+            "description": "Supprimer un dossier à l'aide de son id.\n\nUtilisable seulement par un superviseur (authentifierSupp)."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "TON_TOKEN_ICI",
+      "type": "string"
+    }
+  ]
+}
