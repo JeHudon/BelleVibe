@@ -1,4 +1,4 @@
-const { validerChamps, authentifier, log } = require("../fonctionsCommunes");
+const { validerChamps, authentifier, authentifierSupp, log } = require("../fonctionsCommunes");
 const { db } = require("../BD/creationBd");
 
 const express = require("express");
@@ -35,7 +35,7 @@ router.get("/getClient/:idClient", authentifier, async (req, res) => {
 
 // Créer un client
 
-router.post("/creerClient", async (req, res) => {
+router.post("/creerClient",authentifier, async (req, res) => {
     try {
         const { nomClient, prenomClient, courrielClient, telephoneClient, adresseClient, codePostalClient } = req.body;
 
@@ -61,7 +61,7 @@ router.post("/creerClient", async (req, res) => {
     }
 });
 
-router.delete("/supprimerClient/:idClient", async (req, res) => {
+router.delete("/supprimerClient/:idClient",authentifierSupp, async (req, res) => {
     try {
         const { idClient } = req.params;
 
@@ -81,7 +81,7 @@ router.delete("/supprimerClient/:idClient", async (req, res) => {
 
 //  Mettre à jour un client
 
-router.put("/modifierClient/:idClient", async (req, res) => {
+router.put("/modifierClient/:idClient",authentifier, async (req, res) => {
     try {
         const { idClient } = req.params;
         const { nomClient, prenomClient, courrielClient, telephoneClient, adresseClient, codePostalClient } = req.body;
