@@ -1,0 +1,1702 @@
+openapi: 3.0.3
+info:
+  title: BelleVibe API
+  description: >
+    API de gestion interne pour BelleVibe. Couvre la gestion des employés,
+    clients, dossiers, demandes, notes, documents, forfaits, services et
+    l'historique des actions.
+
+
+    ### Authentification
+
+    Toutes les routes (sauf `/employes/login`) requièrent un token JWT passé
+    dans le header `Authorization: Bearer <token>`.
+    Le token expire après **2 heures**.
+
+
+    ### Niveaux d'accès
+
+    | Middleware          | Rôles autorisés             |
+    |---------------------|-----------------------------|
+    | `authentifier`      | commis, superviseur, admin  |
+    | `authentifierSupp`  | superviseur, admin          |
+    | `authentifierAdmin` | admin seulement             |
+
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: Serveur local de développement
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    # ── Réponses génériques ──────────────────────────────────────────────────
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Opération effectuée avec succès.
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Erreur serveur..
+
+    # ── Auth ─────────────────────────────────────────────────────────────────
+    LoginRequest:
+      type: object
+      required: [email, mdp]
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@bellevibe.com
+        mdp:
+          type: string
+          example: "123456789"
+
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: connexion réussie & sécurisée
+        token:
+          type: string
+          description: JWT valide 2 heures
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    # ── Employé ──────────────────────────────────────────────────────────────
+    EmployeCreate:
+      type: object
+      required: [role, nom, prenom, courriel, telephone, adresse, codePostal, mdp]
+      properties:
+        role:
+          type: string
+          enum: [admin, superviseur, commis]
+          example: commis
+        nom:
+          type: string
+          example: Hanachian
+        prenom:
+          type: string
+          example: Alek
+        courriel:
+          type: string
+          format: email
+          example: alekh@bellevibe.com
+        telephone:
+          type: string
+          example: "9876543210"
+        adresse:
+          type: string
+          example: 1e avenue
+        codePostal:
+          type: string
+          example: A1B2C3
+        mdp:
+          type: string
+          description: Mot de passe en clair — sera haché (bcrypt) avant stockage.
+          example: "motdepasse123"
+
+    EmployeResponse:
+      type: object
+      properties:
+        idEmploye:
+          type: integer
+          example: 7
+        roleEmploye:
+          type: string
+          enum: [admin, superviseur, commis]
+        statutEmploye:
+          type: string
+          enum: [actif, inactif]
+        nomEmploye:
+          type: string
+        prenomEmploye:
+          type: string
+        courrielEmploye:
+          type: string
+          format: email
+        telephoneEmploye:
+          type: string
+        adresseEmploye:
+          type: string
+        codePostalEmploye:
+          type: string
+
+    EmployeUpdate:
+      type: object
+      required: [nom, prenom, courriel, telephone, adresse, codePostal]
+      properties:
+        nom:
+          type: string
+          example: Hanachian
+        prenom:
+          type: string
+          example: Alek
+        courriel:
+          type: string
+          format: email
+          example: alek.h@bellevibe.com
+        telephone:
+          type: string
+          example: "4501234567"
+        adresse:
+          type: string
+          example: 2e avenue
+        codePostal:
+          type: string
+          example: A1B2C3
+
+    EmployeAdminUpdate:
+      type: object
+      required: [role, statut, mdp]
+      description: Modification des données sensibles — admin seulement.
+      properties:
+        role:
+          type: string
+          enum: [admin, superviseur, commis]
+          example: commis
+        statut:
+          type: string
+          enum: [actif, inactif]
+          example: actif
+        mdp:
+          type: string
+          description: Nouveau mot de passe en clair — sera re-haché.
+          example: "nouveaumdp456"
+
+    # ── Client ───────────────────────────────────────────────────────────────
+    ClientBody:
+      type: object
+      required: [nomClient, prenomClient, courrielClient, adresseClient, codePostalClient]
+      properties:
+        nomClient:
+          type: string
+          example: Tremblay
+        prenomClient:
+          type: string
+          example: Jean
+        courrielClient:
+          type: string
+          format: email
+          example: jean.tremblay@example.com
+        telephoneClient:
+          type: string
+          description: Optionnel — non soumis à validerChamps.
+          example: "5141234567"
+        adresseClient:
+          type: string
+          example: 123 rue Principale
+        codePostalClient:
+          type: string
+          example: H1A 1A1
+
+    ClientResponse:
+      allOf:
+        - $ref: '#/components/schemas/ClientBody'
+        - type: object
+          properties:
+            idClient:
+              type: integer
+              example: 1
+
+    # ── Dossier ──────────────────────────────────────────────────────────────
+    DossierCreate:
+      type: object
+      required: [idClient, idEmploye, typeDossier, statutDossier, soldeDossier]
+      properties:
+        idClient:
+          type: integer
+          example: 1
+        idEmploye:
+          type: integer
+          example: 5
+        typeDossier:
+          type: string
+          example: Litige
+        statutDossier:
+          type: string
+          example: En cours
+        soldeDossier:
+          type: number
+          format: float
+          description: Peut être 0 — validé séparément de validerChamps.
+          example: 1500.00
+
+    DossierResponse:
+      allOf:
+        - $ref: '#/components/schemas/DossierCreate'
+        - type: object
+          properties:
+            idDossier:
+              type: integer
+              example: 3
+
+    DossierStatutUpdate:
+      type: object
+      required: [statutDossier]
+      properties:
+        statutDossier:
+          type: string
+          example: Fermé
+
+    # ── Demande ──────────────────────────────────────────────────────────────
+    DemandeCreate:
+      type: object
+      required: [typeDemande, statutDemande, noteInterne]
+      properties:
+        typeDemande:
+          type: string
+          example: Installation
+        statutDemande:
+          type: string
+          enum: [En attente, Ouverte, En retard, Fermée]
+          example: En attente
+        noteInterne:
+          type: string
+          example: Première installation chez le client.
+
+    DemandeResponse:
+      allOf:
+        - $ref: '#/components/schemas/DemandeCreate'
+        - type: object
+          properties:
+            idDemande:
+              type: integer
+              example: 5
+            idDossier:
+              type: integer
+              example: 3
+
+    DemandeUpdate:
+      type: object
+      required: [typeDemande, statutDemande, noteInterne]
+      description: >
+        Modifie la première demande trouvée pour l'idDossier donné.
+        Tous les champs sont obligatoires.
+      properties:
+        typeDemande:
+          type: string
+          example: Support
+        statutDemande:
+          type: string
+          enum: [En attente, Ouverte, En retard, Fermée]
+          example: Ouverte
+        noteInterne:
+          type: string
+          example: Mise à jour suite à l'appel du client.
+
+    # ── Note ─────────────────────────────────────────────────────────────────
+    NoteCreate:
+      type: object
+      required: [idEmploye, type, titre, note]
+      properties:
+        idEmploye:
+          type: integer
+          example: 1
+        type:
+          type: string
+          description: Stocké dans la colonne typeNote.
+          example: Suivi
+        titre:
+          type: string
+          description: Stocké dans la colonne titreNote.
+          example: Appel client
+        note:
+          type: string
+          example: Le client a confirmé le rendez-vous.
+
+    NoteResponse:
+      allOf:
+        - $ref: '#/components/schemas/NoteCreate'
+        - type: object
+          properties:
+            idNote:
+              type: integer
+              example: 10
+            idDossier:
+              type: integer
+              example: 1
+
+    NoteUpdate:
+      type: object
+      required: [idDossier, idEmploye, type, titre, note]
+      properties:
+        idDossier:
+          type: integer
+          example: 1
+        idEmploye:
+          type: integer
+          example: 1
+        type:
+          type: string
+          example: Suivi
+        titre:
+          type: string
+          example: Mise à jour
+        note:
+          type: string
+          example: Contenu modifié.
+
+    # ── Document ─────────────────────────────────────────────────────────────
+    DocumentResponse:
+      type: object
+      properties:
+        idDocument:
+          type: integer
+          example: 2
+        idDossier:
+          type: integer
+          example: 1
+        typeDocument:
+          type: string
+          description: Extension du fichier (ex. .pdf, .png). PUT retourne la valeur en majuscules sans point.
+          example: .pdf
+        tailleDocument:
+          type: integer
+          description: Taille en octets.
+          example: 204800
+        nomDocument:
+          type: string
+          example: contrat.pdf
+        cheminDocument:
+          type: string
+          description: Chemin relatif sur le serveur.
+          example: BD/uploads/1/2026-03-28-14-23-45-123.pdf
+
+    # ── Service ──────────────────────────────────────────────────────────────
+    ServiceCreate:
+      type: object
+      required: [typeService]
+      properties:
+        typeService:
+          type: string
+          example: Installation
+
+    ServiceResponse:
+      allOf:
+        - $ref: '#/components/schemas/ServiceCreate'
+        - type: object
+          properties:
+            idService:
+              type: integer
+              example: 1
+
+    # ── Forfait ──────────────────────────────────────────────────────────────
+    ForfaitCreate:
+      type: object
+      required: [idService, nomForfait, prixForfait, descriptionForfait]
+      properties:
+        idService:
+          type: integer
+          example: 1
+        nomForfait:
+          type: string
+          example: Forfait Standard
+        prixForfait:
+          type: number
+          format: float
+          example: 299.99
+        descriptionForfait:
+          type: string
+          example: Forfait incluant installation et support de base.
+
+    ForfaitResponse:
+      allOf:
+        - $ref: '#/components/schemas/ForfaitCreate'
+        - type: object
+          properties:
+            idForfait:
+              type: integer
+              example: 1
+
+    # ── ForfaitDossier ───────────────────────────────────────────────────────
+    ForfaitDossierCreate:
+      type: object
+      required: [idDossier, idForfait]
+      properties:
+        idDossier:
+          type: integer
+          example: 2
+        idForfait:
+          type: integer
+          example: 1
+
+    ForfaitDossierResponse:
+      allOf:
+        - $ref: '#/components/schemas/ForfaitDossierCreate'
+        - type: object
+          properties:
+            idForfaitDossier:
+              type: integer
+              example: 5
+
+    # ── Historique ───────────────────────────────────────────────────────────
+    HistoriqueEntry:
+      type: object
+      properties:
+        idHistorique:
+          type: integer
+          example: 42
+        idEmploye:
+          type: integer
+          example: 3
+        typeAction:
+          type: string
+          enum: [WRITE, EDIT, DELETE, UPDATE]
+          example: WRITE
+        tableAffectee:
+          type: string
+          example: DOSSIERS
+        idLigne:
+          type: integer
+          example: 7
+        dateAction:
+          type: string
+          format: date-time
+          example: "2026-03-28T14:23:45Z"
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Authentification
+    description: Obtenir un token JWT
+  - name: Employés
+    description: "Gestion des employés — authentifierSupp ou authentifierAdmin selon la route"
+  - name: Clients
+    description: Gestion des clients (création et modification sans auth)
+  - name: Dossiers
+    description: Gestion des dossiers (suppression réservée aux superviseurs)
+  - name: Demandes
+    description: Gestion des demandes liées aux dossiers
+  - name: Notes
+    description: Notes internes par dossier (suppression réservée aux admins)
+  - name: Documents
+    description: Fichiers uploadés par dossier (suppression réservée aux admins)
+  - name: Services
+    description: "Gestion des types de service — lecture authentifier, écriture authentifierAdmin"
+  - name: Forfaits
+    description: "Gestion des forfaits liés aux services — lecture authentifier, écriture authentifierAdmin"
+  - name: ForfaitsDossier
+    description: "Association forfaits et dossiers — lecture authentifier, écriture authentifierSupp"
+  - name: Historique
+    description: Historique des actions enregistrées automatiquement
+
+paths:
+
+  # ══════════════════════════════════════════════
+  # AUTHENTIFICATION
+  # ══════════════════════════════════════════════
+  /employes/login:
+    post:
+      tags: [Authentification]
+      summary: Connexion — obtenir un token JWT
+      description: >
+        Authentifie un employé et retourne un JWT valide 2 heures.
+        Copiez la valeur de `token` et utilisez-la dans le bouton Authorize en haut de cette page.
+
+        Comptes de test disponibles:
+
+        commis - employe@bellevibe.com / 123456
+
+        superviseur - superviseur@bellevibe.com / 123456789
+
+        admin - admin@bellevibe.com / 123456789
+
+        Seule route publique — aucun token requis.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Champs manquants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Mot de passe invalide
+        '500':
+          description: Erreur serveur
+
+  # ══════════════════════════════════════════════
+  # EMPLOYÉS
+  # ══════════════════════════════════════════════
+  /employes/employes:
+    get:
+      tags: [Employés]
+      summary: Lister tous les employés
+      description: Retourne tous les employés avec leurs informations. Superviseur ou admin requis.
+      responses:
+        '200':
+          description: Liste des employés
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmployeResponse'
+        '403':
+          description: Accès refusé
+
+  /employes/addEmploye:
+    post:
+      tags: [Employés]
+      summary: Créer un employé
+      description: >
+        Ajoute un nouvel employé. Le statut est automatiquement défini à actif.
+        Le mot de passe est haché avec bcrypt avant stockage.
+        Superviseur ou admin requis.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeCreate'
+      responses:
+        '201':
+          description: Employé créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeResponse'
+        '400':
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Accès refusé
+
+  /employes/adminEdit/{idEmploye}:
+    put:
+      tags: [Employés]
+      summary: Modifier les données sensibles d'un employé
+      description: >
+        Modifie le rôle, le statut et le mot de passe d'un employé.
+        Le mot de passe est re-haché avant stockage.
+        Admin seulement.
+      parameters:
+        - name: idEmploye
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeAdminUpdate'
+      responses:
+        '200':
+          description: Données sensibles mises à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Champs manquants
+        '403':
+          description: Accès refusé
+        '404':
+          description: Employé non trouvé
+
+  /employes/{idEmploye}:
+    put:
+      tags: [Employés]
+      summary: Modifier les infos de base d'un employé
+      description: >
+        Modifie nom, prénom, courriel, téléphone, adresse et code postal.
+        Ne modifie pas le mot de passe, le rôle ni le statut.
+        Superviseur ou admin requis.
+      parameters:
+        - name: idEmploye
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 7
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeUpdate'
+      responses:
+        '200':
+          description: Infos mises à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Champs manquants
+        '403':
+          description: Accès refusé
+        '404':
+          description: Employé non trouvé
+
+    delete:
+      tags: [Employés]
+      summary: Supprimer un employé
+      description: Supprime définitivement un employé. Admin seulement.
+      parameters:
+        - name: idEmploye
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 8
+      responses:
+        '200':
+          description: Employé supprimé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '403':
+          description: Accès refusé
+        '404':
+          description: Employé non trouvé
+
+  # ══════════════════════════════════════════════
+  # CLIENTS
+  # ══════════════════════════════════════════════
+  /clients/getClients:
+    get:
+      tags: [Clients]
+      summary: Lister tous les clients
+      description: Retourne tous les clients. Token requis (tout rôle).
+      responses:
+        '200':
+          description: Liste des clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClientResponse'
+        '401':
+          description: Non authentifié
+
+  /clients/getClient/{idClient}:
+    get:
+      tags: [Clients]
+      summary: Obtenir un client
+      description: Retourne un client spécifique. Token requis (tout rôle).
+      parameters:
+        - name: idClient
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Données du client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '401':
+          description: Non authentifié
+        '404':
+          description: Client non trouvé
+
+  /clients/creerClient:
+    post:
+      tags: [Clients]
+      summary: Créer un client
+      description: >
+        Crée un nouveau client. Aucune authentification requise.
+        Les champs nomClient, prenomClient, courrielClient, adresseClient
+        et codePostalClient sont obligatoires. telephoneClient est optionnel.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientBody'
+      responses:
+        '201':
+          description: Client créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Client créé avec succès.
+                  idClient:
+                    type: integer
+                    example: 4
+        '400':
+          description: Champs obligatoires manquants
+
+  /clients/modifierClient/{idClient}:
+    put:
+      tags: [Clients]
+      summary: Modifier un client
+      description: Modifie toutes les informations d'un client. Aucune authentification requise.
+      security: []
+      parameters:
+        - name: idClient
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientBody'
+      responses:
+        '200':
+          description: Client modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Champs invalides
+        '404':
+          description: Client non trouvé
+
+  /clients/supprimerClient/{idClient}:
+    delete:
+      tags: [Clients]
+      summary: Supprimer un client
+      description: Supprime un client. Aucune authentification requise.
+      security: []
+      parameters:
+        - name: idClient
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Client supprimé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '404':
+          description: Client non trouvé
+
+  # ══════════════════════════════════════════════
+  # DOSSIERS
+  # ══════════════════════════════════════════════
+  /dossiers/getDossiers:
+    get:
+      tags: [Dossiers]
+      summary: Lister tous les dossiers
+      description: Retourne tous les dossiers. Token requis (tout rôle).
+      responses:
+        '200':
+          description: Liste des dossiers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DossierResponse'
+        '401':
+          description: Non authentifié
+
+  /dossiers/getDossier/{idDossier}:
+    get:
+      tags: [Dossiers]
+      summary: Obtenir un dossier
+      description: Retourne un dossier spécifique. Token requis (tout rôle).
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Données du dossier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DossierResponse'
+        '400':
+          description: idDossier manquant
+        '401':
+          description: Non authentifié
+        '404':
+          description: Dossier non trouvé
+
+  /dossiers/dossiersAttente:
+    get:
+      tags: [Dossiers]
+      summary: Lister les dossiers en attente
+      description: >
+        Retourne les dossiers en attente. Token requis (tout rôle).
+
+        Note: La condition SQL actuelle (where "en attente") est probablement
+        incorrecte et doit être corrigée côté backend.
+      responses:
+        '200':
+          description: Liste des dossiers en attente
+        '401':
+          description: Non authentifié
+
+  /dossiers/creerDossier:
+    post:
+      tags: [Dossiers]
+      summary: Créer un dossier
+      description: >
+        Crée un dossier associé à un client et un employé existants.
+        soldeDossier peut être 0 mais ne peut pas être absent.
+        Token requis (tout rôle).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DossierCreate'
+      responses:
+        '201':
+          description: Dossier créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DossierResponse'
+        '400':
+          description: Champs manquants
+        '401':
+          description: Non authentifié
+        '404':
+          description: Client ou employé non trouvé
+
+  /dossiers/modifierStatut/{idDossier}:
+    put:
+      tags: [Dossiers]
+      summary: Modifier le statut d'un dossier
+      description: Met à jour uniquement le champ statutDossier. Token requis (tout rôle).
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DossierStatutUpdate'
+      responses:
+        '200':
+          description: Statut modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Champs manquants
+        '401':
+          description: Non authentifié
+        '404':
+          description: Dossier non trouvé
+
+  /dossiers/{idDossier}:
+    delete:
+      tags: [Dossiers]
+      summary: Supprimer un dossier
+      description: Supprime définitivement un dossier. Superviseur ou admin requis.
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Dossier supprimé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Non authentifié
+        '403':
+          description: Accès refusé — superviseur requis
+        '404':
+          description: Dossier non trouvé
+
+  # ══════════════════════════════════════════════
+  # DEMANDES
+  # ══════════════════════════════════════════════
+  /demandes/creerDemande/{idDossier}:
+    post:
+      tags: [Demandes]
+      summary: Créer une demande pour un dossier
+      description: Crée une nouvelle demande associée à un dossier. Token requis (tout rôle).
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DemandeCreate'
+      responses:
+        '201':
+          description: Demande créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DemandeResponse'
+        '400':
+          description: Champs manquants
+        '401':
+          description: Non authentifié
+
+  /demandes/getDemande/{idDossier}:
+    get:
+      tags: [Demandes]
+      summary: Obtenir les demandes d'un dossier
+      description: >
+        Retourne toutes les demandes associées à un idDossier donné.
+        Token requis (tout rôle).
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Liste des demandes du dossier
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DemandeResponse'
+        '401':
+          description: Non authentifié
+
+  /demandes/getDemandes:
+    get:
+      tags: [Demandes]
+      summary: Lister toutes les demandes
+      description: Retourne toutes les demandes. Token requis (tout rôle).
+      responses:
+        '200':
+          description: Toutes les demandes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DemandeResponse'
+        '401':
+          description: Non authentifié
+
+  /demandes/getDemandesOuvertes:
+    get:
+      tags: [Demandes]
+      summary: Lister les demandes ouvertes
+      description: >
+        Retourne les demandes avec statutDemande = "Ouverte".
+        Utile pour le tableau de bord. Token requis (tout rôle).
+      responses:
+        '200':
+          description: Demandes ouvertes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DemandeResponse'
+        '401':
+          description: Non authentifié
+
+  /demandes/getDemandesEnRetard:
+    get:
+      tags: [Demandes]
+      summary: Lister les demandes en retard
+      description: >
+        Retourne les demandes avec statutDemande = "En retard".
+        Utile pour le tableau de bord superviseur. Token requis (tout rôle).
+      responses:
+        '200':
+          description: Demandes en retard
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DemandeResponse'
+        '401':
+          description: Non authentifié
+
+  /demandes/getDemandesEnAttente:
+    get:
+      tags: [Demandes]
+      summary: Lister les demandes en attente
+      description: >
+        Retourne les demandes avec statutDemande = "En attente".
+        Utile pour le tableau de bord. Token requis (tout rôle).
+      responses:
+        '200':
+          description: Demandes en attente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DemandeResponse'
+        '401':
+          description: Non authentifié
+
+  /demandes/modifierDemande/{idDossier}:
+    put:
+      tags: [Demandes]
+      summary: Modifier une demande
+      description: >
+        Modifie la première demande trouvée pour l'idDossier donné.
+        Superviseur ou admin requis.
+
+        Attention: le paramètre est un idDossier, pas un idDemande.
+        Si plusieurs demandes existent pour ce dossier, seule la première est modifiée.
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DemandeUpdate'
+      responses:
+        '201':
+          description: Demande modifiée (retourne les données mises à jour)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DemandeResponse'
+        '400':
+          description: Champs manquants
+        '403':
+          description: Accès refusé — superviseur requis
+        '404':
+          description: Demande introuvable pour cet idDossier
+
+  # ══════════════════════════════════════════════
+  # NOTES
+  # ══════════════════════════════════════════════
+  /notes/{idDossier}:
+    get:
+      tags: [Notes]
+      summary: Lister les notes d'un dossier
+      description: Retourne toutes les notes associées à un dossier. Token requis (tout rôle).
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Liste des notes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NoteResponse'
+        '401':
+          description: Non authentifié
+
+    post:
+      tags: [Notes]
+      summary: Ajouter une note à un dossier
+      description: Crée une note associée au dossier. Token requis (tout rôle).
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteCreate'
+      responses:
+        '201':
+          description: Note créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponse'
+        '400':
+          description: Champs manquants
+        '401':
+          description: Non authentifié
+
+  /notes/{idNote}:
+    put:
+      tags: [Notes]
+      summary: Modifier une note
+      description: >
+        Modifie une note existante. idDossier est requis dans le body même si
+        la note est identifiée par idNote dans l'URL. Token requis (tout rôle).
+      parameters:
+        - name: idNote
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 10
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteUpdate'
+      responses:
+        '200':
+          description: Note mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Champs manquants
+        '401':
+          description: Non authentifié
+        '404':
+          description: Note non trouvée
+
+    delete:
+      tags: [Notes]
+      summary: Supprimer une note
+      description: Supprime définitivement une note. Admin seulement.
+      parameters:
+        - name: idNote
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 15
+      responses:
+        '200':
+          description: Note supprimée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Non authentifié
+        '403':
+          description: Accès refusé — admin requis
+        '404':
+          description: Note non trouvée
+
+  # ══════════════════════════════════════════════
+  # DOCUMENTS
+  # ══════════════════════════════════════════════
+  /documents/{idDossier}:
+    get:
+      tags: [Documents]
+      summary: Lister les documents d'un dossier
+      description: Retourne tous les documents d'un dossier. Token requis (tout rôle).
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Liste des documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentResponse'
+        '401':
+          description: Non authentifié
+
+  /documents/{idDossier}/file:
+    post:
+      tags: [Documents]
+      summary: Uploader un document
+      description: >
+        Ajoute un fichier au dossier via multipart/form-data.
+        Le fichier est stocké dans BD/uploads/{idDossier}/ avec un nom basé sur le timestamp.
+        Token requis (tout rôle).
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [fichier]
+              properties:
+                fichier:
+                  type: string
+                  format: binary
+                  description: Fichier à uploader — champ form-data nommé "fichier".
+      responses:
+        '201':
+          description: Document uploadé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Document ajouté avec succès.
+                  idDocument:
+                    type: integer
+                    example: 3
+        '400':
+          description: Aucun fichier fourni
+        '401':
+          description: Non authentifié
+
+  /documents/{idDocument}/file:
+    put:
+      tags: [Documents]
+      summary: Remplacer un document
+      description: >
+        Remplace le fichier existant par un nouveau. L'ancien fichier est supprimé
+        du serveur après la mise à jour en base de données.
+        idDossier est requis dans le body (form-data).
+        Token requis (tout rôle).
+      parameters:
+        - name: idDocument
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [fichier, idDossier]
+              properties:
+                fichier:
+                  type: string
+                  format: binary
+                idDossier:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: Document remplacé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Aucun nouveau fichier ou idDossier manquant
+        '401':
+          description: Non authentifié
+        '404':
+          description: Document non trouvé (nouveau fichier supprimé automatiquement)
+
+  /documents/{idDocument}:
+    delete:
+      tags: [Documents]
+      summary: Supprimer un document
+      description: >
+        Supprime le document en base de données et le fichier sur le serveur.
+        Admin seulement.
+      parameters:
+        - name: idDocument
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 4
+      responses:
+        '200':
+          description: Document supprimé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Non authentifié
+        '403':
+          description: Accès refusé — admin requis
+        '404':
+          description: Document non trouvé
+
+  # ══════════════════════════════════════════════
+  # SERVICES
+  # ══════════════════════════════════════════════
+  /services:
+    get:
+      tags: [Services]
+      summary: Lister tous les services
+      description: Retourne tous les types de service. Token requis (tout rôle).
+      responses:
+        '200':
+          description: Liste des services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceResponse'
+        '401':
+          description: Non authentifié
+
+    post:
+      tags: [Services]
+      summary: Créer un service
+      description: Ajoute un nouveau type de service. Admin seulement.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceCreate'
+      responses:
+        '201':
+          description: Service créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceResponse'
+        '400':
+          description: Champs manquants
+        '403':
+          description: Accès refusé
+
+  /services/{idService}:
+    put:
+      tags: [Services]
+      summary: Modifier un service
+      description: Modifie le typeService. Admin seulement.
+      parameters:
+        - name: idService
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceCreate'
+      responses:
+        '200':
+          description: Service modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Champs manquants
+        '403':
+          description: Accès refusé
+        '404':
+          description: Service non trouvé
+
+    delete:
+      tags: [Services]
+      summary: Supprimer un service
+      description: Supprime un service. Admin seulement.
+      parameters:
+        - name: idService
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Service supprimé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '403':
+          description: Accès refusé
+        '404':
+          description: Service non trouvé
+
+  # ══════════════════════════════════════════════
+  # FORFAITS
+  # ══════════════════════════════════════════════
+  /forfaits:
+    get:
+      tags: [Forfaits]
+      summary: Lister tous les forfaits
+      description: Retourne tous les forfaits disponibles. Token requis (tout rôle).
+      responses:
+        '200':
+          description: Liste des forfaits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForfaitResponse'
+        '401':
+          description: Non authentifié
+
+    post:
+      tags: [Forfaits]
+      summary: Créer un forfait
+      description: Ajoute un forfait lié à un service. Admin seulement.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForfaitCreate'
+      responses:
+        '201':
+          description: Forfait créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForfaitResponse'
+        '400':
+          description: Champs manquants
+        '403':
+          description: Accès refusé
+
+  /forfaits/{idForfait}:
+    put:
+      tags: [Forfaits]
+      summary: Modifier un forfait
+      description: Modifie toutes les informations d'un forfait. Admin seulement.
+      parameters:
+        - name: idForfait
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForfaitCreate'
+      responses:
+        '200':
+          description: Forfait modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Champs manquants
+        '403':
+          description: Accès refusé
+        '404':
+          description: Forfait non trouvé
+
+    delete:
+      tags: [Forfaits]
+      summary: Supprimer un forfait
+      description: Supprime définitivement un forfait. Admin seulement.
+      parameters:
+        - name: idForfait
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Forfait supprimé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '403':
+          description: Accès refusé
+        '404':
+          description: Forfait non trouvé
+
+  # ══════════════════════════════════════════════
+  # FORFAITS DOSSIER
+  # ══════════════════════════════════════════════
+  /forfaitsDossier/{idDossier}:
+    get:
+      tags: [ForfaitsDossier]
+      summary: Lister les forfaits d'un dossier
+      description: Retourne les associations forfait et dossier. Token requis (tout rôle).
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 2
+      responses:
+        '200':
+          description: Liste des forfaits du dossier
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForfaitDossierResponse'
+        '401':
+          description: Non authentifié
+
+  /forfaitsDossier:
+    post:
+      tags: [ForfaitsDossier]
+      summary: Associer un forfait à un dossier
+      description: Crée une association entre un forfait et un dossier. Superviseur ou admin requis.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForfaitDossierCreate'
+      responses:
+        '201':
+          description: Association créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForfaitDossierResponse'
+        '400':
+          description: Champs manquants
+        '403':
+          description: Accès refusé
+
+  /forfaitsDossier/{idForfaitDossier}:
+    delete:
+      tags: [ForfaitsDossier]
+      summary: Retirer un forfait d'un dossier
+      description: Supprime l'association forfait et dossier. Superviseur ou admin requis.
+      parameters:
+        - name: idForfaitDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      responses:
+        '200':
+          description: Association supprimée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '403':
+          description: Accès refusé
+        '404':
+          description: Association non trouvée
+
+  # ══════════════════════════════════════════════
+  # HISTORIQUE
+  # ══════════════════════════════════════════════
+  /historique/allHistorique:
+    get:
+      tags: [Historique]
+      summary: Historique complet
+      description: >
+        Retourne toutes les actions de tous les employés (table historiqueDossiers).
+        Superviseur ou admin requis.
+      responses:
+        '200':
+          description: Historique complet
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoriqueEntry'
+        '403':
+          description: Accès refusé
+
+  /historique/historique:
+    get:
+      tags: [Historique]
+      summary: Mon historique
+      description: >
+        Retourne uniquement les actions de l'employé actuellement connecté
+        (filtré par req.user.id). Token requis (tout rôle).
+      responses:
+        '200':
+          description: Historique de l'employé connecté
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoriqueEntry'
+        '401':
+          description: Non authentifié
