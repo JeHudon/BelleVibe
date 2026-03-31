@@ -38,12 +38,12 @@ const authentifier = (req, res, next) => {
         const userDecoded = jwt.verify(token, jwt_mdp)
         req.user = userDecoded
         if (req.user.statut != "actif") {
-            return res.status(401).json({ message: "Accès refusé. Compte employé inactif"})
+            return res.status(403).json({ message: "Accès refusé. Compte employé inactif"})
         }
         next()
     }
     catch (error) {
-        return res.status(403).json({ message: "Token invalide ou expiré" })
+        return res.status(401).json({ message: "Token invalide ou expiré" })
     }
 }
 
@@ -58,18 +58,18 @@ const authentifierSupp = (req, res, next) => {
         const userDecoded = jwt.verify(token, jwt_mdp)
         req.user = userDecoded
         if (req.user.statut != "actif") {
-            return res.status(401).json({ message: "Accès refusé. Compte employé inactif"})
+            return res.status(403).json({ message: "Accès refusé. Compte employé inactif"})
         }
         // si superviseur ou admin, refuse les employés standards ("commis")
         if (req.user.role == "superviseur" || req.user.role == "admin") {
             next()
         }
         else {
-            return res.status(401).json({ message: "Accès refusé. Permissions manquantes." })
+            return res.status(403).json({ message: "Accès refusé. Permissions manquantes." })
         }
     }
     catch (error) {
-        return res.status(403).json({ message: "Token invalide ou expiré" })
+        return res.status(401).json({ message: "Token invalide ou expiré" })
     }
 }
 
@@ -84,18 +84,18 @@ const authentifierAdmin = (req, res, next) => {
         const userDecoded = jwt.verify(token, jwt_mdp)
         req.user = userDecoded
         if (req.user.statut != "actif") {
-            return res.status(401).json({ message: "Accès refusé. Compte employé inactif"})
+            return res.status(403).json({ message: "Accès refusé. Compte employé inactif"})
         }
         // si admin, refuse les employés standards ("commis") ou superviseurs 
         if (req.user.role == "admin") {
             next()
         }
         else {
-            return res.status(401).json({ message: "Accès refusé. Permissions manquantes." })
+            return res.status(403).json({ message: "Accès refusé. Permissions manquantes." })
         }
     }
     catch (error) {
-        return res.status(403).json({ message: "Token invalide ou expiré" })
+        return res.status(401).json({ message: "Token invalide ou expiré" })
     }
 }
 

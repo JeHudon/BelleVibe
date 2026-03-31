@@ -11,13 +11,16 @@ router.get("/getDemande/:idDossier", authentifier, async (req, res) => {
     const { idDossier } = req.params;
     try {
         const demande = await db("demandes").select("*").where("idDossier", idDossier)
+        if (demande == 0) {
+            return res.status(404).json({ error: "Dossier non trouvé." });
+        }
         res.status(200).json(demande)
     } catch (error) {
         console.error("Erreur /getDemande/:idDossier")
         res.status(500).json({ error: "Erreur serveur.." })
-    } 
+    }
 })
-    
+
 // Get tout les demandes
 router.get("/getDemandes", authentifier, async (req, res) => {
     try {
@@ -47,7 +50,7 @@ router.get("/getDemandesEnRetard", authentifier, async (req, res) => {
         res.status(200).json(demandesEnRetard)
     } catch (error) {
         console.error("Erreur /getDemandesEnRetard")
-        res.status(500).json({ error: "Erreur serveur.." })        
+        res.status(500).json({ error: "Erreur serveur.." })
     }
 })
 
@@ -58,7 +61,7 @@ router.get("/getDemandesEnAttente", authentifier, async (req, res) => {
         res.status(200).json(demandesEnAttente)
     } catch (error) {
         console.error("Erreur /getDemandesEnAttente")
-        res.status(500).json({ error: "Erreur serveur.." })  
+        res.status(500).json({ error: "Erreur serveur.." })
     }
 })
 
@@ -69,8 +72,8 @@ router.post("/creerDemande/:idDossier", authentifier, async (req, res) => {
         // Récupération des paramètres/body
         console.log(req.body)
         const { typeDemande, statutDemande, noteInterne } = req.body
-        const { idDossier } = req.params 
-        
+        const { idDossier } = req.params
+
         // Vérification que tous les champs sont remplis
         const validationResult = validerChamps({ idDossier, typeDemande, statutDemande, noteInterne });
         if (validationResult.error) {
@@ -79,10 +82,10 @@ router.post("/creerDemande/:idDossier", authentifier, async (req, res) => {
 
         // On met les infos dans une variable
         const demande = {
-            idDossier : idDossier,
-            typeDemande : typeDemande,
-            statutDemande : statutDemande,
-            noteInterne : noteInterne
+            idDossier: idDossier,
+            typeDemande: typeDemande,
+            statutDemande: statutDemande,
+            noteInterne: noteInterne
         }
 
         // On l'ajoute à la base de données et on le retourne
@@ -92,7 +95,7 @@ router.post("/creerDemande/:idDossier", authentifier, async (req, res) => {
 
     } catch (error) {
         console.error("Erreur /creerDemande/:idDossier")
-        res.status(500).json({ error: "Erreur serveur.." })  
+        res.status(500).json({ error: "Erreur serveur.." })
     }
 })
 
@@ -115,15 +118,15 @@ router.put("/modifierDemande/:idDossier", authentifierSupp, async (req, res) => 
         const verifDemande = await db("demandes").where("idDossier", idDossier).first()
         if (!verifDemande) {
             // Indique à l'utilisateur si la demande n'existe pas
-            return res.status(404).json({ error : "Demande inexistante" })
+            return res.status(404).json({ error: "Demande inexistante" })
         }
 
         // On met les infos dans une variable
         const demande = {
-            idDossier : idDossier,
-            typeDemande : typeDemande,
-            statutDemande : statutDemande,
-            noteInterne : noteInterne
+            idDossier: idDossier,
+            typeDemande: typeDemande,
+            statutDemande: statutDemande,
+            noteInterne: noteInterne
         }
 
         // On update la demande correspondante dans la base de données
@@ -133,7 +136,7 @@ router.put("/modifierDemande/:idDossier", authentifierSupp, async (req, res) => 
 
     } catch (error) {
         console.error("Erreur /editDemandee/:idDossier")
-        res.status(500).json({ error: "Erreur serveur.." }) 
+        res.status(500).json({ error: "Erreur serveur.." })
     }
 })
 
