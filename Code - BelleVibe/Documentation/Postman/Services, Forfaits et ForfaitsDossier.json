@@ -1,0 +1,213 @@
+{
+  "info": {
+    "_postman_id": "bellevibe-services-forfaits",
+    "name": "Services, Forfaits & ForfaitsDossier",
+    "description": "Routes API pour services, forfaits et forfaitsDossier avec authentification JWT.\n\nLe token doit être obtenu via /employes/login puis inséré dans la variable {{token}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Services",
+      "item": [
+        {
+          "name": "GET /services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/services",
+              "host": ["{{url}}"],
+              "path": ["services"]
+            },
+            "description": "Obtenir tous les services (authentifier requis)."
+          }
+        },
+        {
+          "name": "POST /services",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"typeService\": \"Nettoyage\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/services",
+              "host": ["{{url}}"],
+              "path": ["services"]
+            },
+            "description": "Ajouter un service (admin seulement)."
+          }
+        },
+        {
+          "name": "PUT /services/:id",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"typeService\": \"Réparation\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/services/1",
+              "host": ["{{url}}"],
+              "path": ["services", "1"]
+            },
+            "description": "Modifier un service (admin seulement)."
+          }
+        },
+        {
+          "name": "DELETE /services/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/services/1",
+              "host": ["{{url}}"],
+              "path": ["services", "1"]
+            },
+            "description": "Supprimer un service (admin seulement)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Forfaits",
+      "item": [
+        {
+          "name": "GET /forfaits",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/forfaits",
+              "host": ["{{url}}"],
+              "path": ["forfaits"]
+            },
+            "description": "Obtenir tous les forfaits (authentifier requis)."
+          }
+        },
+        {
+          "name": "POST /forfaits",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idService\": 1,\n  \"nomForfait\": \"Premium\",\n  \"prixForfait\": 99.99,\n  \"descriptionForfait\": \"Full service\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/forfaits",
+              "host": ["{{url}}"],
+              "path": ["forfaits"]
+            },
+            "description": "Ajouter un forfait (admin seulement)."
+          }
+        },
+        {
+          "name": "PUT /forfaits/:id",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idService\": 1,\n  \"nomForfait\": \"VIP\",\n  \"prixForfait\": 120,\n  \"descriptionForfait\": \"Top\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/forfaits/1",
+              "host": ["{{url}}"],
+              "path": ["forfaits", "1"]
+            },
+            "description": "Modifier un forfait (admin seulement)."
+          }
+        },
+        {
+          "name": "DELETE /forfaits/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/forfaits/1",
+              "host": ["{{url}}"],
+              "path": ["forfaits", "1"]
+            },
+            "description": "Supprimer un forfait (admin seulement)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "ForfaitsDossier",
+      "item": [
+        {
+          "name": "GET /forfaitsDossier/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/forfaitsDossier/1",
+              "host": ["{{url}}"],
+              "path": ["forfaitsDossier", "1"]
+            },
+            "description": "Obtenir les forfaits liés à un dossier (authentifier requis)."
+          }
+        },
+        {
+          "name": "POST /forfaitsDossier",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idDossier\": 1,\n  \"idForfait\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/forfaitsDossier",
+              "host": ["{{url}}"],
+              "path": ["forfaitsDossier"]
+            },
+            "description": "Associer un forfait à un dossier (superviseur ou admin)."
+          }
+        },
+        {
+          "name": "DELETE /forfaitsDossier/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/forfaitsDossier/1",
+              "host": ["{{url}}"],
+              "path": ["forfaitsDossier", "1"]
+            },
+            "description": "Supprimer un forfait d’un dossier (superviseur ou admin)."
+          }
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
