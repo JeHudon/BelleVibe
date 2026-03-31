@@ -13,15 +13,6 @@ info:
     dans le header `Authorization: Bearer <token>`.
     Le token expire après **2 heures**.
 
-
-    ### Niveaux d'accès
-
-    | Middleware          | Rôles autorisés             |
-    |---------------------|-----------------------------|
-    | `authentifier`      | commis, superviseur, admin  |
-    | `authentifierSupp`  | superviseur, admin          |
-    | `authentifierAdmin` | admin seulement             |
-
   version: 1.0.0
 
 servers:
@@ -45,12 +36,26 @@ components:
           type: string
           example: Opération effectuée avec succès.
 
-    ErrorResponse:
+    ChampManquant:
       type: object
       properties:
         error:
           type: string
-          example: Erreur serveur..
+          example: Champs manquants
+
+    PWInvalide:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Mot de passe invalide
+
+    PermissionsInvalides:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Accès refusé. Permissions manquantes.
 
     # ── Auth ─────────────────────────────────────────────────────────────────
     LoginRequest:
@@ -60,7 +65,7 @@ components:
         email:
           type: string
           format: email
-          example: admin@bellevibe.com
+          example: employe@bellevibe.com
         mdp:
           type: string
           example: "123456789"
@@ -73,7 +78,6 @@ components:
           example: connexion réussie & sécurisée
         token:
           type: string
-          description: JWT valide 2 heures
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
     # ── Employé ──────────────────────────────────────────────────────────────
@@ -84,17 +88,17 @@ components:
         role:
           type: string
           enum: [admin, superviseur, commis]
-          example: commis
+          example: superviseur
         nom:
           type: string
-          example: Hanachian
+          example: St-Pierre
         prenom:
           type: string
-          example: Alek
+          example: George
         courriel:
           type: string
           format: email
-          example: alekh@bellevibe.com
+          example: superviseur@bellevibe.com
         telephone:
           type: string
           example: "9876543210"
@@ -107,7 +111,7 @@ components:
         mdp:
           type: string
           description: Mot de passe en clair — sera haché (bcrypt) avant stockage.
-          example: "motdepasse123"
+          example: "123456789"
 
     EmployeResponse:
       type: object
@@ -118,22 +122,30 @@ components:
         roleEmploye:
           type: string
           enum: [admin, superviseur, commis]
+          example: superviseur
         statutEmploye:
           type: string
           enum: [actif, inactif]
+          example: actif
         nomEmploye:
           type: string
+          example: St-Pierre
         prenomEmploye:
           type: string
+          example: George
         courrielEmploye:
           type: string
           format: email
+          example: superviseur@bellevibe.com
         telephoneEmploye:
           type: string
+          example: "9876543210"
         adresseEmploye:
           type: string
+          example: 1e avenue
         codePostalEmploye:
           type: string
+          example: A1B2C3
 
     EmployeUpdate:
       type: object
@@ -225,10 +237,10 @@ components:
           example: 5
         typeDossier:
           type: string
-          example: Litige
+          example: Personnel
         statutDossier:
           type: string
-          example: En cours
+          example: Actif
         soldeDossier:
           type: number
           format: float
@@ -250,7 +262,7 @@ components:
       properties:
         statutDossier:
           type: string
-          example: Fermé
+          example: En attente
 
     # ── Demande ──────────────────────────────────────────────────────────────
     DemandeCreate:
@@ -362,7 +374,7 @@ components:
           example: 1
         typeDocument:
           type: string
-          description: Extension du fichier (ex. .pdf, .png). PUT retourne la valeur en majuscules sans point.
+          description: Extension du fichier (ex. .pdf, .png). Retourne la valeur en majuscules sans point.
           example: .pdf
         tailleDocument:
           type: integer
@@ -383,7 +395,7 @@ components:
       properties:
         typeService:
           type: string
-          example: Installation
+          example: Téléphone
 
     ServiceResponse:
       allOf:
@@ -473,11 +485,11 @@ security:
 
 tags:
   - name: Authentification
-    description: Obtenir un token JWT
+    description: Obtenir un token
   - name: Employés
     description: "Gestion des employés — authentifierSupp ou authentifierAdmin selon la route"
   - name: Clients
-    description: Gestion des clients (création et modification sans auth)
+    description: "Gestion des clients — création et modification authentifier, suppression authentifierSupp"
   - name: Dossiers
     description: Gestion des dossiers (suppression réservée aux superviseurs)
   - name: Demandes
@@ -503,20 +515,13 @@ paths:
   /employes/login:
     post:
       tags: [Authentification]
-      summary: Connexion — obtenir un token JWT
+      summary: Connexion
       description: >
-        Authentifie un employé et retourne un JWT valide 2 heures.
-        Copiez la valeur de `token` et utilisez-la dans le bouton Authorize en haut de cette page.
-
-        Comptes de test disponibles:
-
-        commis - employe@bellevibe.com / 123456
-
-        superviseur - superviseur@bellevibe.com / 123456789
-
-        admin - admin@bellevibe.com / 123456789
-
-        Seule route publique — aucun token requis.
+        Authentifie un employé et retourne un token.<br>
+        Comptes de test disponibles:<br><br>
+        commis - employe@bellevibe.com / 123456<br>
+        superviseur - superviseur@bellevibe.com / 123456789 <br>
+        admin - admin@bellevibe.com / 123456789 <br>
       security: []
       requestBody:
         required: true
@@ -536,11 +541,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Mot de passe invalide
-        '500':
-          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PWInvalide'
 
   # ══════════════════════════════════════════════
   # EMPLOYÉS
@@ -559,8 +566,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/EmployeResponse'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
 
   /employes/addEmploye:
     post:
@@ -568,7 +581,7 @@ paths:
       summary: Créer un employé
       description: >
         Ajoute un nouvel employé. Le statut est automatiquement défini à actif.
-        Le mot de passe est haché avec bcrypt avant stockage.
+        Le mot de passe est haché avant stockage.
         Superviseur ou admin requis.
       requestBody:
         required: true
@@ -588,9 +601,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
 
   /employes/adminEdit/{idEmploye}:
     put:
@@ -621,9 +640,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Employé non trouvé
 
@@ -656,9 +685,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Employé non trouvé
 
@@ -680,8 +719,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: idEmploye manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Employé non trouvé
 
@@ -692,7 +743,7 @@ paths:
     get:
       tags: [Clients]
       summary: Lister tous les clients
-      description: Retourne tous les clients. Token requis (tout rôle).
+      description: Retourne tous les clients.
       responses:
         '200':
           description: Liste des clients
@@ -709,7 +760,7 @@ paths:
     get:
       tags: [Clients]
       summary: Obtenir un client
-      description: Retourne un client spécifique. Token requis (tout rôle).
+      description: Retourne un client spécifique. 
       parameters:
         - name: idClient
           in: path
@@ -724,6 +775,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ClientResponse'
+        '400':
+          description: idClient manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
         '404':
@@ -734,10 +791,7 @@ paths:
       tags: [Clients]
       summary: Créer un client
       description: >
-        Crée un nouveau client. Aucune authentification requise.
-        Les champs nomClient, prenomClient, courrielClient, adresseClient
-        et codePostalClient sont obligatoires. telephoneClient est optionnel.
-      security: []
+        Crée un nouveau client. telephoneClient est optionnel.
       requestBody:
         required: true
         content:
@@ -759,14 +813,19 @@ paths:
                     type: integer
                     example: 4
         '400':
-          description: Champs obligatoires manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
 
   /clients/modifierClient/{idClient}:
     put:
       tags: [Clients]
       summary: Modifier un client
-      description: Modifie toutes les informations d'un client. Aucune authentification requise.
-      security: []
+      description: Modifie toutes les informations d'un client. 
       parameters:
         - name: idClient
           in: path
@@ -788,7 +847,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '400':
-          description: Champs invalides
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '404':
           description: Client non trouvé
 
@@ -796,8 +859,7 @@ paths:
     delete:
       tags: [Clients]
       summary: Supprimer un client
-      description: Supprime un client. Aucune authentification requise.
-      security: []
+      description: Supprime un client. Superviseur ou admin requis.
       parameters:
         - name: idClient
           in: path
@@ -812,6 +874,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: idClient manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '403':
+          description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Client non trouvé
 
@@ -822,7 +896,7 @@ paths:
     get:
       tags: [Dossiers]
       summary: Lister tous les dossiers
-      description: Retourne tous les dossiers. Token requis (tout rôle).
+      description: Retourne tous les dossiers. 
       responses:
         '200':
           description: Liste des dossiers
@@ -839,7 +913,7 @@ paths:
     get:
       tags: [Dossiers]
       summary: Obtenir un dossier
-      description: Retourne un dossier spécifique. Token requis (tout rôle).
+      description: Retourne un dossier spécifique. 
       parameters:
         - name: idDossier
           in: path
@@ -856,6 +930,10 @@ paths:
                 $ref: '#/components/schemas/DossierResponse'
         '400':
           description: idDossier manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
         '404':
@@ -866,7 +944,7 @@ paths:
       tags: [Dossiers]
       summary: Lister les dossiers en attente
       description: >
-        Retourne les dossiers en attente. Token requis (tout rôle).
+        Retourne les dossiers en attente. 
 
         Note: La condition SQL actuelle (where "en attente") est probablement
         incorrecte et doit être corrigée côté backend.
@@ -881,9 +959,9 @@ paths:
       tags: [Dossiers]
       summary: Créer un dossier
       description: >
-        Crée un dossier associé à un client et un employé existants.
+        Crée un dossier associé à un client et un employé existant.
         soldeDossier peut être 0 mais ne peut pas être absent.
-        Token requis (tout rôle).
+        
       requestBody:
         required: true
         content:
@@ -898,7 +976,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/DossierResponse'
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
         '404':
@@ -908,7 +990,7 @@ paths:
     put:
       tags: [Dossiers]
       summary: Modifier le statut d'un dossier
-      description: Met à jour uniquement le champ statutDossier. Token requis (tout rôle).
+      description: Met à jour uniquement le champ statutDossier. 
       parameters:
         - name: idDossier
           in: path
@@ -930,7 +1012,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
         '404':
@@ -958,7 +1044,11 @@ paths:
         '401':
           description: Non authentifié
         '403':
-          description: Accès refusé — superviseur requis
+          description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Dossier non trouvé
 
@@ -969,7 +1059,7 @@ paths:
     post:
       tags: [Demandes]
       summary: Créer une demande pour un dossier
-      description: Crée une nouvelle demande associée à un dossier. Token requis (tout rôle).
+      description: Crée une nouvelle demande associée à un dossier. 
       parameters:
         - name: idDossier
           in: path
@@ -991,9 +1081,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/DemandeResponse'
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
+        '404':
+          description: Demande non trouvée
 
   /demandes/getDemande/{idDossier}:
     get:
@@ -1001,7 +1097,7 @@ paths:
       summary: Obtenir les demandes d'un dossier
       description: >
         Retourne toutes les demandes associées à un idDossier donné.
-        Token requis (tout rôle).
+        
       parameters:
         - name: idDossier
           in: path
@@ -1018,6 +1114,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DemandeResponse'
+        '400':
+          description: idDossier manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
 
@@ -1025,7 +1127,7 @@ paths:
     get:
       tags: [Demandes]
       summary: Lister toutes les demandes
-      description: Retourne toutes les demandes. Token requis (tout rôle).
+      description: Retourne toutes les demandes. 
       responses:
         '200':
           description: Toutes les demandes
@@ -1044,7 +1146,7 @@ paths:
       summary: Lister les demandes ouvertes
       description: >
         Retourne les demandes avec statutDemande = "Ouverte".
-        Utile pour le tableau de bord. Token requis (tout rôle).
+        Utile pour le tableau de bord. 
       responses:
         '200':
           description: Demandes ouvertes
@@ -1063,7 +1165,7 @@ paths:
       summary: Lister les demandes en retard
       description: >
         Retourne les demandes avec statutDemande = "En retard".
-        Utile pour le tableau de bord superviseur. Token requis (tout rôle).
+        Utile pour le tableau de bord superviseur. 
       responses:
         '200':
           description: Demandes en retard
@@ -1082,7 +1184,7 @@ paths:
       summary: Lister les demandes en attente
       description: >
         Retourne les demandes avec statutDemande = "En attente".
-        Utile pour le tableau de bord. Token requis (tout rôle).
+        Utile pour le tableau de bord. 
       responses:
         '200':
           description: Demandes en attente
@@ -1126,9 +1228,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/DemandeResponse'
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '403':
-          description: Accès refusé — superviseur requis
+          description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Demande introuvable pour cet idDossier
 
@@ -1139,7 +1249,7 @@ paths:
     get:
       tags: [Notes]
       summary: Lister les notes d'un dossier
-      description: Retourne toutes les notes associées à un dossier. Token requis (tout rôle).
+      description: Retourne toutes les notes associées à un dossier. 
       parameters:
         - name: idDossier
           in: path
@@ -1156,13 +1266,22 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/NoteResponse'
+        '400':
+          description: idDossier manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
+        '404':
+          description: Dossier non trouvée
+
 
     post:
       tags: [Notes]
       summary: Ajouter une note à un dossier
-      description: Crée une note associée au dossier. Token requis (tout rôle).
+      description: Crée une note associée au dossier. 
       parameters:
         - name: idDossier
           in: path
@@ -1184,9 +1303,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/NoteResponse'
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
+        '404':
+          description: Dossier non trouvée
 
   /notes/{idNote}:
     put:
@@ -1194,7 +1319,7 @@ paths:
       summary: Modifier une note
       description: >
         Modifie une note existante. idDossier est requis dans le body même si
-        la note est identifiée par idNote dans l'URL. Token requis (tout rôle).
+        la note est identifiée par idNote dans l'URL. 
       parameters:
         - name: idNote
           in: path
@@ -1216,7 +1341,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
         '404':
@@ -1240,10 +1369,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: idNote manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
         '403':
-          description: Accès refusé — admin requis
+          description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Note non trouvée
 
@@ -1254,7 +1393,7 @@ paths:
     get:
       tags: [Documents]
       summary: Lister les documents d'un dossier
-      description: Retourne tous les documents d'un dossier. Token requis (tout rôle).
+      description: Retourne tous les documents d'un dossier. 
       parameters:
         - name: idDossier
           in: path
@@ -1273,6 +1412,12 @@ paths:
                   $ref: '#/components/schemas/DocumentResponse'
         '401':
           description: Non authentifié
+        '400':
+          description: idDossier manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
 
   /documents/{idDossier}/file:
     post:
@@ -1281,7 +1426,7 @@ paths:
       description: >
         Ajoute un fichier au dossier via multipart/form-data.
         Le fichier est stocké dans BD/uploads/{idDossier}/ avec un nom basé sur le timestamp.
-        Token requis (tout rôle).
+        
       parameters:
         - name: idDossier
           in: path
@@ -1316,7 +1461,11 @@ paths:
                     type: integer
                     example: 3
         '400':
-          description: Aucun fichier fourni
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
 
@@ -1328,7 +1477,7 @@ paths:
         Remplace le fichier existant par un nouveau. L'ancien fichier est supprimé
         du serveur après la mise à jour en base de données.
         idDossier est requis dans le body (form-data).
-        Token requis (tout rôle).
+        
       parameters:
         - name: idDocument
           in: path
@@ -1358,7 +1507,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '400':
-          description: Aucun nouveau fichier ou idDossier manquant
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
         '404':
@@ -1387,8 +1540,18 @@ paths:
                 $ref: '#/components/schemas/MessageResponse'
         '401':
           description: Non authentifié
+        '400':
+          description: idDocument manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '403':
-          description: Accès refusé — admin requis
+          description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Document non trouvé
 
@@ -1399,7 +1562,7 @@ paths:
     get:
       tags: [Services]
       summary: Lister tous les services
-      description: Retourne tous les types de service. Token requis (tout rôle).
+      description: Retourne tous les types de service. 
       responses:
         '200':
           description: Liste des services
@@ -1422,6 +1585,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ServiceCreate'
+            example:
+              typeService: Internet
       responses:
         '201':
           description: Service créé
@@ -1429,10 +1594,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServiceResponse'
+              example:
+                message: Service ajouté avec succès.
+                idService: 1
+                typeService: Internet
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
 
   /services/{idService}:
     put:
@@ -1452,6 +1631,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ServiceCreate'
+            example:
+              typeService: Réparation
       responses:
         '200':
           description: Service modifié
@@ -1459,10 +1640,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
+              example:
+                message: Service modifié avec succès.
+                idService: 1
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Service non trouvé
 
@@ -1484,8 +1678,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: idService manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Service non trouvé
 
@@ -1496,7 +1702,7 @@ paths:
     get:
       tags: [Forfaits]
       summary: Lister tous les forfaits
-      description: Retourne tous les forfaits disponibles. Token requis (tout rôle).
+      description: Retourne tous les forfaits disponibles. 
       responses:
         '200':
           description: Liste des forfaits
@@ -1519,6 +1725,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ForfaitCreate'
+            example:
+              idService: 1
+              nomForfait: Premium
+              prixForfait: 99.99
+              descriptionForfait: Full service
       responses:
         '201':
           description: Forfait créé
@@ -1526,10 +1737,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForfaitResponse'
+              example:
+                message: Forfait ajouté avec succès.
+                idForfait: 1
+                idService: 1
+                nomForfait: Premium
+                prixForfait: 99.99
+                descriptionForfait: Full service
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
 
   /forfaits/{idForfait}:
     put:
@@ -1549,6 +1777,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ForfaitCreate'
+            example:
+              idService: 1
+              nomForfait: VIP
+              prixForfait: 120.00
+              descriptionForfait: Top
       responses:
         '200':
           description: Forfait modifié
@@ -1556,10 +1789,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
+              example:
+                message: Forfait modifié avec succès.
+                idForfait: 1
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Forfait non trouvé
 
@@ -1581,8 +1827,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: idForfait manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Forfait non trouvé
 
@@ -1593,7 +1851,7 @@ paths:
     get:
       tags: [ForfaitsDossier]
       summary: Lister les forfaits d'un dossier
-      description: Retourne les associations forfait et dossier. Token requis (tout rôle).
+      description: Retourne les associations forfait et dossier. 
       parameters:
         - name: idDossier
           in: path
@@ -1610,6 +1868,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ForfaitDossierResponse'
+        '400':
+          description: idDossier manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
         '401':
           description: Non authentifié
 
@@ -1624,6 +1888,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ForfaitDossierCreate'
+            example:
+              idDossier: 1
+              idForfait: 1
       responses:
         '201':
           description: Association créée
@@ -1631,10 +1898,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForfaitDossierResponse'
+              example:
+                message: Forfait ajouté au dossier avec succès.
+                idForfaitDossier: 5
+                idDossier: 1
+                idForfait: 1
         '400':
-          description: Champs manquants
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
 
   /forfaitsDossier/{idForfaitDossier}:
     delete:
@@ -1655,8 +1937,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: idForfaitDossier manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
         '404':
           description: Association non trouvée
 
@@ -1668,7 +1962,7 @@ paths:
       tags: [Historique]
       summary: Historique complet
       description: >
-        Retourne toutes les actions de tous les employés (table historiqueDossiers).
+        Retourne toutes les actions de tous les employés.
         Superviseur ou admin requis.
       responses:
         '200':
@@ -1679,16 +1973,22 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/HistoriqueEntry'
+        '401':
+          description: Non authentifié
         '403':
           description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
 
   /historique/historique:
     get:
       tags: [Historique]
-      summary: Mon historique
+      summary: Historique de l'employé logged in
       description: >
         Retourne uniquement les actions de l'employé actuellement connecté
-        (filtré par req.user.id). Token requis (tout rôle).
+        (filtré par le token). 
       responses:
         '200':
           description: Historique de l'employé connecté
@@ -1700,3 +2000,5 @@ paths:
                   $ref: '#/components/schemas/HistoriqueEntry'
         '401':
           description: Non authentifié
+        '404':
+          description: Employé non trouvée
