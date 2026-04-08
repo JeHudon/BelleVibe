@@ -1,0 +1,12 @@
+{
+  "name": "bellevibe",
+  "version": "1.0.0",
+  "scripts": {
+    "backend": "cd BackEnd && node app.js",
+    "frontend": "cd FrontEnd && npx vite",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
