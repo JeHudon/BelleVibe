@@ -2,7 +2,7 @@
   "name": "bellevibe",
   "version": "1.0.0",
   "scripts": {
-    "backend": "cd BackEnd && node app.js",
+    "backend": "cd BackEnd && nodemon app.js",
     "frontend": "cd FrontEnd && npx vite",
     "dev": "concurrently \"npm run backend\" \"npm run frontend\""
   },
