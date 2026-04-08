@@ -4,6 +4,8 @@
 ~$BelleVibe MatricePermissions.xlsx
 *.bkp
 /Code - BelleVibe/BackEnd/node_modules
-Code - BelleVibe/BackEnd/-- SQLite.sql
-Code - BelleVibe/BackEnd/BD/-- SQLite.sql
+/Code - BelleVibe/FrontEnd/node_modules
+/Code - BelleVibe/node_modules
+/Code - BelleVibe/BackEnd/-- SQLite.sql
+/Code - BelleVibe/BackEnd/BD/-- SQLite.sql
 *.sql
