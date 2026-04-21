@@ -2,11 +2,16 @@
   "name": "bellevibe",
   "version": "1.0.0",
   "scripts": {
-    "backend": "cd BackEnd && node app.js",
+    "backend": "cd BackEnd && nodemon app.js",
     "frontend": "cd FrontEnd && npx vite",
     "dev": "concurrently \"npm run backend\" \"npm run frontend\""
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1",
+    "nodemon": "^3.1.14",
+    "swagger-ui-express": "^5.0.1"
   }
 }

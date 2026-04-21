@@ -5,6 +5,12 @@ const express = require("express");
 const app = express();
 const crypto = require("crypto");
 
+// pour la route /api qui va générer un swagger avec la documentation des routes
+const swaggerUi = require("swagger-ui-express")
+const YAML = require("js-yaml")
+const fs = require("fs")
+const swaggerDocument = YAML.load(fs.readFileSync("./bellevibe-api.yaml"))
+
 /* Path permet de gérer les chemins de fichiers */
 const path = require("path");
 
@@ -29,10 +35,13 @@ app.use(express.static(path.join(__dirname, "../../"))); // client global
 app.use(express.static(path.join(__dirname, "../client"))); // client connexion-inscription
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // dossier pour les images uploadées
 
+// route /api qui montre le swagger
+app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get("/", (req, res) => {
     res.send("Serveur fonctionne");
 });
+
 
 
 // Importation des routes

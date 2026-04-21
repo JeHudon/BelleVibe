@@ -173,8 +173,24 @@ async function createTables() {
         console.log("Table 'services' créée. ")
     }
 
+    /*---------- Création de la table facturation ----------*/
+    const facturation = await db.schema.hasTable("facturation")
+    // si la table n'existe pas, on la crée
+    if (!facturation) {
+        await db.schema.createTable("facturation", (table)=>{
+            table.increments("idFacturation")
+            table.integer("idDossier").references("idDossier").inTable("dossier")
+            table.integer("idEmploye").references("idEmploye").inTable("employe")
+            table.string("statut_facture").notNullable()
+            table.float("montant_total").notNullable()
+            table.float("montant_paye").notNullable()
+            table.date("date_emission").notNullable()
+            // peut etre null puisque la facture peut ne pas etre payée
+            table.date("date_paiement")
+            table.timestamps(true, true)
+        })
+    }
 }
-
 
 /* Exporte l'instance db et la fonction createTables */
 module.exports = {
