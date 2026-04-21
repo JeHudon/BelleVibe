@@ -10,7 +10,10 @@ router.get("/:idDossier", authentifier, async (req, res) => {
         const { idDossier } = req.params;
 
         const data = await db("forfaitsDossier")
-            .where("idDossier", idDossier);
+            .join('forfaits', 'forfaitsDossier.idForfait', 'forfaits.idForfait')
+            .join('services', 'forfaits.idService', 'services.idService')
+            .where("idDossier", idDossier)
+            .select('forfaitsDossier.*', 'forfaits.*', 'services.typeService as typeService');
 
         res.status(200).json(data);
     } catch (err) {
