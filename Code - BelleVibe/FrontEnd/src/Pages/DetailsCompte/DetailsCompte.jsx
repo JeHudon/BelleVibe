@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 function DetailsCompte() {
-	const [compte, setCompte] = useState(null);
+	const [client, setClient] = useState(null);
 	const [forfaits, setForfaits] = useState(null);
 
 	const { onglet } = useParams();
@@ -10,7 +10,7 @@ function DetailsCompte() {
 
 	const navigate = useNavigate();
 
-	const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+	const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
 	function updateFilters(onglet) {
 		navigate(`/comptes/${id}/${onglet}`);
@@ -29,7 +29,8 @@ function DetailsCompte() {
 					},
 				},
 			).then((res) => res.json());
-			setCompte(data);
+			setClient(data);
+			console.log(data);
 		}
 		async function fetchForfaits() {
 			const data = await fetch(`/api/forfaitsDossier/${id}`, {
@@ -98,7 +99,13 @@ function DetailsCompte() {
 						{forfaits && forfaits.length > 0 ? (
 							forfaits.map((forfait) =>
 								forfait.typeService === "Mobile" ? (
-									<div className={isDark ? "notification is-info" : "notification is-info is-light"}>
+									<div
+										className={
+											isDark
+												? "notification is-info"
+												: "notification is-info is-light"
+										}
+									>
 										<div
 											className="is-flex is-align-items-center"
 											style={{ gap: "14px" }}
@@ -111,7 +118,8 @@ function DetailsCompte() {
 													className="has-text-weight-semibold"
 													style={{ margin: "0" }}
 												>
-													Mobile - {forfait.nomForfait}
+													Mobile -{" "}
+													{forfait.nomForfait}
 												</p>
 												<p
 													className="has-text-grey is-size-7"
@@ -123,7 +131,13 @@ function DetailsCompte() {
 										</div>
 									</div>
 								) : forfait.typeService === "Wifi" ? (
-									<div className={isDark ? "notification is-primary" : "notification is-primary is-light"}>
+									<div
+										className={
+											isDark
+												? "notification is-primary"
+												: "notification is-primary is-light"
+										}
+									>
 										<div
 											className="is-flex is-align-items-center"
 											style={{ gap: "14px" }}
@@ -136,7 +150,8 @@ function DetailsCompte() {
 													className="has-text-weight-semibold"
 													style={{ margin: "0" }}
 												>
-													Internet - {forfait.nomForfait}
+													Internet -{" "}
+													{forfait.nomForfait}
 												</p>
 												<p
 													className="has-text-grey is-size-7"
@@ -179,6 +194,37 @@ function DetailsCompte() {
 						) : (
 							<h1>Aucun forfait actif</h1>
 						)}
+						<h3 className="title is-4">Informations clients</h3>
+						<div className="columns">
+							<div className="column is-6">
+								<label>
+									Email :
+								</label>
+								<div className="control">
+									<p className="has-text-weight-bold">
+										{client?.courrielClient}
+									</p>
+								</div>
+							</div>
+							<div className="column is-6">
+								<label>
+									Téléphone :
+								</label>
+								<div className="control">
+									<p className="has-text-weight-bold">
+										{client?.telephoneClient}
+									</p>
+								</div>
+							</div>
+						</div>
+						<div className="">
+							<label>Adresse :</label>
+							<div className="control">
+								<p className="has-text-weight-bold">
+									{client?.adresseClient}
+								</p>
+							</div>
+						</div>
 					</div>
 				)}
 			</div>
