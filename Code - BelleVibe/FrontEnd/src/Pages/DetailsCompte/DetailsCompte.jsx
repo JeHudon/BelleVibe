@@ -10,6 +10,8 @@ function DetailsCompte() {
 
 	const navigate = useNavigate();
 
+	const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+
 	function updateFilters(onglet) {
 		navigate(`/comptes/${id}/${onglet}`);
 	}
@@ -96,7 +98,7 @@ function DetailsCompte() {
 						{forfaits && forfaits.length > 0 ? (
 							forfaits.map((forfait) =>
 								forfait.typeService === "Mobile" ? (
-									<div className="notification is-info is-light">
+									<div className={isDark ? "notification is-info" : "notification is-info is-light"}>
 										<div
 											className="is-flex is-align-items-center"
 											style={{ gap: "14px" }}
@@ -121,7 +123,7 @@ function DetailsCompte() {
 										</div>
 									</div>
 								) : forfait.typeService === "Wifi" ? (
-									<div className="notification is-primary is-light">
+									<div className={isDark ? "notification is-primary" : "notification is-primary is-light"}>
 										<div
 											className="is-flex is-align-items-center"
 											style={{ gap: "14px" }}
