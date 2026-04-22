@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 export function Login() {
@@ -6,6 +6,7 @@ export function Login() {
     const [mdp, setMdp] = useState("123456");
     const [role, setRole] = useState("Employé")
     const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     async function loginOnClick(e) {
         e.preventDefault();
@@ -33,6 +34,8 @@ export function Login() {
             const data = await response.json();
             console.log(data)
             localStorage.setItem("token", data.token)
+
+            navigate("/dashboard")
 
         } catch (err) {
             setError("Erreur réseau", err);
@@ -70,7 +73,7 @@ export function Login() {
                 alt="BelleVibe Logo"
                 style={{
                     position: "absolute",
-                    top: "-5rem",
+                    top: "-4rem",
                     left: "50%",
                     transform: "translateX(-50%)",
                     width: "min(600px, 70vw)",
@@ -165,11 +168,9 @@ export function Login() {
 
                 <div className="field is-grouped is-justify-content-space-between mt-5">
                     <div className="control">
-                        <Link to={`/dashboard`} >
-                            <button type="submit" className="button is-primary">
-                                Se connecter
-                            </button>
-                        </Link>
+                        <button type="submit" className="button is-primary">
+                            Se connecter
+                        </button>
                     </div>
                 </div>
             </form>
