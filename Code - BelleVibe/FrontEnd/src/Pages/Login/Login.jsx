@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 export function Login() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("employe@bellevibe.com");
     const [mdp, setMdp] = useState("123456");
     const [role, setRole] = useState("Employé")
@@ -33,6 +34,7 @@ export function Login() {
             const data = await response.json();
             console.log(data)
             localStorage.setItem("token", data.token)
+            navigate("/dashboard");
 
         } catch (err) {
             setError("Erreur réseau", err);
@@ -165,11 +167,9 @@ export function Login() {
 
                 <div className="field is-grouped is-justify-content-space-between mt-5">
                     <div className="control">
-                        <Link to={`/dashboard`} >
-                            <button type="submit" className="button is-primary">
-                                Se connecter
-                            </button>
-                        </Link>
+                        <button type="submit" className="button is-primary">
+                            Se connecter
+                        </button>
                     </div>
                 </div>
             </form>
