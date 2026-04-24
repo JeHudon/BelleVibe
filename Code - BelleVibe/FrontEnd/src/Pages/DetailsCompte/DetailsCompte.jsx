@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 function DetailsCompte() {
 	const [client, setClient] = useState(null);
 	const [forfaits, setForfaits] = useState(null);
+	const [demandes, setDemandes] = useState(null);
 
 	const { onglet } = useParams();
 	const { id } = useParams();
@@ -42,8 +43,20 @@ function DetailsCompte() {
 			}).then((res) => res.json());
 			setForfaits(data);
 		}
+		async function fetchDemandes() {
+			const data = await fetch(`/api/demandes/getDemande/${id}`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}).then((res) => res.json());
+			setDemandes(data);
+		}
+
 		fetchClient();
 		fetchForfaits();
+		fetchDemandes();
 	}, []);
 
 	return (
@@ -197,9 +210,7 @@ function DetailsCompte() {
 						<h3 className="title is-4">Informations clients</h3>
 						<div className="columns">
 							<div className="column is-6">
-								<label>
-									Email :
-								</label>
+								<label>Email :</label>
 								<div className="control">
 									<p className="has-text-weight-bold">
 										{client?.courrielClient}
@@ -207,9 +218,7 @@ function DetailsCompte() {
 								</div>
 							</div>
 							<div className="column is-6">
-								<label>
-									Téléphone :
-								</label>
+								<label>Téléphone :</label>
 								<div className="control">
 									<p className="has-text-weight-bold">
 										{client?.telephoneClient}
@@ -225,6 +234,104 @@ function DetailsCompte() {
 								</p>
 							</div>
 						</div>
+					</div>
+				)}
+				{onglet === "demandes" && (
+					<div
+						className="box is-shadowless"
+						style={{ border: "1px solid #d6d6d6" }}
+					>
+						<div class="level">
+							<div class="level-left">
+								<div class="level-item">
+									<div>
+										<h2 className="title is-5">
+											Demandes de service
+										</h2>
+										<p class="subtitle is-6">
+											Gérer les demandes pour ce compte
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="level-right">
+								<div class="level-item">
+									<button class="button is-dark">
+										+ Créer demande
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<table
+							className="table is-fullwidth is-striped is-hoverable"
+							style={{ tableLayout: "fixed" }}
+						>
+							<thead>
+								<tr>
+									<th style={{ width: "100px" }}>
+										Catégorie
+									</th>
+									<th style={{ width: "400px" }}>
+										Description
+									</th>
+									<th style={{ width: "80px" }}>Statut</th>
+									<th style={{ width: "150px" }}>Créée le</th>
+									<th style={{ width: "60px" }}>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{demandes && demandes.length > 0 ? (
+									demandes.map((demande) => (
+										<tr>
+											<td>
+												<strong>
+													{demande.typeDemande}
+												</strong>
+											</td>
+											<td>{demande.noteInterne}</td>
+											<td>
+												<span
+													className={
+														demande.statutDemande ===
+														"Ouverte"
+															? "tag is-success"
+															: demande.statutDemande ===
+																  "En attente"
+																? "tag is-warning"
+																: demande.statutDemande ===
+																	  "Fermée"
+																	? "tag is-dark"
+																	: "tag is-danger"
+													}
+													style={{
+														fontWeight: "500",
+													}}
+												>
+													{demande.statutDemande}
+												</span>
+											</td>
+											<td>{demande.created_at}</td>
+											<td>
+												<button
+													className="button is-small is-ghost"
+													title="Modifier"
+												>
+													<i className="fa-regular fa-pen-to-square"></i>
+												</button>
+											</td>
+										</tr>
+									))
+								) : (
+									<tr>
+										<td colSpan="6">
+											Aucune demande de service pour ce
+											compte.
+										</td>
+									</tr>
+								)}
+							</tbody>
+						</table>
 					</div>
 				)}
 			</div>

@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 export function Login() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("employe@bellevibe.com");
     const [mdp, setMdp] = useState("123456");
     const [role, setRole] = useState("Employé")
@@ -34,6 +35,7 @@ export function Login() {
             const data = await response.json();
             console.log(data)
             localStorage.setItem("token", data.token)
+            navigate("/dashboard");
 
             navigate("/dashboard")
 
