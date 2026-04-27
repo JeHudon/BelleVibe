@@ -10,7 +10,10 @@ const router = express.Router();
 router.get("/:idDossier", authentifier, async (req, res) => {
     const { idDossier } = req.params;
     try {
-        const notes = await db("Notes").select("*").where("idDossier", idDossier);
+        const notes = await db("Notes")
+        .join("employes", "notes.idEmploye", "employes.idEmploye")
+        .select("notes.*", "employes.nomEmploye", "employes.prenomEmploye")
+        .where("notes.idDossier", idDossier);
         res.status(200).json(notes);
     } catch (err) {
         console.error("Erreur /getNotes/:idDossier", err);
