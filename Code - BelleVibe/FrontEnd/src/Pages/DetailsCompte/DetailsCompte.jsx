@@ -5,6 +5,8 @@ function DetailsCompte() {
 	const [client, setClient] = useState(null);
 	const [forfaits, setForfaits] = useState(null);
 	const [demandes, setDemandes] = useState(null);
+	const [documents, setDocuments] = useState(null);
+	const [notes, setNotes] = useState(null);
 
 	const { onglet } = useParams();
 	const { id } = useParams();
@@ -16,6 +18,17 @@ function DetailsCompte() {
 	function updateFilters(onglet) {
 		navigate(`/comptes/${id}/${onglet}`);
 	}
+
+	function formatDate(dateString) {
+		const options = {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+		};
+		return new Date(dateString).toLocaleDateString("fr-FR", options);
+	}	
 
 	useEffect(() => {
 		async function fetchClient() {
@@ -53,10 +66,32 @@ function DetailsCompte() {
 			}).then((res) => res.json());
 			setDemandes(data);
 		}
+		async function fetchDocuments() {
+			const data = await fetch(`/api/documents/${id}`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}).then((res) => res.json());
+			setDocuments(data);
+		}
+		async function fetchNotes() {
+			const data = await fetch(`/api/notes/${id}`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			}).then((res) => res.json());
+			setNotes(data);
+		}
 
 		fetchClient();
 		fetchForfaits();
 		fetchDemandes();
+		fetchDocuments();
+		fetchNotes();
 	}, []);
 
 	return (
@@ -241,22 +276,22 @@ function DetailsCompte() {
 						className="box is-shadowless"
 						style={{ border: "1px solid #d6d6d6" }}
 					>
-						<div class="level">
-							<div class="level-left">
-								<div class="level-item">
+						<div className="level">
+							<div className="level-left">
+								<div className="level-item">
 									<div>
 										<h2 className="title is-5">
 											Demandes de service
 										</h2>
-										<p class="subtitle is-6">
+										<p className="subtitle is-6">
 											Gérer les demandes pour ce compte
 										</p>
 									</div>
 								</div>
 							</div>
-							<div class="level-right">
-								<div class="level-item">
-									<button class="button is-dark">
+							<div className="level-right">
+								<div className="level-item">
+									<button className="button is-dark">
 										+ Créer demande
 									</button>
 								</div>
@@ -283,14 +318,16 @@ function DetailsCompte() {
 							<tbody>
 								{demandes && demandes.length > 0 ? (
 									demandes.map((demande) => (
-										<tr>
-											<td>
+										<tr style={{ height: "55px" }}>
+											<td className="is-vcentered">
 												<strong>
 													{demande.typeDemande}
 												</strong>
 											</td>
-											<td>{demande.noteInterne}</td>
-											<td>
+											<td className="is-vcentered">
+												{demande.noteInterne}
+											</td>
+											<td className="is-vcentered">
 												<span
 													className={
 														demande.statutDemande ===
@@ -311,13 +348,15 @@ function DetailsCompte() {
 													{demande.statutDemande}
 												</span>
 											</td>
-											<td>{demande.created_at}</td>
-											<td>
+											<td className="is-vcentered">
+												{formatDate(demande.created_at)}
+											</td>
+											<td className="is-vcentered">
 												<button
 													className="button is-small is-ghost"
 													title="Modifier"
 												>
-													<i className="fa-regular fa-pen-to-square"></i>
+													<i className="fa-regular fa-pen-to-square fa-lg"></i>
 												</button>
 											</td>
 										</tr>
@@ -332,6 +371,164 @@ function DetailsCompte() {
 								)}
 							</tbody>
 						</table>
+					</div>
+				)}
+				{onglet === "documents" && (
+					<div
+						className="box is-shadowless"
+						style={{ border: "1px solid #d6d6d6" }}
+					>
+						<div className="level">
+							<div className="level-left">
+								<div className="level-item">
+									<div>
+										<h2 className="title is-5">
+											Documents
+										</h2>
+										<p className="subtitle is-6">
+											Gérer les documents du compte
+										</p>
+									</div>
+								</div>
+							</div>
+							<div className="level-right">
+								<div className="level-item">
+									<button className="button is-dark">
+										+ Ajouter document
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<table
+							className="table is-fullwidth is-striped is-hoverable"
+							style={{ tableLayout: "fixed" }}
+						>
+							<thead>
+								<tr>
+									<th style={{ width: "100px" }}>Type</th>
+									<th style={{ width: "350px" }}>
+										Nom du fichier
+									</th>
+									<th style={{ width: "100px" }}>Taille</th>
+									<th style={{ width: "180px" }}>
+										Ajouté le
+									</th>
+									<th style={{ width: "100px" }}>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{documents && documents.length > 0 ? (
+									documents.map((document) => (
+										<tr style={{ height: "55px" }}>
+											<td className="is-vcentered">
+												<strong>
+													{document.typeDocument}
+												</strong>
+											</td>
+											<td className="is-vcentered">
+												{document.nomDocument}
+											</td>
+											<td className="is-vcentered">
+												{Math.round(
+													(document.tailleDocument /
+														8 /
+														1024) *
+														100,
+												) / 100}{" "}
+												KB
+											</td>
+											<td className="is-vcentered">
+												{formatDate(document.created_at)}
+											</td>
+											<td className="is-vcentered">
+												<button
+													className="button is-small is-ghost"
+													title="Modifier"
+												>
+													<i className="fa-solid fa-pen-to-square fa-lg"></i>
+												</button>
+												<button
+													className="button is-small is-ghost"
+													title="Telecharger"
+												>
+													<i className="fa-solid fa-download fa-lg"></i>
+												</button>
+											</td>
+										</tr>
+									))
+								) : (
+									<tr>
+										<td colSpan="6">
+											Aucune demande de service pour ce
+											compte.
+										</td>
+									</tr>
+								)}
+							</tbody>
+						</table>
+					</div>
+				)}
+				{onglet === "notes" && (
+					<div
+						className="box is-shadowless"
+						style={{ border: "1px solid #d6d6d6" }}
+					>
+						<div className="level">
+							<div className="level-left">
+								<div className="level-item">
+									<div>
+										<h2 className="title is-5">Notes</h2>
+										<p className="subtitle is-6">
+											Historique des notes pour ce compte
+										</p>
+									</div>
+								</div>
+							</div>
+							<div className="level-right">
+								<div className="level-item">
+									<button className="button is-dark">
+										+ Ajouter note
+									</button>
+								</div>
+							</div>
+						</div>
+						{notes && notes.length > 0 ? (
+							notes.map((note) => (
+								<div
+									style={{
+										border: "1px solid #d6d6d6",
+										borderRadius: "6px",
+										padding: "1rem",
+										marginBottom: "1rem",
+									}}
+								>
+									<div
+										className="is-flex is-justify-content-space-between is-align-items-flex-start"
+										style={{ gap: "1rem" }}
+									>
+										<div>
+											<p className="title is-6" style={{ marginBottom: "0.25rem" }}>
+												{note.titreNote}
+											</p>
+											<p className="mb-1">{note.note}</p>{" "}
+											<p
+												style={{ fontSize: "0.875em" }}
+											>
+												Par {note.prenomEmploye}{" "}
+												{note.nomEmploye}
+											</p>
+										</div>
+
+										<div>
+											{formatDate(note.created_at)}
+										</div>
+									</div>
+								</div>
+							))
+						) : (
+							<p>Aucune note pour ce compte.</p>
+						)}
 					</div>
 				)}
 			</div>
