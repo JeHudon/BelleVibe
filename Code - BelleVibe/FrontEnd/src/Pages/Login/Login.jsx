@@ -7,7 +7,6 @@ export function Login() {
     const [mdp, setMdp] = useState("123456");
     const [role, setRole] = useState("Employé")
     const [error, setError] = useState("");
-    const navigate = useNavigate();
 
     async function loginOnClick(e) {
         e.preventDefault();
