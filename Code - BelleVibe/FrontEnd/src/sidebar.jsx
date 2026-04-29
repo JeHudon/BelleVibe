@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
@@ -17,6 +17,39 @@ const serviceIcons = [
 
 export default function Sidebar() {
   const location = useLocation();
+  const [employe, setEmploye] = useState(null);
+  const [erreur, setErreur] = useState("");
+
+  useEffect(() => {
+    const fetchEmploye = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        console.log("Token:", token);
+
+        const res = await fetch("http://localhost:3000/employes/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("Status:", res.status);
+        const data = await res.json();
+        console.log("Data:", data);
+
+        if (!res.ok) {
+          setErreur(data.message || `Erreur ${res.status}`);
+          return;
+        }
+
+        setEmploye(data);
+      } catch (err) {
+        console.error("Fetch erreur:", err);
+        setErreur("Serveur inaccessible");
+      }
+    };
+
+    fetchEmploye();
+  }, []);
 
   return (
     <aside className="menu is-fullheight p-4 ">
@@ -25,11 +58,14 @@ export default function Sidebar() {
           <div className="media-left">
             <span className="icon is-large">
               {/* <i className="fa-solid fa-wave-square" /> */}
-              <img src="https://arbrescanada.ca/wp-content/uploads/2023/08/Bell_Blue_large_transparent-1.png" alt="Logo" />
+              <img
+                src="https://arbrescanada.ca/wp-content/uploads/2023/08/Bell_Blue_large_transparent-1.png"
+                alt="Logo"
+              />
             </span>
           </div>
           <div className="media-content">
-            <p className="title is-5 mb-1">BelleVide</p>
+            <p className="title is-5 mb-1">BelleVibe</p>
             <p className="subtitle is-7 has-text-link">Telecom</p>
           </div>
         </div>
@@ -40,9 +76,19 @@ export default function Sidebar() {
               <i className="fa-solid fa-user-tie" />
             </span>
           </div>
+
           <div className="media-content">
-            <p className="title is-6 mb-1">Marie Lavoie</p>
-            <p className="subtitle is-7 has-text-grey">Employé</p>
+            <p className="title is-6 mb-1">
+              {employe
+                ? `${employe.prenomEmploye} ${employe.nomEmploye}`
+                : erreur
+                ? <span className="has-text-danger is-size-7">{erreur}</span>
+                : "Chargement..."}
+            </p>
+
+            <p className="subtitle is-7 has-text-grey">
+              {employe ? employe.roleEmploye : ""}
+            </p>
           </div>
         </div>
 
@@ -67,6 +113,17 @@ export default function Sidebar() {
           </ul>
         </nav>
       </div>
+      <button
+        className="button is-danger is-light is-fullwidth mb-4"
+        onClick={() => {
+          localStorage.removeItem("token");
+          window.location.replace("/login");
+        }}
+      >
+        <span className="icon"><i className="fa-solid fa-right-from-bracket" /></span>
+        <span>Déconnexion</span>
+      </button>
+
       <p className="subtitle is-7 has-text-weight-semibold">Nos services</p>
       <div className="columns is-mobile is-multiline is-variable is-1">
         {serviceIcons.map((service) => (
