@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import AjouterDocuments from "../../../components/AjouterDocuments";
 
 function DetailsCompte() {
 	const [client, setClient] = useState(null);
@@ -7,6 +8,8 @@ function DetailsCompte() {
 	const [demandes, setDemandes] = useState(null);
 	const [documents, setDocuments] = useState(null);
 	const [notes, setNotes] = useState(null);
+
+	const [modalOpen, setModalOpen] = useState(false);
 
 	const { onglet } = useParams();
 	const { id } = useParams();
@@ -28,7 +31,7 @@ function DetailsCompte() {
 			minute: "2-digit",
 		};
 		return new Date(dateString).toLocaleDateString("fr-FR", options);
-	}	
+	}
 
 	useEffect(() => {
 		async function fetchClient() {
@@ -92,7 +95,7 @@ function DetailsCompte() {
 		fetchDemandes();
 		fetchDocuments();
 		fetchNotes();
-	}, []);
+	}, [onglet, id]);
 
 	return (
 		<div className="section">
@@ -393,12 +396,21 @@ function DetailsCompte() {
 							</div>
 							<div className="level-right">
 								<div className="level-item">
-									<button className="button is-dark">
+									<button
+										className="button is-dark"
+										onClick={() => setModalOpen(true)}
+									>
 										+ Ajouter document
 									</button>
 								</div>
 							</div>
 						</div>
+
+						<AjouterDocuments
+							isOpen={modalOpen}
+							onClose={() => setModalOpen(false)}
+							idDossier={id}
+						/>
 
 						<table
 							className="table is-fullwidth is-striped is-hoverable"
@@ -439,7 +451,9 @@ function DetailsCompte() {
 												KB
 											</td>
 											<td className="is-vcentered">
-												{formatDate(document.created_at)}
+												{formatDate(
+													document.created_at,
+												)}
 											</td>
 											<td className="is-vcentered">
 												<button
@@ -508,21 +522,22 @@ function DetailsCompte() {
 										style={{ gap: "1rem" }}
 									>
 										<div>
-											<p className="title is-6" style={{ marginBottom: "0.25rem" }}>
+											<p
+												className="title is-6"
+												style={{
+													marginBottom: "0.25rem",
+												}}
+											>
 												{note.titreNote}
 											</p>
 											<p className="mb-1">{note.note}</p>{" "}
-											<p
-												style={{ fontSize: "0.875em" }}
-											>
+											<p style={{ fontSize: "0.875em" }}>
 												Par {note.prenomEmploye}{" "}
 												{note.nomEmploye}
 											</p>
 										</div>
 
-										<div>
-											{formatDate(note.created_at)}
-										</div>
+										<div>{formatDate(note.created_at)}</div>
 									</div>
 								</div>
 							))
