@@ -25,7 +25,7 @@ export default function CreeClient() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:3000/clients/creerClient", {
+      const res = await fetch("/api/clients/creerClient", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

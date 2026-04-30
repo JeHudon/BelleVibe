@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 const menuItems = [
   { to: "/", label: "Tableau de bord", icon: "fa-chart-line" },
   { to: "/clients/nouveau", label: "Créer client", icon: "fa-user-plus" },
-  { to: "/comptes/nouveau", label: "Créer compte", icon: "fa-wallet" },
+  { to: "/creerCompte", label: "Créer compte", icon: "fa-wallet" },
   { to: "/notes/nouvelle", label: "Ajouter note", icon: "fa-file-lines" },
   { to: "/comptes", label: "Gestion du compte", icon: "fa-folder" },
 ];
