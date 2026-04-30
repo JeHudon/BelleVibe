@@ -1,38 +1,27 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const TYPE_PIECE = ["Permis de conduire", "Passeport", "Carte d'identité"];
-
 export default function CreeClient() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     prenomClient: "",
     nomClient: "",
-    dateNaissance: "",
     telephoneClient: "",
     courrielClient: "",
     adresseClient: "",
     codePostalClient: "",
-    typePiece: TYPE_PIECE[0],
-    numeroPiece: "",
-    consentement: false,
   });
   const [erreur, setErreur] = useState("");
   const [succes, setSucces] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErreur("");
-
-    if (!form.consentement) {
-      setErreur("Le consentement du client est obligatoire.");
-      return;
-    }
 
     try {
       const token = localStorage.getItem("token");
@@ -47,7 +36,7 @@ export default function CreeClient() {
 
       if (!res.ok) {
         const data = await res.json();
-        setErreur(data.message || "Erreur lors de la création du client.");
+        setErreur(data.error || data.message || "Erreur lors de la création du client.");
         return;
       }
 
@@ -132,20 +121,6 @@ export default function CreeClient() {
             </div>
           </div>
 
-          {/* Date de naissance */}
-          <div className="field">
-            <label className="label">Date de naissance</label>
-            <div className="control">
-              <input
-                className="input"
-                type="date"
-                name="dateNaissance"
-                value={form.dateNaissance}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
           {/* Téléphone / Courriel */}
           <div className="columns">
             <div className="column">
@@ -215,63 +190,6 @@ export default function CreeClient() {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Pièce d'identité */}
-          <p className="label mt-5 mb-3">Pièce d'identité</p>
-          <div className="columns">
-            <div className="column">
-              <div className="field">
-                <label className="label">Type de pièce</label>
-                <div className="control">
-                  <div className="select is-fullwidth">
-                    <select
-                      name="typePiece"
-                      value={form.typePiece}
-                      onChange={handleChange}
-                    >
-                      {TYPE_PIECE.map((t) => (
-                        <option key={t}>{t}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="column">
-              <div className="field">
-                <label className="label">Numéro de pièce</label>
-                <div className="control">
-                  <input
-                    className="input"
-                    type="text"
-                    name="numeroPiece"
-                    placeholder="G1234-567890-12"
-                    value={form.numeroPiece}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Consentement */}
-          <div className="notification is-light mt-4">
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                name="consentement"
-                checked={form.consentement}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              <strong>Consentement du client *</strong>
-            </label>
-            <p className="help mt-1">
-              Le client consent à ce que ses informations personnelles soient
-              collectées et utilisées conformément à notre politique de
-              confidentialité.
-            </p>
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
@@ -15,41 +15,32 @@ const serviceIcons = [
   { icon: "fa-tv", label: "TV" },
 ];
 
+// Fonction pour décoder le token JWT
+function parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
+
 export default function Sidebar() {
   const location = useLocation();
-  const [employe, setEmploye] = useState(null);
-  const [erreur, setErreur] = useState("");
-
-  useEffect(() => {
-    const fetchEmploye = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        console.log("Token:", token);
-
-        const res = await fetch("http://localhost:3000/employes/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        console.log("Status:", res.status);
-        const data = await res.json();
-        console.log("Data:", data);
-
-        if (!res.ok) {
-          setErreur(data.message || `Erreur ${res.status}`);
-          return;
-        }
-
-        setEmploye(data);
-      } catch (err) {
-        console.error("Fetch erreur:", err);
-        setErreur("Serveur inaccessible");
-      }
-    };
-
-    fetchEmploye();
-  }, []);
+  
+  // Extraire les infos de l'employé depuis le token
+  const token = localStorage.getItem("token");
+  const userInfo = token ? parseJwt(token) : null;
+  
+  const employeNom = userInfo ? `Employé #${userInfo.id}` : "Invité";
+  const employeRole = userInfo ? userInfo.role : "";
 
   return (
     <aside className="menu is-fullheight p-4 ">
@@ -57,7 +48,6 @@ export default function Sidebar() {
         <div className="media">
           <div className="media-left">
             <span className="icon is-large">
-              {/* <i className="fa-solid fa-wave-square" /> */}
               <img
                 src="https://arbrescanada.ca/wp-content/uploads/2023/08/Bell_Blue_large_transparent-1.png"
                 alt="Logo"
@@ -79,15 +69,11 @@ export default function Sidebar() {
 
           <div className="media-content">
             <p className="title is-6 mb-1">
-              {employe
-                ? `${employe.prenomEmploye} ${employe.nomEmploye}`
-                : erreur
-                ? <span className="has-text-danger is-size-7">{erreur}</span>
-                : "Chargement..."}
+              {employeNom}
             </p>
 
             <p className="subtitle is-7 has-text-grey">
-              {employe ? employe.roleEmploye : ""}
+              {employeRole}
             </p>
           </div>
         </div>
