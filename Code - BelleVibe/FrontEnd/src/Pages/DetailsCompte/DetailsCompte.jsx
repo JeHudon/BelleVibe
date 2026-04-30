@@ -8,11 +8,14 @@ function DetailsCompte() {
 	const [demandes, setDemandes] = useState(null);
 	const [documents, setDocuments] = useState(null);
 	const [notes, setNotes] = useState(null);
+	const [editingDoc, setEditingDoc] = useState(null);
 
 	const [modalOpen, setModalOpen] = useState(false);
 
 	const { onglet } = useParams();
 	const { id } = useParams();
+
+	const token = localStorage.getItem("token");
 
 	const navigate = useNavigate();
 
@@ -42,19 +45,18 @@ function DetailsCompte() {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: `Bearer ${localStorage.getItem("token")}`,
+						Authorization: `Bearer ${token}`,
 					},
 				},
 			).then((res) => res.json());
 			setClient(data);
-			console.log(data);
 		}
 		async function fetchForfaits() {
 			const data = await fetch(`/api/forfaitsDossier/${id}`, {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
+					Authorization: `Bearer ${token}`,
 				},
 			}).then((res) => res.json());
 			setForfaits(data);
@@ -64,7 +66,7 @@ function DetailsCompte() {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
+					Authorization: `Bearer ${token}`,
 				},
 			}).then((res) => res.json());
 			setDemandes(data);
@@ -74,7 +76,7 @@ function DetailsCompte() {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
+					Authorization: `Bearer ${token}`,
 				},
 			}).then((res) => res.json());
 			setDocuments(data);
@@ -84,7 +86,7 @@ function DetailsCompte() {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
+					Authorization: `Bearer ${token}`,
 				},
 			}).then((res) => res.json());
 			setNotes(data);
@@ -96,6 +98,12 @@ function DetailsCompte() {
 		fetchDocuments();
 		fetchNotes();
 	}, [onglet, id]);
+
+	const formatSize = (bytes) => {
+		if (bytes < 1024) return `${bytes} B`;
+		if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+		return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+	};
 
 	return (
 		<div className="section">
@@ -356,10 +364,14 @@ function DetailsCompte() {
 											</td>
 											<td className="is-vcentered">
 												<button
-													className="button is-small is-ghost"
+													className="button is-medium is-ghost"
+													style={{
+														paddingLeft: "0.5rem",
+														paddingRight: "0.5rem",
+													}}
 													title="Modifier"
 												>
-													<i className="fa-regular fa-pen-to-square fa-lg"></i>
+													<i className="fas fa-pen-to-square"></i>
 												</button>
 											</td>
 										</tr>
@@ -407,9 +419,13 @@ function DetailsCompte() {
 						</div>
 
 						<AjouterDocuments
-							isOpen={modalOpen}
-							onClose={() => setModalOpen(false)}
+							isOpen={!!editingDoc || modalOpen}
+							onClose={() => {
+								setEditingDoc(null);
+								setModalOpen(false);
+							}}
 							idDossier={id}
+							documentToEdit={editingDoc} // null = add mode, { id, name } = edit mode
 						/>
 
 						<table
@@ -442,13 +458,9 @@ function DetailsCompte() {
 												{document.nomDocument}
 											</td>
 											<td className="is-vcentered">
-												{Math.round(
-													(document.tailleDocument /
-														8 /
-														1024) *
-														100,
-												) / 100}{" "}
-												KB
+												{formatSize(
+													document.tailleDocument,
+												)}
 											</td>
 											<td className="is-vcentered">
 												{formatDate(
@@ -457,16 +469,30 @@ function DetailsCompte() {
 											</td>
 											<td className="is-vcentered">
 												<button
-													className="button is-small is-ghost"
+													className="button is-medium is-ghost"
+													style={{
+														paddingLeft: "0.5rem",
+														paddingRight: "0.5rem",
+													}}
 													title="Modifier"
+													onClick={() =>
+														setEditingDoc({
+															id: document.idDocument,
+															name: document.nomDocument,
+														})
+													}
 												>
-													<i className="fa-solid fa-pen-to-square fa-lg"></i>
+													<i className="fa-solid fa-pen-to-square"></i>
 												</button>
 												<button
-													className="button is-small is-ghost"
+													className="button is-medium is-ghost"
+													style={{
+														paddingLeft: "0.5rem",
+														paddingRight: "0.5rem",
+													}}
 													title="Telecharger"
 												>
-													<i className="fa-solid fa-download fa-lg"></i>
+													<i className="fa-solid fa-download"></i>
 												</button>
 											</td>
 										</tr>
