@@ -28,6 +28,19 @@ router.get("/:idDossier", authentifier, async (req, res) => {
 	}
 });
 
+router.get("/:idDocument", authentifier, async (req, res) => {
+	const { idDocument } = req.params;
+	try {
+		const document = await db("documents")
+			.select("*")
+			.where("idDocument", idDocument);
+		res.status(200).json(document);
+	} catch (err) {
+		console.error("Erreur /getDocuments/:idDocument", err);
+		res.status(500).json({ error: "Erreur serveur.." });
+	}
+});
+
 async function resolveDossier(req, res, next) {
 	if (!req.params.idDossier && req.params.idDocument) {
 		const doc = await db("documents")
@@ -115,7 +128,7 @@ router.post(
 // });
 
 // Modifier un document d'un dossier
-router.put(
+router.patch(
 	"/:idDocument/file",
 	authentifier,
 	resolveDossier,
@@ -123,49 +136,44 @@ router.put(
 	async (req, res) => {
 		try {
 			const { idDocument } = req.params;
-			const { idDossier } = req.body;
 
-			// Vérification qu'il y a bien un fichier dans la requête
-			if (!req.file) {
-				return res
-					.status(400)
-					.json({ error: "Aucun nouveau fichier fourni" });
-			}
-
-			// Vérification que tous les champs sont remplis
-			const validationResult = validerChamps({ idDossier });
-			if (validationResult.error)
-				return res.status(400).json({ error: validationResult.error });
-
-			// Récupérer le chemin de l'ancien fichier pour pouvoir le supprimer plus tard
+			// Vérification que le document existe avant de le modifier
 			const existing = await db("documents")
 				.where({ idDocument })
 				.select("cheminDocument")
 				.first();
 
-			const data = {
-				idDossier,
-				typeDocument: path
-					.extname(req.file.originalname)
-					.slice(1)
-					.toUpperCase(),
-				tailleDocument: req.file.size,
-				nomDocument: req.file.originalname,
-				cheminDocument: req.file.path,
-			};
-
-			// Vérification que le document existe avant de le modifier
-			const verifDocument = await db("documents")
-				.where("idDocument", idDocument)
-				.update(data);
-			if (verifDocument === 0) {
-				// Si l'update a échoué, supprimer le nouveau fichier uploadé
-				fs.unlinkSync(req.file.path);
+			if (!existing) {
+				if (req.file) fs.unlinkSync(req.file.path);
 				return res.status(404).json({ error: "Document non trouvé" });
 			}
 
-			// Supprimer l'ancien fichier du serveur seulement après avoir mis à jour la base de données avec le nouveau fichier
-			if (existing?.cheminDocument) {
+			// Construire l'objet de mise à jour
+			const data = {};
+
+			if (req.body.nomDocument) {
+				data.nomDocument = req.body.nomDocument;
+			}
+
+			if (req.file) {
+				data.typeDocument = path
+					.extname(req.file.originalname)
+					.slice(1)
+					.toUpperCase();
+				data.tailleDocument = req.file.size;
+				data.cheminDocument = req.file.path;
+			}
+
+			if (Object.keys(data).length === 0) {
+				return res
+					.status(400)
+					.json({ error: "Aucune modification fournie" });
+			}
+
+			await db("documents").where({ idDocument }).update(data);
+
+			// Supprimer l'ancien fichier seulement si un nouveau a été uploadé
+			if (req.file && existing.cheminDocument) {
 				fs.unlink(existing.cheminDocument, (err) => {
 					if (err)
 						console.warn(
@@ -181,7 +189,7 @@ router.put(
 				idDocument: Number(idDocument),
 			});
 		} catch (err) {
-			console.error("Erreur PUT /:idDocument/file", err);
+			console.error("Erreur PATCH /:idDocument/file", err);
 			res.status(500).json({ error: "Erreur serveur", err });
 		}
 	},
