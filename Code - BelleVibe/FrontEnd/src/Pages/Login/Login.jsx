@@ -36,6 +36,8 @@ export function Login() {
             localStorage.setItem("token", data.token)
             navigate("/dashboard");
 
+            navigate("/dashboard")
+
         } catch (err) {
             setError("Erreur réseau", err);
         }
@@ -72,7 +74,7 @@ export function Login() {
                 alt="BelleVibe Logo"
                 style={{
                     position: "absolute",
-                    top: "-5rem",
+                    top: "-4rem",
                     left: "50%",
                     transform: "translateX(-50%)",
                     width: "min(600px, 70vw)",
