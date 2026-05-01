@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
-  { to: "/", label: "Tableau de bord", icon: "fa-chart-line" },
+  { to: "/dashboard", label: "Tableau de bord", icon: "fa-chart-line" },
   { to: "/clients/nouveau", label: "Créer client", icon: "fa-user-plus" },
   { to: "/creerCompte", label: "Créer compte", icon: "fa-wallet" },
   { to: "/notes/nouvelle", label: "Ajouter note", icon: "fa-file-lines" },
@@ -81,7 +81,7 @@ export default function Sidebar() {
         <nav className="menu">
           <ul className="menu-list">
             {menuItems.map((item) => {
-              const isActive = location.pathname === item.to;
+              const isActive = location.pathname.includes(item.to);
               return (
                 <li key={item.to}>
                   <Link
