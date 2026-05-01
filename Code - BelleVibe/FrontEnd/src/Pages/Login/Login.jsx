@@ -34,10 +34,8 @@ export function Login() {
             const data = await response.json();
             console.log(data)
             localStorage.setItem("token", data.token)
+            
             navigate("/dashboard");
-
-            navigate("/dashboard")
-
         } catch (err) {
             setError("Erreur réseau", err);
         }
