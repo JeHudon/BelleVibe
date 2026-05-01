@@ -8,6 +8,7 @@ export function CreerCompte() {
     const [clientSelection, setClientSelection] = useState(null);
     const [servicesSelection, setServicesSelection] = useState([]);
     const [typeServicesSelection, setTypeServicesSelection] = useState([]);
+    const [forfaitsSelection, setForfaitsSelection] = useState([]);
     const [afficherErreur, setAfficherErreur] = useState(false);
     const [messageErreur, setMessageErreur] = useState("");
     const labels = ["Client", "Services", "Forfaits", "Confirmer"];
@@ -108,40 +109,121 @@ export function CreerCompte() {
         }
     }
 
-    function selectionForfaits(idForfait, prixForfait) {
+    function selectionForfaits(idForfait, typeService) {
 
+        const service = services.find(s => s.typeService === typeService);
+
+        const forfaitMemeCat = forfaits.find(f =>
+            forfaitsSelection.includes(f.idForfait) && f.idService === service.idService
+        );
+
+        if (forfaitsSelection.includes(idForfait)) {
+            setForfaitsSelection(forfaitsSelection.filter(id => id !== idForfait))
+        } else if (forfaitMemeCat) {
+            setForfaitsSelection(forfaitsSelection.filter(id => id !== forfaitMemeCat.idForfait).concat(idForfait))
+        } else {
+            setForfaitsSelection([...forfaitsSelection, idForfait])
+        }
     }
 
     function affichageForfaits() {
-        if (typeServicesSelection.includes("TV")) {
-            return (
-                <div className="subtitle is-4 mt-2">
-                    Forfaits TV
-                    {forfaits.filter(forfait => forfait.typeService === "TV").map((forfait) => (
-                        <div key={forfait.idForfait}
-                            className="button is-light"
-                            onClick={() => selectionClient(client.idClient)}
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                width: "100%",
-                                height: "auto",
-                                marginBottom: "0.5rem",
-                                alignItems: "flex-start",
-                                textAlign: "left",
-                                transition: "all 0.2s ease",
-                                ...(clientSelection === client.idClient && {
-                                    backgroundColor: "#62cf5fff",
-                                    boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
-                                })
-                            }}>
-                            <div className="subtitle is-5 mb-0">{client.prenomClient} {client.nomClient}</div>
-                            <div className="subtitle is-6 mb-0">{client.telephoneClient} - {client.courrielClient}</div>
-                        </div>
-                    ))}
-                </div>
-            )
-        }
+        return (
+            <div>
+                {typeServicesSelection.includes("TV") && (
+                    <div>
+                        <div className="title is-5 mt-4 mb-4">Forfaits TV</div>
+                        {forfaits.filter(forfait => forfait.typeService === "TV").map((forfait) => (
+                            <div key={forfait.idForfait}
+                                className="button is-light"
+                                onClick={() => selectionForfaits(forfait.idForfait, "TV")}
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    width: "100%",
+                                    height: "auto",
+                                    marginBottom: "0.5rem",
+                                    textAlign: "left",
+                                    transition: "all 0.2s ease",
+                                    ...(forfaitsSelection.includes(forfait.idForfait) && {
+                                        backgroundColor: "#62cf5fff",
+                                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
+                                    })
+                                }}>
+                                <div>
+                                    <div className="subtitle is-5 mb-0 has-text-weight-bold">{forfait.nomForfait}</div>
+                                    <div className="subtitle is-5 mb-0">{forfait.descriptionForfait}</div>
+                                </div>
+                                <div className="has-text-weight-bold">{forfait.prixForfait}$/mois</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                {typeServicesSelection.includes("Wi-fi") && (
+                    <div>
+                        <div className="title is-5 mt-4 mb-4">Forfaits Wi-Fi</div>
+                        {forfaits.filter(forfait => forfait.typeService === "Wi-fi").map((forfait) => (
+                            <div key={forfait.idForfait}
+                                className="button is-light"
+                                onClick={() => selectionForfaits(forfait.idForfait, "Wi-fi")}
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    width: "100%",
+                                    height: "auto",
+                                    marginBottom: "0.5rem",
+                                    textAlign: "left",
+                                    transition: "all 0.2s ease",
+                                    ...(forfaitsSelection.includes(forfait.idForfait) && {
+                                        backgroundColor: "#62cf5fff",
+                                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
+                                    })
+                                }}>
+                                <div>
+                                    <div className="subtitle is-5 mb-0 has-text-weight-bold">{forfait.nomForfait}</div>
+                                    <div className="subtitle is-5 mb-0">{forfait.descriptionForfait}</div>
+                                </div>
+                                <div className="has-text-weight-bold">{forfait.prixForfait}$/mois</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                {typeServicesSelection.includes("Cellulaire") && (
+                    <div>
+                        <div className="title is-5 mt-4 mb-4">Forfaits Cellulaire</div>
+                        {forfaits.filter(forfait => forfait.typeService === "Cellulaire").map((forfait) => (
+                            <div key={forfait.idForfait}
+                                className="button is-light"
+                                onClick={() => selectionForfaits(forfait.idForfait, "Cellulaire")}
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    width: "100%",
+                                    height: "auto",
+                                    marginBottom: "0.5rem",
+                                    textAlign: "left",
+                                    transition: "all 0.2s ease",
+                                    ...(forfaitsSelection.includes(forfait.idForfait) && {
+                                        backgroundColor: "#62cf5fff",
+                                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
+                                    })
+                                }}>
+                                <div>
+                                    <div className="subtitle is-5 mb-0 has-text-weight-bold">{forfait.nomForfait}</div>
+                                    <div className="subtitle is-5 mb-0">{forfait.descriptionForfait}</div>
+                                </div>
+                                <div className="has-text-weight-bold">{forfait.prixForfait}$/mois</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        )
     }
 
 
@@ -169,7 +251,7 @@ export function CreerCompte() {
                                     boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
                                 })
                             }}>
-                            <div className="subtitle is-5 mb-0">{client.prenomClient} {client.nomClient}</div>
+                            <div className="subtitle is-5 mb-0 has-text-weight-bold">{client.prenomClient} {client.nomClient}</div>
                             <div className="subtitle is-6 mb-0">{client.telephoneClient} - {client.courrielClient}</div>
                         </div>
                     ))}
@@ -194,7 +276,7 @@ export function CreerCompte() {
                                             boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
                                         })
                                     }}>
-                                    <div className="subtitle is-5 mb-0">{service.typeService}</div>
+                                    <div className="subtitle is-5 mb-0 has-text-weight-bold">{service.typeService}</div>
                                 </div>
                             </div>
                         ))}
@@ -205,8 +287,39 @@ export function CreerCompte() {
             return (
                 <div className="mt-2">
                     <h3 className="title is-4">Sélection des forfaits</h3>
-                    <div className="subtitle is-5 mt-2">Sélectionner un ou plusieurs forfaits</div>
+                    <div className="subtitle is-5 mt-2">Sélectionner un forfait pour chaque service</div>
                     {affichageForfaits()}
+                </div>
+            )
+        } else if (etape == 4) {
+            const client = clients.find(c => c.idClient === clientSelection);
+            return (
+                <div className="mt-2">
+                    <h3 className="title is-4">Résumé et confirmation</h3>
+                    <div className="subtitle is-5 mt-2">Confirmer les informations sélectionnées</div>
+                    <div className="box">
+                        <div className="title is-4 mb-2">Client sélectionné</div>
+                        <div className="subtitle is-5">{client.prenomClient} {client.nomClient} - {client.telephoneClient}</div>
+                    </div>
+                    <div className="box">
+                        <div className="title is-4">Services sélectionnés</div>
+                        <div className="subtitle is-5 mt-2">
+                            {services
+                                .filter(s => servicesSelection.includes(s.idService))
+                                .map(s => s.typeService)
+                                .join(", ")}
+                        </div>
+                    </div>
+                    <div className="title is-4">Forfaits sélectionnés</div>
+                    {forfaits
+                        .filter(f => forfaitsSelection.includes(f.idForfait))
+                        .map((forfait) => (
+                            <div key={forfait.idForfait} className="box">
+                                <div className="title is-4">{forfait.nomForfait}</div>
+                                <div className="subtitle is-5 mt-2">{forfait.prixForfait}</div>
+                            </div>
+                        ))
+                    }
                 </div>
             )
         }
@@ -227,6 +340,22 @@ export function CreerCompte() {
                 setAfficherErreur(true)
                 setTimeout(() => setAfficherErreur(false), 6000);
                 setMessageErreur("Veuillez sélectionner un service")
+            } else {
+                setEtape(etape + 1)
+                return
+            }
+        } else if (etape == 3) {
+            const tousLesForfaitsChoisis = typeServicesSelection.every(type => {
+                const service = services.find(s => s.typeService === type);
+                return forfaits.some(f =>
+                    f.idService === service.idService && forfaitsSelection.includes(f.idForfait)
+                );
+            });
+
+            if (!tousLesForfaitsChoisis) {
+                setAfficherErreur(true)
+                setTimeout(() => setAfficherErreur(false), 6000);
+                setMessageErreur("Veuillez sélectionner un forfait par service")
             } else {
                 setEtape(etape + 1)
                 return
