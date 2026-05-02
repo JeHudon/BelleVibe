@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AjouterDocuments from "../components/AjouterDocuments";
+import { ForfaitCard } from "../components/ForfaitCard";
 
 function DetailsCompte() {
 	const [client, setClient] = useState(null);
@@ -112,155 +113,43 @@ function DetailsCompte() {
 				<div className="tabs is-toggle is-toggle-rounded is-fullwidth">
 					<ul>
 						<li className={onglet === "resume" ? "is-active" : ""}>
-							<a onClick={() => updateFilters("resume")}>
-								Résumé
-							</a>
+							<a onClick={() => updateFilters("resume")}>Résumé</a>
 						</li>
-						<li
-							className={onglet === "demandes" ? "is-active" : ""}
-						>
-							<a onClick={() => updateFilters("demandes")}>
-								Demandes
-							</a>
+						<li className={onglet === "demandes" ? "is-active" : ""}>
+							<a onClick={() => updateFilters("demandes")}>Demandes</a>
 						</li>
-						<li
-							className={
-								onglet === "documents" ? "is-active" : ""
-							}
-						>
-							<a onClick={() => updateFilters("documents")}>
-								Documents
-							</a>
+						<li className={onglet === "documents" ? "is-active" : ""}>
+							<a onClick={() => updateFilters("documents")}>Documents</a>
 						</li>
 						<li className={onglet === "notes" ? "is-active" : ""}>
 							<a onClick={() => updateFilters("notes")}>Notes</a>
 						</li>
-						<li
-							className={
-								onglet === "facturation" ? "is-active" : ""
-							}
-						>
-							<a onClick={() => updateFilters("facturation")}>
-								Facturation
-							</a>
+						<li className={onglet === "facturation" ? "is-active" : ""}>
+							<a onClick={() => updateFilters("facturation")}>Facturation</a>
 						</li>
 					</ul>
 				</div>
 				{onglet === "resume" && (
-					<div
-						className="box is-shadowless"
-						style={{ border: "1px solid #d6d6d6" }}
-					>
-						<h2 className="title is-5 is-spaced">
-							Informations du compte
-						</h2>
+					<div className="box is-shadowless" style={{ border: "1px solid #d6d6d6" }}>
+						<h2 className="title is-5 is-spaced">Informations du compte</h2>
 						<h3 className="title is-4">Forfaits actifs</h3>
 						{forfaits && forfaits.length > 0 ? (
-							forfaits.map((forfait) =>
-								forfait.typeService === "Mobile" ? (
-									<div
-										className={
-											isDark
-												? "notification is-info"
-												: "notification is-info is-light"
-										}
-									>
-										<div
-											className="is-flex is-align-items-center"
-											style={{ gap: "14px" }}
-										>
-											<span className="icon is-medium">
-												<i className="fa-solid fa-signal"></i>
-											</span>
-											<div>
-												<p
-													className="has-text-weight-semibold"
-													style={{ margin: "0" }}
-												>
-													Mobile -{" "}
-													{forfait.nomForfait}
-												</p>
-												<p
-													className="has-text-grey is-size-7"
-													style={{ margin: "0" }}
-												>
-													{forfait.descriptionForfait}
-												</p>
-											</div>
-										</div>
-									</div>
-								) : forfait.typeService === "Wifi" ? (
-									<div
-										className={
-											isDark
-												? "notification is-primary"
-												: "notification is-primary is-light"
-										}
-									>
-										<div
-											className="is-flex is-align-items-center"
-											style={{ gap: "14px" }}
-										>
-											<span className="icon is-medium">
-												<i className="fa-solid fa-wifi"></i>
-											</span>
-											<div>
-												<p
-													className="has-text-weight-semibold"
-													style={{ margin: "0" }}
-												>
-													Internet -{" "}
-													{forfait.nomForfait}
-												</p>
-												<p
-													className="has-text-grey is-size-7"
-													style={{ margin: "0" }}
-												>
-													{forfait.descriptionForfait}
-												</p>
-											</div>
-										</div>
-									</div>
-								) : forfait.typeService === "TV" ? (
-									<div className="notification is-link is-light">
-										<div
-											className="is-flex is-align-items-center"
-											style={{ gap: "14px" }}
-										>
-											<span className="icon is-medium">
-												<i className="fa-solid fa-tv"></i>
-											</span>
-											<div>
-												<p
-													className="has-text-weight-semibold"
-													style={{ margin: "0" }}
-												>
-													TV - {forfait.nomForfait}
-												</p>
-												<p
-													className="has-text-grey is-size-7"
-													style={{ margin: "0" }}
-												>
-													{forfait.descriptionForfait}
-												</p>
-											</div>
-										</div>
-									</div>
-								) : (
-									""
-								),
-							)
+							forfaits.map((forfait) => (
+								<ForfaitCard
+									key={forfait.idForfait}
+									forfait={forfait}
+									isDark={isDark}
+								/>
+							))
 						) : (
-							<h1>Aucun forfait actif</h1>
+							<h1>Aucun forfait trouvé pour ce compte</h1>
 						)}
 						<h3 className="title is-4">Informations clients</h3>
 						<div className="columns">
 							<div className="column is-6">
 								<label>Email :</label>
 								<div className="control">
-									<p className="has-text-weight-bold">
-										{client?.courrielClient}
-									</p>
+									<p className="has-text-weight-bold">{client?.courrielClient}</p>
 								</div>
 							</div>
 							<div className="column is-6">
@@ -275,25 +164,18 @@ function DetailsCompte() {
 						<div className="">
 							<label>Adresse :</label>
 							<div className="control">
-								<p className="has-text-weight-bold">
-									{client?.adresseClient}
-								</p>
+								<p className="has-text-weight-bold">{client?.adresseClient}</p>
 							</div>
 						</div>
 					</div>
 				)}
 				{onglet === "demandes" && (
-					<div
-						className="box is-shadowless"
-						style={{ border: "1px solid #d6d6d6" }}
-					>
+					<div className="box is-shadowless" style={{ border: "1px solid #d6d6d6" }}>
 						<div className="level">
 							<div className="level-left">
 								<div className="level-item">
 									<div>
-										<h2 className="title is-5">
-											Demandes de service
-										</h2>
+										<h2 className="title is-5">Demandes de service</h2>
 										<p className="subtitle is-6">
 											Gérer les demandes pour ce compte
 										</p>
@@ -302,9 +184,7 @@ function DetailsCompte() {
 							</div>
 							<div className="level-right">
 								<div className="level-item">
-									<button className="button is-dark">
-										+ Créer demande
-									</button>
+									<button className="button is-dark">+ Créer demande</button>
 								</div>
 							</div>
 						</div>
@@ -315,12 +195,8 @@ function DetailsCompte() {
 						>
 							<thead>
 								<tr>
-									<th style={{ width: "100px" }}>
-										Catégorie
-									</th>
-									<th style={{ width: "400px" }}>
-										Description
-									</th>
+									<th style={{ width: "100px" }}>Catégorie</th>
+									<th style={{ width: "400px" }}>Description</th>
 									<th style={{ width: "80px" }}>Statut</th>
 									<th style={{ width: "150px" }}>Créée le</th>
 									<th style={{ width: "60px" }}>Actions</th>
@@ -329,26 +205,19 @@ function DetailsCompte() {
 							<tbody>
 								{demandes && demandes.length > 0 ? (
 									demandes.map((demande) => (
-										<tr style={{ height: "55px" }}>
+										<tr style={{ height: "55px" }} key={demande.idDemande}>
 											<td className="is-vcentered">
-												<strong>
-													{demande.typeDemande}
-												</strong>
+												<strong>{demande.typeDemande}</strong>
 											</td>
-											<td className="is-vcentered">
-												{demande.noteInterne}
-											</td>
+											<td className="is-vcentered">{demande.noteInterne}</td>
 											<td className="is-vcentered">
 												<span
 													className={
-														demande.statutDemande ===
-														"Ouverte"
+														demande.statutDemande === "Ouverte"
 															? "tag is-success"
-															: demande.statutDemande ===
-																  "En attente"
+															: demande.statutDemande === "En attente"
 																? "tag is-warning"
-																: demande.statutDemande ===
-																	  "Fermée"
+																: demande.statutDemande === "Fermée"
 																	? "tag is-dark"
 																	: "tag is-danger"
 													}
@@ -379,8 +248,7 @@ function DetailsCompte() {
 								) : (
 									<tr>
 										<td colSpan="6">
-											Aucune demande de service pour ce
-											compte.
+											Aucune demande de service pour ce compte.
 										</td>
 									</tr>
 								)}
@@ -389,17 +257,12 @@ function DetailsCompte() {
 					</div>
 				)}
 				{onglet === "documents" && (
-					<div
-						className="box is-shadowless"
-						style={{ border: "1px solid #d6d6d6" }}
-					>
+					<div className="box is-shadowless" style={{ border: "1px solid #d6d6d6" }}>
 						<div className="level">
 							<div className="level-left">
 								<div className="level-item">
 									<div>
-										<h2 className="title is-5">
-											Documents
-										</h2>
+										<h2 className="title is-5">Documents</h2>
 										<p className="subtitle is-6">
 											Gérer les documents du compte
 										</p>
@@ -435,37 +298,25 @@ function DetailsCompte() {
 							<thead>
 								<tr>
 									<th style={{ width: "100px" }}>Type</th>
-									<th style={{ width: "350px" }}>
-										Nom du fichier
-									</th>
+									<th style={{ width: "350px" }}>Nom du fichier</th>
 									<th style={{ width: "100px" }}>Taille</th>
-									<th style={{ width: "180px" }}>
-										Ajouté le
-									</th>
+									<th style={{ width: "180px" }}>Ajouté le</th>
 									<th style={{ width: "100px" }}>Actions</th>
 								</tr>
 							</thead>
 							<tbody>
 								{documents && documents.length > 0 ? (
 									documents.map((document) => (
-										<tr style={{ height: "55px" }}>
+										<tr style={{ height: "55px" }} key={document.idDocument}>
 											<td className="is-vcentered">
-												<strong>
-													{document.typeDocument}
-												</strong>
+												<strong>{document.typeDocument}</strong>
+											</td>
+											<td className="is-vcentered">{document.nomDocument}</td>
+											<td className="is-vcentered">
+												{formatSize(document.tailleDocument)}
 											</td>
 											<td className="is-vcentered">
-												{document.nomDocument}
-											</td>
-											<td className="is-vcentered">
-												{formatSize(
-													document.tailleDocument,
-												)}
-											</td>
-											<td className="is-vcentered">
-												{formatDate(
-													document.created_at,
-												)}
+												{formatDate(document.created_at)}
 											</td>
 											<td className="is-vcentered">
 												<button
@@ -500,8 +351,7 @@ function DetailsCompte() {
 								) : (
 									<tr>
 										<td colSpan="6">
-											Aucune demande de service pour ce
-											compte.
+											Aucune demande de service pour ce compte.
 										</td>
 									</tr>
 								)}
@@ -510,10 +360,7 @@ function DetailsCompte() {
 					</div>
 				)}
 				{onglet === "notes" && (
-					<div
-						className="box is-shadowless"
-						style={{ border: "1px solid #d6d6d6" }}
-					>
+					<div className="box is-shadowless" style={{ border: "1px solid #d6d6d6" }}>
 						<div className="level">
 							<div className="level-left">
 								<div className="level-item">
@@ -527,9 +374,7 @@ function DetailsCompte() {
 							</div>
 							<div className="level-right">
 								<div className="level-item">
-									<button className="button is-dark">
-										+ Ajouter note
-									</button>
+									<button className="button is-dark">+ Ajouter note</button>
 								</div>
 							</div>
 						</div>
@@ -542,24 +387,17 @@ function DetailsCompte() {
 										padding: "1rem",
 										marginBottom: "1rem",
 									}}
+									key={note.idNote}
 								>
 									<div
 										className="is-flex is-justify-content-space-between is-align-items-flex-start"
 										style={{ gap: "1rem" }}
 									>
 										<div>
-											<p
-												className="title is-6"
-												style={{
-													marginBottom: "0.25rem",
-												}}
-											>
-												{note.titreNote}
-											</p>
+											<p className="title is-6 mb-2">{note.titreNote}</p>
 											<p className="mb-1">{note.note}</p>{" "}
 											<p style={{ fontSize: "0.875em" }}>
-												Par {note.prenomEmploye}{" "}
-												{note.nomEmploye}
+												Par {note.prenomEmploye} {note.nomEmploye}
 											</p>
 										</div>
 

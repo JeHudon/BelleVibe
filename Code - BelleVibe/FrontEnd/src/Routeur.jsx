@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import App from "./Pages/App.jsx";
 import DetailsCompte from "./Pages/DetailsCompte.jsx";
+import DetailsClient from "./Pages/DetailsClient.jsx";
 import { Login }  from "./Pages/Login.jsx";
 import { CreerCompte } from "./Pages/CreerCompte.jsx";
 import Sidebar from "./components/Sidebar";
@@ -57,6 +58,7 @@ function Routeur() {
 						<Route path="/clients/nouveau" element={<CreeClient />} />
 						<Route path="/creerCompte" element={<CreerCompte />} />
 						<Route path="/comptes/:id/:onglet" element={<DetailsCompte />} />
+						<Route path="/clients/:id/:onglet" element={<DetailsClient />} />
 						<Route path="*" element={<div className="section has-text-centered">Page non trouvée</div>} />
 					</Route>
 				</Routes>

@@ -42,6 +42,29 @@ router.get("/getDossier/:idDossier", authentifier, async (req, res) => {
     }
 });
 
+// Get les dossiers d'un client
+router.get("/getDossiers/:idClient", authentifier, async (req, res) => {
+    try {
+        const { idClient } = req.params;
+
+        // const validationResult = validerChamps({ idClient });
+        // if (validationResult.error) {
+        //     return res.status(400).json({ error: validationResult.error });
+        // }
+
+        const dossiers = await db("dossiers").where("idClient", idClient);
+
+        if (!dossiers) {
+            return res.status(404).json({ error: "Dossiers non trouvé." });
+        }
+
+        res.status(200).json(dossiers);
+    } catch (error) {
+        console.error("Erreur /getDossier/:idDossier", error);
+        res.status(500).json({ error: "Erreur serveur." });
+    }
+});
+
 // get les dossiers en attente
 router.get('/dossiersAttente', authentifier, async (req, res) => {
     try {
