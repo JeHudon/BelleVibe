@@ -1,8 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext} from "react";
+import { LoginContext } from "../../LoginContext.js";
 
 export function Login() {
     const navigate = useNavigate();
+    const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
     const [email, setEmail] = useState("employe@bellevibe.com");
     const [mdp, setMdp] = useState("123456");
     const [role, setRole] = useState("Employé")
@@ -35,6 +37,7 @@ export function Login() {
             console.log(data)
             localStorage.setItem("token", data.token)
             
+            setIsLoggedIn(true);
             navigate("/dashboard");
         } catch (err) {
             setError("Erreur réseau", err);
