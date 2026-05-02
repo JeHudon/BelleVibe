@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext} from "react";
-import { LoginContext } from "../../LoginContext.js";
+import { LoginContext } from "../context/LoginContext.js";
 
 export function Login() {
     const navigate = useNavigate();
