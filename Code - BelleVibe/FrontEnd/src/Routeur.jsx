@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import App from "./Pages/App/App.jsx";
 import DetailsCompte from "./Pages/DetailsCompte/DetailsCompte.jsx";
-import { Login } from "./Pages/Login/Login.jsx";
+import { Login }  from "./Pages/Login/Login.jsx";
 import { CreerCompte } from "./CreerCompte.jsx";
 import Sidebar from "./sidebar";
 import CreeClient from "./CreeClient";
@@ -16,9 +16,19 @@ function isTokenExpired(token) {
 function Routeur() {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [isLoggedIn, setIsLoggedIn] = useState(() => {
-		return localStorage.getItem("token") !== null;
+		const token = localStorage.getItem("token");
+		if (!token) return false;
+		if (isTokenExpired(token)) {
+			localStorage.removeItem("token");
+			return false;
+		}
+		return true;
 	});
-	const objetsEtMethodesDuContexte = { isLoggedIn, setIsLoggedIn };
+
+	const objetsEtMethodesDuContexte = {
+		isLoggedIn,
+		setIsLoggedIn,
+	};
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -27,71 +37,28 @@ function Routeur() {
 			setIsLoggedIn(false);
 		}
 	}, []);
-
 	return (
-		<LoginContext.Provider value={objetsEtMethodesDuContexte}>
+		<LoginContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
 			<BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
 				<Routes>
-					<Route path="/login" element={<Login />} />
 					<Route
-						path="*"
-						element={
-							!isLoggedIn ? (
-								<Navigate to="/login" replace />
-							) : (
-								<div className="columns is-gapless" style={{ minHeight: "100vh" }}>
-									<div
-										className={`column is-narrow px-0 ${sidebarOpen ? "" : "is-hidden-touch"}`}
-									>
-										<Sidebar
-											isOpen={sidebarOpen}
-											onClose={() => setSidebarOpen(false)}
-										/>
-									</div>
-									<div
-										className="column"
-										style={{ background: "#f8fbff", padding: "2rem" }}
-									>
-										<div className="is-hidden-tablet mb-4">
-											<button
-												className="button is-white"
-												onClick={() => setSidebarOpen((open) => !open)}
-											>
-												<span className="icon">
-													<i className="fa-solid fa-bars" />
-												</span>
-												<span>Menu</span>
-											</button>
-										</div>
-										<Routes>
-											<Route
-												path="/"
-												element={<Navigate to="/login" replace />}
-											/>
-											<Route path="/dashboard" element={<App />} />
-											<Route
-												path="/clients/nouveau"
-												element={<CreeClient />}
-											/>
-											<Route path="/creerCompte" element={<CreerCompte />} />
-											<Route
-												path="/comptes/:id/:onglet"
-												element={<DetailsCompte />}
-											/>
-											<Route
-												path="*"
-												element={
-													<div className="section has-text-centered">
-														Page non trouvée
-													</div>
-												}
-											/>
-										</Routes>
-									</div>
-								</div>
-							)
-						}
+						path="/login"
+						element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Login />}
 					/>
+					<Route
+						element={
+							isLoggedIn
+								? <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+								: <Navigate to="/login" replace />
+						}
+					>
+						<Route index element={<Navigate to="/dashboard" replace />} />
+						<Route path="/dashboard" element={<App />} />
+						<Route path="/clients/nouveau" element={<CreeClient />} />
+						<Route path="/creerCompte" element={<CreerCompte />} />
+						<Route path="/comptes/:id/:onglet" element={<DetailsCompte />} />
+						<Route path="*" element={<div className="section has-text-centered">Page non trouvée</div>} />
+					</Route>
 				</Routes>
 			</BrowserRouter>
 		</LoginContext.Provider>
