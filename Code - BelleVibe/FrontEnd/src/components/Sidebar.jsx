@@ -7,6 +7,7 @@ const menuItems = [
 	{ to: "/creerCompte", label: "Créer compte", icon: "fa-wallet" },
 	{ to: "/notes/nouvelle", label: "Ajouter note", icon: "fa-file-lines" },
 	{ to: "/comptes", label: "Gestion du compte", icon: "fa-folder" },
+	{ to: "/clients", label: "Gestion du clients", icon: "fa-user" },
 ];
 
 const serviceIcons = [
@@ -79,7 +80,9 @@ export default function Sidebar(sidebarOpen, setSidebarOpen) {
 						<nav className="menu">
 							<ul className="menu-list">
 								{menuItems.map((item) => {
-									const isActive = location.pathname.includes(item.to);
+									const isActive =
+										location.pathname === item.to ||
+										location.pathname.startsWith(item.to + "/");
 									return (
 										<li key={item.to}>
 											<Link
