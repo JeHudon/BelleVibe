@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
-import App from "./Pages/App/App.jsx";
-import DetailsCompte from "./Pages/DetailsCompte/DetailsCompte.jsx";
-import { Login }  from "./Pages/Login/Login.jsx";
-import { CreerCompte } from "./CreerCompte.jsx";
-import Sidebar from "./sidebar";
-import CreeClient from "./CreeClient";
-import { LoginContext } from "./LoginContext.js";
+import App from "./Pages/App.jsx";
+import DetailsCompte from "./Pages/DetailsCompte.jsx";
+import { Login }  from "./Pages/Login.jsx";
+import { CreerCompte } from "./Pages/CreerCompte.jsx";
+import Sidebar from "./components/Sidebar";
+import CreeClient from "./Pages/CreerClient";
+import { LoginContext } from "./context/LoginContext.js";
 
 function isTokenExpired(token) {
 	const payload = JSON.parse(atob(token.split(".")[1]));

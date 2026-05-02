@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import AjouterDocuments from "../../../components/AjouterDocuments";
+import AjouterDocuments from "../components/AjouterDocuments";
 
 function DetailsCompte() {
 	const [client, setClient] = useState(null);
