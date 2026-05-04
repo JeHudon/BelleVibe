@@ -1,11 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
-export default function AjouterDocuments({
-	isOpen,
-	onClose,
-	idDossier,
-	documentToEdit,
-}) {
+export default function AjouterDocuments({ isOpen, onClose, idDossier, documentToEdit }) {
 	const isEditMode = !!documentToEdit;
 	const [files, setFiles] = useState([]);
 	const [isDragging, setIsDragging] = useState(false);
@@ -18,15 +13,11 @@ export default function AjouterDocuments({
 		setFiles((prev) => {
 			const merged = [...prev];
 			for (const f of newFiles) {
-				if (
-					!merged.find(
-						(x) => x.file.name === f.name && x.file.size === f.size,
-					)
-				) {
-					const { base, ext } = splitName(f.name); 
+				if (!merged.find((x) => x.file.name === f.name && x.file.size === f.size)) {
+					const { base, ext } = splitName(f.name);
 					merged.push({
 						file: f,
-						base, 
+						base,
 						ext,
 					});
 				}
@@ -35,8 +26,7 @@ export default function AjouterDocuments({
 		});
 	};
 
-	const removeFile = (index) =>
-		setFiles((prev) => prev.filter((_, i) => i !== index));
+	const removeFile = (index) => setFiles((prev) => prev.filter((_, i) => i !== index));
 
 	const handleDrop = useCallback((e) => {
 		e.preventDefault();
@@ -64,6 +54,7 @@ export default function AjouterDocuments({
 			setFiles([]);
 			setEditBase("");
 			setEditExt("");
+			setMessage([]); 
 		}
 	}, [isOpen, documentToEdit]);
 
@@ -87,7 +78,7 @@ export default function AjouterDocuments({
 					files.map((f) => {
 						const formData = new FormData();
 						formData.append("fichier", f.file);
-						formData.append("nomDocument", f.base + f.ext); 
+						formData.append("nomDocument", f.base + f.ext);
 						return fetch(`/api/documents/${idDossier}/file`, {
 							method: "POST",
 							body: formData,
@@ -113,6 +104,7 @@ export default function AjouterDocuments({
 	const handleClose = () => {
 		setFiles([]);
 		setIsDragging(false);
+		setMessage([]); 
 		onClose();
 	};
 
@@ -134,72 +126,53 @@ export default function AjouterDocuments({
 	return (
 		<div className={`modal ${isOpen ? "is-active" : ""}`}>
 			<div className="modal-background" onClick={handleClose} />
-			<div
-				className="modal-card"
-				style={{ maxWidth: 720, width: "100%" }}
-			>
+			<div className="modal-card" style={{ maxWidth: 720, width: "100%" }}>
 				<header className="modal-card-head">
 					<p className="modal-card-title">
-						{isEditMode
-							? "Modifier le document"
-							: "Ajouter un document"}{" "}
+						{isEditMode ? "Modifier le document" : "Ajouter un document"}{" "}
 					</p>
-					<button
-						className="delete"
-						onClick={handleClose}
-						aria-label="close"
-					/>
+					<button className="delete" onClick={handleClose} aria-label="close" />
 				</header>
-
-				{message.length !== 0 && (
-					<div className="block">
-						<div className="notification is-primary">
-							<button
-								className="delete"
-								tabIndex="-1"
-								onClick={() => {
-									setMessage([]);
-								}}
-							></button>
-							{message.map((msg) => {
-								return (
-									<span key={msg}>
-										{msg.text}
-										<br />
-									</span>
-								);
-							})}
-						</div>
-					</div>
-				)}
-
 				<section className="modal-card-body">
+					{message.length !== 0 && (
+						<div className="block">
+							<div className="notification is-primary">
+								<button
+									className="delete"
+									tabIndex="-1"
+									onClick={() => {
+										setMessage([]);
+									}}
+								></button>
+								{message.map((msg) => {
+									return (
+										<span key={msg}>
+											{msg.text}
+											<br />
+										</span>
+									);
+								})}
+							</div>
+						</div>
+					)}
 					{isEditMode && (
 						<>
 							{/* Name field */}
 							<div className="field mb-4">
-								<label className="label is-small">
-									Nom du document
-								</label>
+								<label className="label is-small">Nom du document</label>
 								<div className="control has-addons">
 									<div className="is-flex" style={{ gap: 0 }}>
 										<input
 											className="input"
 											value={editBase}
-											onChange={(e) =>
-												setEditBase(e.target.value)
-											}
+											onChange={(e) => setEditBase(e.target.value)}
 										/>
-										<span className="button is-static">
-											{editExt}
-										</span>
+										<span className="button is-static">{editExt}</span>
 									</div>
 								</div>
 							</div>
 
-							<p className="label is-small mb-2">
-								Remplacer le fichier (optionnel)
-							</p>
+							<p className="label is-small mb-2">Remplacer le fichier (optionnel)</p>
 						</>
 					)}
 
@@ -219,12 +192,8 @@ export default function AjouterDocuments({
 							transition: "border-color 0.2s, background 0.2s",
 						}}
 					>
-						<p style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>
-							⬆
-						</p>
-						<p className="has-text-weight-semibold">
-							Glisser-déposer des fichiers ici
-						</p>
+						<p style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>⬆</p>
+						<p className="has-text-weight-semibold">Glisser-déposer des fichiers ici</p>
 						<p className="has-text-grey is-size-7 mt-1 mb-3">
 							ou cliquer pour parcourir
 						</p>
@@ -236,9 +205,7 @@ export default function AjouterDocuments({
 							type="file"
 							multiple={!isEditMode}
 							style={{ display: "none" }}
-							onChange={(e) =>
-								addFiles(Array.from(e.target.files))
-							}
+							onChange={(e) => addFiles(Array.from(e.target.files))}
 						/>
 					</div>
 
@@ -256,34 +223,26 @@ export default function AjouterDocuments({
 										fontSize: "0.875rem",
 									}}
 								>
-									<span className="icon is-small has-text-grey">
-										📄
-									</span>
-									<div
-										className="is-flex"
-										style={{ flex: 1 }}
-									>
+									<span className="icon is-small has-text-grey">📄</span>
+									<div className="is-flex" style={{ flex: 1 }}>
 										<input
 											className="input is-small"
 											value={f.base}
 											onChange={(e) => {
 												const newBase = e.target.value;
 												setFiles((prev) =>
-													prev.map(
-														(fileObj, index) =>
-															index === i
-																? {
-																		...fileObj,
-																		base: newBase,
-																	}
-																: fileObj,
+													prev.map((fileObj, index) =>
+														index === i
+															? {
+																	...fileObj,
+																	base: newBase,
+																}
+															: fileObj,
 													),
 												);
 											}}
 										/>
-										<span className="button is-static is-small">
-											{f.ext}
-										</span>
+										<span className="button is-static is-small">{f.ext}</span>
 									</div>
 									<span className="has-text-grey is-size-7">
 										{formatSize(f.file.size)}
@@ -311,9 +270,7 @@ export default function AjouterDocuments({
 					<button
 						className={`button is-dark ${isUploading ? "is-loading" : ""}`}
 						disabled={
-							(isEditMode
-								? !editBase.trim()
-								: files.length === 0) || isUploading
+							(isEditMode ? !editBase.trim() : files.length === 0) || isUploading
 						}
 						onClick={handleUpload}
 					>

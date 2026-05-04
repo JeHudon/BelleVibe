@@ -304,6 +304,7 @@ function DetailsCompte() {
 							onClose={() => {
 								setEditingDoc(null);
 								setModalOpen(false);
+								setMessage([])
 							}}
 							idDossier={id}
 							documentToEdit={editingDoc} // null = add mode, { id, name } = edit mode
