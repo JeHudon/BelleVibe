@@ -6,8 +6,7 @@ const menuItems = [
 	{ to: "/clients/nouveau", label: "Créer client", icon: "fa-user-plus" },
 	{ to: "/creerCompte", label: "Créer compte", icon: "fa-wallet" },
 	{ to: "/notes/nouvelle", label: "Ajouter note", icon: "fa-file-lines" },
-	{ to: "/comptes", label: "Gestion du compte", icon: "fa-folder" },
-	{ to: "/clients", label: "Gestion du clients", icon: "fa-user" },
+	{ to: "/GestionCompte", label: "Gestion du compte", icon: "fa-folder" },
 ];
 
 const serviceIcons = [
@@ -33,7 +32,7 @@ function parseJwt(token) {
 	}
 }
 
-export default function Sidebar(sidebarOpen, setSidebarOpen) {
+export default function Sidebar() {
 	const location = useLocation();
 
 	// Extraire les infos de l'employé depuis le token
@@ -43,16 +42,24 @@ export default function Sidebar(sidebarOpen, setSidebarOpen) {
 	const employeNom = userInfo ? `Employé #${userInfo.id}` : "Invité";
 	const employeRole = userInfo ? userInfo.role : "";
 
+	const activeItem = menuItems.reduce((best, item) => {
+		const matches =
+			location.pathname === item.to ||
+			location.pathname.startsWith(item.to + "/");
+		if (matches && item.to.length > (best?.to.length ?? -1)) return item;
+		return best;
+	}, null);
+
 	return (
 		<div className="columns is-gapless" style={{ minHeight: "100vh" }}>
-			<div className={`column is-narrow px-0 ${sidebarOpen ? "" : "is-hidden-touch"}`}>
+			<div className="column is-narrow px-0">
 				<aside className="menu is-fullheight p-4 ">
 					<div className="mb-5">
 						<div className="media">
 							<div className="media-left">
 								<span className="icon is-large">
 									<img
-										src="https://arbrescanada.ca/wp-content/uploads/2023/08/Bell_Blue_large_transparent-1.png"
+										src="../images/logo.png"
 										alt="Logo"
 									/>
 								</span>
@@ -80,9 +87,7 @@ export default function Sidebar(sidebarOpen, setSidebarOpen) {
 						<nav className="menu">
 							<ul className="menu-list">
 								{menuItems.map((item) => {
-									const isActive =
-										location.pathname === item.to ||
-										location.pathname.startsWith(item.to + "/");
+									const isActive = activeItem !== null && item.to === activeItem.to;
 									return (
 										<li key={item.to}>
 											<Link
@@ -128,14 +133,6 @@ export default function Sidebar(sidebarOpen, setSidebarOpen) {
 				</aside>
 			</div>
 			<div className="column" style={{ background: "#f8fbff", padding: "2rem" }}>
-				<div className="is-hidden-tablet mb-4">
-					<button className="button is-white" onClick={() => setSidebarOpen((o) => !o)}>
-						<span className="icon">
-							<i className="fa-solid fa-bars" />
-						</span>
-						<span>Menu</span>
-					</button>
-				</div>
 				<Outlet /> {/* render le reste du site ici dans le code */}
 			</div>
 		</div>

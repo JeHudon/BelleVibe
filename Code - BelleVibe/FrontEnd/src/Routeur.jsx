@@ -8,6 +8,7 @@ import { CreerCompte } from "./Pages/CreerCompte.jsx";
 import Sidebar from "./components/Sidebar";
 import CreeClient from "./Pages/CreerClient";
 import { LoginContext } from "./context/LoginContext.js";
+import GestionCompte from "./Pages/GestionCompte.jsx";
 
 function isTokenExpired(token) {
 	const payload = JSON.parse(atob(token.split(".")[1]));
@@ -15,7 +16,6 @@ function isTokenExpired(token) {
 }
 
 function Routeur() {
-	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [isLoggedIn, setIsLoggedIn] = useState(() => {
 		const token = localStorage.getItem("token");
 		if (!token) return false;
@@ -49,7 +49,7 @@ function Routeur() {
 					<Route
 						element={
 							isLoggedIn
-								? <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+								? <Sidebar />
 								: <Navigate to="/login" replace />
 						}
 					>
@@ -57,6 +57,7 @@ function Routeur() {
 						<Route path="/dashboard" element={<App />} />
 						<Route path="/clients/nouveau" element={<CreeClient />} />
 						<Route path="/creerCompte" element={<CreerCompte />} />
+						<Route path="/GestionCompte" element={<GestionCompte />} />
 						<Route path="/comptes/:id/:onglet" element={<DetailsCompte />} />
 						<Route path="/clients/:id/:onglet" element={<DetailsClient />} />
 						<Route path="*" element={<div className="section has-text-centered">Page non trouvée</div>} />
