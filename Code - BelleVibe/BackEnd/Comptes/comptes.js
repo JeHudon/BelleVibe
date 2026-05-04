@@ -76,10 +76,12 @@ router.get('/dossiersAttente', authentifier, async (req, res) => {
         res.status(500).json({ error: "Erreur serveur" })
     }
 })
+
 // Créer un dossier associé à un employé
-router.post("/creerDossier",authentifier, async (req, res) => {
+router.post("/creerDossier", authentifier, async (req, res) => {
     try {
-        const { idClient, idEmploye, typeDossier, statutDossier, soldeDossier } = req.body;
+        const { idClient, typeDossier, statutDossier, soldeDossier } = req.body;
+        const idEmploye = req.user.id
 
         // Validation
         // validerChamps est utilisé ici pour vérifier que les champs ne sont pas vides.
