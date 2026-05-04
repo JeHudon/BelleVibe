@@ -3,12 +3,15 @@ import { Fragment, useEffect, useState } from "react"
 export function CreerCompte() {
     const [etape, setEtape] = useState(1);
     const [clients, setClients] = useState([]);
+    const [typeCompte, setTypeCompte] = useState("");
+    const [soldeCompte, setSoldeCompte] = useState(0);
     const [services, setServices] = useState([]);
     const [forfaits, setForfaits] = useState([]);
     const [clientSelection, setClientSelection] = useState(null);
     const [servicesSelection, setServicesSelection] = useState([]);
     const [typeServicesSelection, setTypeServicesSelection] = useState([]);
     const [forfaitsSelection, setForfaitsSelection] = useState([]);
+    const [afficherSucces, setAfficherSucces] = useState(false);
     const [afficherErreur, setAfficherErreur] = useState(false);
     const [messageErreur, setMessageErreur] = useState("");
     const labels = ["Client", "Services", "Forfaits", "Confirmer"];
@@ -260,24 +263,60 @@ export function CreerCompte() {
         } else if (etape == 2) {
             return (
                 <div className="mt-2">
+                    <h3 className="title is-4">Choisir le type de compte</h3>
+                    <div className="subtitle is-5 mt-2">Sélectionner de quel genre de compte il s'agit</div>
+                    <div className="is-flex" style={{ gap: "1rem", marginBottom: "2rem" }}>
+                        {["Personnel", "Entreprise", "Familial"].map((type) => (
+                            <label
+                                key={type}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.5rem",
+                                    padding: "0.75rem 1.25rem",
+                                    borderRadius: "8px",
+                                    border: `2px solid ${typeCompte === type ? "#62cf5fff" : "#dbdbdb"}`,
+                                    backgroundColor: typeCompte === type ? "#62cf5fff" : "white",
+                                    boxShadow: typeCompte === type ? "inset 0 2px 4px rgba(0,0,0,0.2)" : "none",
+                                    cursor: "pointer",
+                                    transition: "all 0.2s ease",
+                                    fontWeight: "bold",
+                                }}
+                            >
+                                <input
+                                    type="radio"
+                                    name="choix"
+                                    value={type}
+                                    checked={typeCompte === type}
+                                    onChange={(e) => setTypeCompte(e.target.value)}
+                                    style={{ display: "none" }}
+                                />
+                                {type}
+                            </label>
+                        ))}
+                    </div>
+
                     <h3 className="title is-4">Choisir les services</h3>
                     <div className="subtitle is-5 mt-2">Sélectionner un ou plusieurs services</div>
-                    <div className="columns is-multiline">
+                    <div className="is-flex" style={{ gap: "1rem", flexWrap: "wrap" }}>
                         {services.map((service) => (
-                            <div key={service.idService} className="column is-narrow">
-                                <div
-                                    className="box"
-                                    onClick={() => selectionService(service.idService, service.typeService)}
-                                    style={{
-                                        cursor: "pointer",
-                                        transition: "all 0.2s ease",
-                                        ...(servicesSelection.includes(service.idService) && {
-                                            backgroundColor: "#62cf5fff",
-                                            boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
-                                        })
-                                    }}>
-                                    <div className="subtitle is-5 mb-0 has-text-weight-bold">{service.typeService}</div>
-                                </div>
+                            <div
+                                key={service.idService}
+                                onClick={() => selectionService(service.idService, service.typeService)}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    padding: "0.75rem 1.25rem",
+                                    borderRadius: "8px",
+                                    border: `2px solid ${servicesSelection.includes(service.idService) ? "#62cf5fff" : "#dbdbdb"}`,
+                                    backgroundColor: servicesSelection.includes(service.idService) ? "#62cf5fff" : "white",
+                                    boxShadow: servicesSelection.includes(service.idService) ? "inset 0 2px 4px rgba(0,0,0,0.2)" : "none",
+                                    cursor: "pointer",
+                                    transition: "all 0.2s ease",
+                                    fontWeight: "bold",
+                                }}
+                            >
+                                {service.typeService}
                             </div>
                         ))}
                     </div>
@@ -302,24 +341,46 @@ export function CreerCompte() {
                         <div className="subtitle is-5">{client.prenomClient} {client.nomClient} - {client.telephoneClient}</div>
                     </div>
                     <div className="box">
-                        <div className="title is-4">Services sélectionnés</div>
-                        <div className="subtitle is-5 mt-2">
-                            {services
-                                .filter(s => servicesSelection.includes(s.idService))
-                                .map(s => s.typeService)
-                                .join(", ")}
+                        <div className="title is-4 mb-2">Type de compte sélectionné</div>
+                        <div className="subtitle is-5">{typeCompte}</div>
+                    </div>
+                    <div className="box">
+                        <div className="title is-4 mb-3">Services et forfaits sélectionnés</div>
+                        {services
+                            .filter(s => servicesSelection.includes(s.idService))
+                            .map(service => {
+                                const forfait = forfaits.find(f =>
+                                    forfaitsSelection.includes(f.idForfait) && f.idService === service.idService
+                                );
+                                return (
+                                    <div key={service.idService} className="mb-4">
+                                        <div className="subtitle is-5 has-text-weight-bold mb-1">{service.typeService}</div>
+                                        {forfait ? (
+                                            <div className="box" style={{ backgroundColor: "#f5f5f5" }}>
+                                                <div className="is-flex is-justify-content-space-between is-align-items-center">
+                                                    <div>
+                                                        <div className="has-text-weight-bold">{forfait.nomForfait}</div>
+                                                        <div className="is-size-6">{forfait.descriptionForfait}</div>
+                                                    </div>
+                                                    <div className="has-text-weight-bold">{forfait.prixForfait}$/mois</div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="has-text-danger">Aucun forfait sélectionné</div>
+                                        )}
+                                    </div>
+                                );
+                            })
+                        }
+                        <div className="is-flex is-justify-content-flex-end">
+                            <div className="has-text-weight-bold is-size-5">
+                                Total : {forfaits
+                                    .filter(f => forfaitsSelection.includes(f.idForfait))
+                                    .reduce((acc, f) => acc + f.prixForfait, 0)
+                                }$/mois
+                            </div>
                         </div>
                     </div>
-                    <div className="title is-4">Forfaits sélectionnés</div>
-                    {forfaits
-                        .filter(f => forfaitsSelection.includes(f.idForfait))
-                        .map((forfait) => (
-                            <div key={forfait.idForfait} className="box">
-                                <div className="title is-4">{forfait.nomForfait}</div>
-                                <div className="subtitle is-5 mt-2">{forfait.prixForfait}</div>
-                            </div>
-                        ))
-                    }
                 </div>
             )
         }
@@ -364,6 +425,80 @@ export function CreerCompte() {
 
     }
 
+    async function requeteCreerCompte() {
+        const token = localStorage.getItem("token")
+
+        const total = forfaits
+            .filter(f => forfaitsSelection.includes(f.idForfait))
+            .reduce((acc, f) => acc + f.prixForfait, 0)
+
+        setSoldeCompte(total)
+
+        try {
+            const response = await fetch(`/api/comptes/creerDossier`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    idClient: clientSelection,
+                    typeDossier: typeCompte,
+                    statutDossier: "actif",
+                    soldeDossier: total
+                })
+            })
+
+            if (!response.ok) {
+                setAfficherErreur(true)
+                setMessageErreur("Erreur en créant le nouveau compte")
+                return
+            }
+
+            const data = await response.json()
+
+            await Promise.all(forfaitsSelection.map(async (forfait) => {
+                try {
+                    const response = await fetch(`/api/forfaitsDossier/`, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Accept": "application/json",
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            idDossier: data.idDossier,
+                            idForfait: forfait
+                        })
+                    })
+
+                    if (!response.ok) {
+                        setAfficherErreur(true)
+                        setMessageErreur("Erreur en associant le forfait au dossier")
+                        return
+                    }
+
+                } catch (err) {
+                    setAfficherErreur(true)
+                    setMessageErreur("Erreur serveur", err)
+                }
+            }))
+
+            setAfficherSucces(true)
+            setTimeout(() => setAfficherSucces(false), 6000)
+
+        } catch (err) {
+            console.error("Erreur complète :", err)
+            setAfficherErreur(true)
+            setMessageErreur("Erreur serveur : " + err.message)
+        }
+    }
+
+
+
+
+
     return (
         <div className="section">
             <div className="container is-centered mt-3">
@@ -397,16 +532,23 @@ export function CreerCompte() {
                 <div className="box">
                     {affichageSelonEtape(etape)}
                 </div>
-                <button
-                    className="button is-light mr-4"
-                    disabled={etape === 1}
-                    onClick={() => setEtape(etape - 1)}
-                >Précédent</button>
-                <button
-                    className="button is-dark"
-                    disabled={etape === 4}
-                    onClick={() => boutonSuivant()}
-                >Suivant</button>
+                <div className="is-flex is-justify-content-space-between mt-4">
+                    <div>
+                        <button
+                            className="button is-light mr-4"
+                            disabled={etape === 1}
+                            onClick={() => setEtape(etape - 1)}
+                        >Précédent</button>
+                        <button
+                            className="button is-dark"
+                            disabled={etape === 4}
+                            onClick={() => boutonSuivant()}
+                        >Suivant</button>
+                    </div>
+                    {etape === 4 && (
+                        <button className="button is-dark" onClick={() => requeteCreerCompte()}>Confirmer</button>
+                    )}
+                </div>
             </div>
             <div className="notification is-danger" style={{
                 position: "fixed",
@@ -422,6 +564,20 @@ export function CreerCompte() {
                 <button className="delete" onClick={() => setAfficherErreur(false)}></button>
                 <p className="has-text-centered">{messageErreur}</p>
             </div>
+            <div className="notification is-success" style={{
+                position: "fixed",
+                bottom: "1.5rem",
+                right: "1.5rem",
+                zIndex: 1000,
+                minWidth: "20rem",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+                opacity: afficherSucces ? 1 : 0,
+                transition: "opacity 0.5s ease",
+                pointerEvents: afficherSucces ? "auto" : "none",
+            }}>
+                <button className="delete" onClick={() => setAfficherSucces(false)}></button>
+                <p className="has-text-centered has-text-weight-bold">Compte créé avec succès !</p>
+            </div>
         </div>
     )
-} 
+}
