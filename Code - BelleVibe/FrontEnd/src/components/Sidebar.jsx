@@ -7,6 +7,7 @@ const menuItems = [
 	{ to: "/creerCompte", label: "Créer compte", icon: "fa-wallet" },
 	{ to: "/notes/nouvelle", label: "Ajouter note", icon: "fa-file-lines" },
 	{ to: "/GestionCompte", label: "Gestion du compte", icon: "fa-folder" },
+	{ to: "/CreerEmploye", label: "Créer employé", icon: "fa-user-tie", roles: ["superviseur", "admin"] },
 ];
 
 const serviceIcons = [
@@ -86,7 +87,7 @@ export default function Sidebar() {
 
 						<nav className="menu">
 							<ul className="menu-list">
-								{menuItems.map((item) => {
+								{menuItems.filter((item) => !item.roles || item.roles.includes(employeRole)).map((item) => {
 									const isActive = activeItem !== null && item.to === activeItem.to;
 									return (
 										<li key={item.to}>
