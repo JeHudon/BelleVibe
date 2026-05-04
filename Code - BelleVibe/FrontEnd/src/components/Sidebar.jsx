@@ -136,7 +136,7 @@ export default function Sidebar(sidebarOpen, setSidebarOpen) {
 						<span>Menu</span>
 					</button>
 				</div>
-				<Outlet /> {/* ← child routes render here */}
+				<Outlet /> {/* render le reste du site ici dans le code */}
 			</div>
 		</div>
 	);

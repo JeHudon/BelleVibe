@@ -109,7 +109,7 @@ function DetailsClient() {
 					</ul>
 				</div>
 				{onglet === "resume" && (
-					<div className="box is-shadowless" style={{ border: "1px solid #d6d6d6" }}>
+					<div className="box" style={{ border: "1px solid #d6d6d6" }}>
 						<h2 className="title is-5 is-spaced">Informations du client</h2>
 						<h3 className="title is-4">Informations clients</h3>
 						<div className="columns">
@@ -137,7 +137,7 @@ function DetailsClient() {
 					</div>
 				)}
 				{onglet === "comptes" && (
-					<div className="box is-shadowless" style={{ border: "1px solid #d6d6d6" }}>
+					<div className="box" style={{ border: "1px solid #d6d6d6" }}>
 						<div className="level">
 							<div className="level-left">
 								<div className="level-item">
@@ -164,8 +164,8 @@ function DetailsClient() {
 								const forfaits = forfaitsParCompte[c.idDossier];
 
 								return (
-									<div key={c.idDossier} style={{marginBottom: 20}}>
-										<p className="subtitle is-5 mb-2" >
+									<div key={c.idDossier} style={{ marginBottom: 20 }}>
+										<p className="subtitle is-5 mb-2">
 											Forfait du compte {c.typeDossier}
 										</p>
 										{forfaits && forfaits.length > 0 ? (
@@ -179,6 +179,13 @@ function DetailsClient() {
 										) : (
 											<p>Aucun forfait trouvé pour ce compte</p>
 										)}
+										<p>
+											{" "}
+											<span className="has-text-weight-bold">
+												Solde dû par mois :{" "}
+											</span>
+											{c.soldeDossier} $
+										</p>
 									</div>
 								);
 							})

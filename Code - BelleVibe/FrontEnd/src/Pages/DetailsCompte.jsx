@@ -5,6 +5,7 @@ import { ForfaitCard } from "../components/ForfaitCard";
 
 function DetailsCompte() {
 	const [client, setClient] = useState(null);
+	const [compte, setCompte] = useState(null);
 	const [forfaits, setForfaits] = useState(null);
 	const [demandes, setDemandes] = useState(null);
 	const [documents, setDocuments] = useState(null);
@@ -38,19 +39,29 @@ function DetailsCompte() {
 	}
 
 	useEffect(() => {
-		async function fetchClient() {
-			const data = await fetch(
-				`/api/clients/getClient
-				/${id}`,
-				{
-					method: "GET",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${token}`,
-					},
+		// async function fetchClient() {
+		// 	const data = await fetch(
+		// 		`/api/clients/getClient
+		// 		/${id}`,
+		// 		{
+		// 			method: "GET",
+		// 			headers: {
+		// 				"Content-Type": "application/json",
+		// 				Authorization: `Bearer ${token}`,
+		// 			},
+		// 		},
+		// 	).then((res) => res.json());
+		// 	setClient(data);
+		// }
+		async function fetchCompte() {
+			const data = await fetch(`/api/comptes/getDossier/${id}`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
 				},
-			).then((res) => res.json());
-			setClient(data);
+			}).then((res) => res.json());
+			setCompte(data);
 		}
 		async function fetchForfaits() {
 			const data = await fetch(`/api/forfaitsDossier/${id}`, {
@@ -93,7 +104,8 @@ function DetailsCompte() {
 			setNotes(data);
 		}
 
-		fetchClient();
+		// fetchClient();
+		fetchCompte();
 		fetchForfaits();
 		fetchDemandes();
 		fetchDocuments();
@@ -130,20 +142,26 @@ function DetailsCompte() {
 					</ul>
 				</div>
 				{onglet === "resume" && (
-					<div className="box is-shadowless" style={{ border: "1px solid #d6d6d6" }}>
+					<div className="box" style={{ border: "1px solid #d6d6d6" }}>
 						<h2 className="title is-5 is-spaced">Informations du compte</h2>
 						<h3 className="title is-4">Forfaits actifs</h3>
-						{forfaits && forfaits.length > 0 ? (
-							forfaits.map((forfait) => (
-								<ForfaitCard
-									key={forfait.idForfait}
-									forfait={forfait}
-									isDark={isDark}
-								/>
-							))
-						) : (
-							<h1>Aucun forfait trouvé pour ce compte</h1>
-						)}
+						<div style={{ marginBottom: 20 }}>
+							{forfaits && forfaits.length > 0 ? (
+								forfaits.map((forfait) => (
+									<ForfaitCard
+										key={forfait.idForfait}
+										forfait={forfait}
+										isDark={isDark}
+									/>
+								))
+							) : (
+								<p>Aucun forfait trouvé pour ce compte</p>
+							)}
+							<p>
+								<span className="has-text-weight-bold">Solde dû par mois : </span>
+								{compte?.soldeDossier} $
+							</p>
+						</div>
 						<h3 className="title is-4">Informations clients</h3>
 						<div className="columns">
 							<div className="column is-6">
@@ -170,7 +188,7 @@ function DetailsCompte() {
 					</div>
 				)}
 				{onglet === "demandes" && (
-					<div className="box is-shadowless" style={{ border: "1px solid #d6d6d6" }}>
+					<div className="box " style={{ border: "1px solid #d6d6d6" }}>
 						<div className="level">
 							<div className="level-left">
 								<div className="level-item">
@@ -257,7 +275,7 @@ function DetailsCompte() {
 					</div>
 				)}
 				{onglet === "documents" && (
-					<div className="box is-shadowless" style={{ border: "1px solid #d6d6d6" }}>
+					<div className="box " style={{ border: "1px solid #d6d6d6" }}>
 						<div className="level">
 							<div className="level-left">
 								<div className="level-item">
@@ -360,7 +378,7 @@ function DetailsCompte() {
 					</div>
 				)}
 				{onglet === "notes" && (
-					<div className="box is-shadowless" style={{ border: "1px solid #d6d6d6" }}>
+					<div className="box " style={{ border: "1px solid #d6d6d6" }}>
 						<div className="level">
 							<div className="level-left">
 								<div className="level-item">
