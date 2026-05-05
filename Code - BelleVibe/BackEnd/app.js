@@ -55,6 +55,7 @@ app.use("/clients", require("./Clients/clients.js"))
 app.use("/services", require("./Services/services.js"))
 app.use("/forfaits", require("./Forfaits/forfaits.js"))
 app.use("/forfaitsDossier", require("./ForfaitsDossier/forfaitsDossier.js"))
+app.use("/facturation", require("./Facturation/facturation.js"))
 // Initialisation de la base de données et démarrage du serveur
 createTables()
     .then(() => {

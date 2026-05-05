@@ -179,8 +179,8 @@ async function createTables() {
     if (!facturation) {
         await db.schema.createTable("facturation", (table)=>{
             table.increments("idFacturation")
-            table.integer("idDossier").references("idDossier").inTable("dossier")
-            table.integer("idEmploye").references("idEmploye").inTable("employe")
+            table.integer("idDossier").references("idDossier").inTable("dossiers")
+            table.integer("idEmploye").references("idEmploye").inTable("employes")
             table.string("statut_facture").notNullable()
             table.float("montant_total").notNullable()
             table.float("montant_paye").notNullable()
