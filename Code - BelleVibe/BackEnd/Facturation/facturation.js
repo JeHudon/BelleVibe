@@ -155,7 +155,7 @@ router.patch("/updateFactureSupp/:idFacture", authentifierSupp, async (req, res)
         await log(req.user.id, "EDIT", "FACTURATION", Number(idFacture))
     }
     catch (error) {
-        console.error("Erreur dans PATCH /facturation/updateFacture", error)
+        console.error("Erreur dans PATCH /facturation/updateFactureSupp", error)
         res.status(500).json({ message: "Erreur serveur", error })
     }
 })
