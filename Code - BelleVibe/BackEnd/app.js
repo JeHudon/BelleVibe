@@ -43,6 +43,24 @@ app.get("/", (req, res) => {
     res.send("Serveur fonctionne");
 });
 
+app.get('/files/:id', async (req, res) => {
+    const file = await db('documents').where({ idDocument: req.params.id }).first();
+
+    if (!file) return res.status(404).json({ error: 'File not found' });
+
+    const filePath = path.join(__dirname, file.cheminDocument);
+    res.sendFile(filePath);
+});
+
+app.get('/download/:id', async (req, res) => {
+    const file = await db('documents').where({ idDocument: req.params.id }).first();
+
+    if (!file) return res.status(404).json({ error: 'File not found' });
+
+    const filePath = path.join(__dirname, file.cheminDocument);
+    res.download(filePath, file.nomDocument); // utilise le vrai nom pour le téléchargement
+});
+
 
 
 // Importation des routes
