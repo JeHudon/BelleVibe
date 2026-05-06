@@ -80,7 +80,7 @@ export default function GestionCompte() {
 			<h1 className="title">Gestion du compte</h1>
 			<p className="subtitle is-6 has-text-link">Liste de tous les comptes clients</p>
 
-			<div className="box" style={{ border: "1px solid #e8e8e8" }}>
+			<div className="box " style={{ border: "1px solid #d6d6d6" }}>
 				<div className="level mb-4">
 					<div className="level-left">
 						<div>

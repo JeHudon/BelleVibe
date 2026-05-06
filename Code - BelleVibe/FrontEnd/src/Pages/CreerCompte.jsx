@@ -529,7 +529,7 @@ export function CreerCompte() {
                         ))}
                     </div>
                 </div>
-                <div className="box">
+                <div className="box " style={{ border: "1px solid #d6d6d6" }}>
                     {affichageSelonEtape(etape)}
                 </div>
                 <div className="is-flex is-justify-content-space-between mt-4">

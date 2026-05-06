@@ -1,7 +1,7 @@
 export function ForfaitCard({ forfait, isDark }) {
     const config = {
-        Cellulaire: { color: "info", icon: "fa-signal", label: "Mobile" },
-        "Wi-fi": { color: "primary", icon: "fa-wifi", label: "Internet" },
+        Cellulaire: { color: "info is-light", icon: "fa-signal", label: "Mobile" },
+        "Wi-fi": { color: "primary is-light", icon: "fa-wifi", label: "Internet" },
         TV: { color: "link is-light", icon: "fa-tv", label: "TV" },
     };
 
