@@ -870,7 +870,7 @@ async function supprimerDocument() {
 			</header>
 
 			<section className="modal-card-body">
-				<p>Voulez-vous vraiment supprimer cette note?</p>
+				<p>Voulez-vous vraiment supprimer cette note ?</p>
 				<p className="has-text-weight-bold mt-2">
 					{noteSelectionnee?.titreNote}
 				</p>
