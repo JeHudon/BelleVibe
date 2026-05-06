@@ -426,6 +426,7 @@ async function supprimerDocument() {
 														paddingRight: "0.5rem",
 													}}
 													title="Modifier"
+													onClick={() => ouvrirModifierDemande(demande)}
 												>
 													<i className="fas fa-pen-to-square"></i>
 												</button>
@@ -533,6 +534,21 @@ async function supprimerDocument() {
 												>
 													<i className="fa-solid fa-download"></i>
 												</button>
+
+												<button
+	                                                className="button is-medium is-ghost has-text-danger"
+	                                                style={{
+		                                                paddingLeft: "0.5rem",
+		                                                paddingRight: "0.5rem",
+	                                                }}
+	                                                title="Supprimer"
+	                                                onClick={() => {
+		                                                setDocumentSelectionne(document);
+		                                                setModalSupprimerDocument(true);
+	                                                }}
+                                                >
+	                                                <i className="fa-solid fa-trash"></i>
+                                                </button>
 											</td>
 										</tr>
 									))
@@ -562,7 +578,7 @@ async function supprimerDocument() {
 							</div>
 							<div className="level-right">
 								<div className="level-item">
-									<button className="button is-dark">+ Ajouter note</button>
+									<button className="button is-dark" onClick={() => setModalNote(true)}>+ Ajouter note</button>
 								</div>
 							</div>
 						</div>
@@ -589,7 +605,28 @@ async function supprimerDocument() {
 											</p>
 										</div>
 
-										<div>{formatDate(note.created_at)}</div>
+										<div className="has-text-right">
+	                                        <div>{formatDate(note.created_at)}</div>
+
+	                                        <div className="buttons are-small mt-2">
+		                                        <button
+			                                        className="button is-ghost"
+			                                        onClick={() => ouvrirModifierNote(note)}
+		                                        >
+			                                        <i className="fa-solid fa-pen-to-square"></i>
+		                                        </button>
+
+		                                        <button
+			                                        className="button is-ghost has-text-danger"
+			                                        onClick={() => {
+				                                        setNoteSelectionnee(note);
+				                                        setModalSupprimerNote(true);
+			                                        }}
+		                                        >
+			                                        <i className="fa-solid fa-trash"></i>
+		                                        </button>
+	                                        </div>
+                                        </div>
 									</div>
 								</div>
 							))
@@ -598,6 +635,286 @@ async function supprimerDocument() {
 						)}
 					</div>
 				)}
+
+{modalDemande && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalDemande(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Créer une demande</p>
+				<button className="delete" onClick={() => setModalDemande(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<div className="field">
+					<label className="label">Type de demande</label>
+					<input
+						className="input"
+						value={formDemande.typeDemande}
+						onChange={(e) =>
+							setFormDemande({ ...formDemande, typeDemande: e.target.value })
+						}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Statut</label>
+					<div className="select is-fullwidth">
+						<select
+							value={formDemande.statutDemande}
+							onChange={(e) =>
+								setFormDemande({ ...formDemande, statutDemande: e.target.value })
+							}
+						>
+							<option>Ouverte</option>
+							<option>En attente</option>
+							<option>En retard</option>
+							<option>Fermée</option>
+						</select>
+					</div>
+				</div>
+
+				<div className="field">
+					<label className="label">Note interne</label>
+					<textarea
+						className="textarea"
+						value={formDemande.noteInterne}
+						onChange={(e) =>
+							setFormDemande({ ...formDemande, noteInterne: e.target.value })
+						}
+					/>
+				</div>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-dark" onClick={ajouterDemande}>
+					Enregistrer
+				</button>
+				<button className="button" onClick={() => setModalDemande(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
+
+{modalModifierDemande && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalModifierDemande(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Modifier la demande</p>
+				<button className="delete" onClick={() => setModalModifierDemande(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<div className="field">
+					<label className="label">Type de demande</label>
+					<input
+						className="input"
+						value={formDemande.typeDemande}
+						onChange={(e) =>
+							setFormDemande({ ...formDemande, typeDemande: e.target.value })
+						}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Statut</label>
+					<div className="select is-fullwidth">
+						<select
+							value={formDemande.statutDemande}
+							onChange={(e) =>
+								setFormDemande({ ...formDemande, statutDemande: e.target.value })
+							}
+						>
+							<option>Ouverte</option>
+							<option>En attente</option>
+							<option>En retard</option>
+							<option>Fermée</option>
+						</select>
+					</div>
+				</div>
+
+				<div className="field">
+					<label className="label">Note interne</label>
+					<textarea
+						className="textarea"
+						value={formDemande.noteInterne}
+						onChange={(e) =>
+							setFormDemande({ ...formDemande, noteInterne: e.target.value })
+						}
+					/>
+				</div>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-dark" onClick={modifierDemande}>
+					Enregistrer
+				</button>
+				<button className="button" onClick={() => setModalModifierDemande(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
+
+{modalNote && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalNote(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Ajouter une note</p>
+				<button className="delete" onClick={() => setModalNote(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<div className="field">
+					<label className="label">Type</label>
+					<input
+						className="input"
+						value={formNote.type}
+						onChange={(e) => setFormNote({ ...formNote, type: e.target.value })}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Titre</label>
+					<input
+						className="input"
+						value={formNote.titre}
+						onChange={(e) => setFormNote({ ...formNote, titre: e.target.value })}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Note</label>
+					<textarea
+						className="textarea"
+						value={formNote.note}
+						onChange={(e) => setFormNote({ ...formNote, note: e.target.value })}
+					/>
+				</div>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-dark" onClick={ajouterNote}>
+					Enregistrer
+				</button>
+				<button className="button" onClick={() => setModalNote(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
+
+{modalModifierNote && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalModifierNote(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Modifier la note</p>
+				<button className="delete" onClick={() => setModalModifierNote(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<div className="field">
+					<label className="label">Type</label>
+					<input
+						className="input"
+						value={formNote.type}
+						onChange={(e) => setFormNote({ ...formNote, type: e.target.value })}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Titre</label>
+					<input
+						className="input"
+						value={formNote.titre}
+						onChange={(e) => setFormNote({ ...formNote, titre: e.target.value })}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Note</label>
+					<textarea
+						className="textarea"
+						value={formNote.note}
+						onChange={(e) => setFormNote({ ...formNote, note: e.target.value })}
+					/>
+				</div>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-dark" onClick={modifierNote}>
+					Enregistrer
+				</button>
+				<button className="button" onClick={() => setModalModifierNote(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
+
+{modalSupprimerNote && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalSupprimerNote(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Supprimer la note</p>
+				<button className="delete" onClick={() => setModalSupprimerNote(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<p>Voulez-vous vraiment supprimer cette note ?</p>
+				<p className="has-text-weight-bold mt-2">
+					{noteSelectionnee?.titreNote}
+				</p>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-danger" onClick={supprimerNote}>
+					Supprimer
+				</button>
+				<button className="button" onClick={() => setModalSupprimerNote(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
+
+{modalSupprimerDocument && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalSupprimerDocument(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Supprimer le document</p>
+				<button className="delete" onClick={() => setModalSupprimerDocument(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<p>Voulez-vous vraiment supprimer ce document ?</p>
+				<p className="has-text-weight-bold mt-2">
+					{documentSelectionne?.nomDocument}
+				</p>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-danger" onClick={supprimerDocument}>
+					Supprimer
+				</button>
+				<button className="button" onClick={() => setModalSupprimerDocument(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
 			</div>
 		</div>
 	);
