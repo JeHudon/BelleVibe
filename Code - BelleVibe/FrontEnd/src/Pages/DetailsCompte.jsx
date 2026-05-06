@@ -299,7 +299,20 @@ async function supprimerDocument() {
 				</div>
 				{onglet === "resume" && (
 					<div className="box" style={{ border: "1px solid #d6d6d6" }}>
-						<h2 className="title is-5 is-spaced">Informations du compte</h2>
+						<div className="level">
+							<div className="level-left">
+								<div className="level-item">
+									<div>
+										<h2 className="title is-5 is-spaced">Informations du compte</h2>
+									</div>
+								</div>
+							</div>
+							<div className="level-right">
+								<div className="level-item">
+									<button className="button is-dark" onClick={() => setModalDemande(true)}>+ Modifier Forfait</button> 
+								</div>
+							</div>
+						</div>
 						<h3 className="title is-4">Forfaits actifs</h3>
 						<div style={{ marginBottom: 20 }}>
 							{forfaits && forfaits.length > 0 ? (
