@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AjouterDocuments from "../components/AjouterDocuments";
 import { ForfaitCard } from "../components/ForfaitCard";
+import { Link } from "react-router-dom";
 
 function DetailsCompte() {
 	const [client, setClient] = useState(null);
