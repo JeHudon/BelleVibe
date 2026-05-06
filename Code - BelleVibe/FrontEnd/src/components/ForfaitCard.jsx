@@ -1,8 +1,8 @@
 export function ForfaitCard({ forfait, isSelected, onClick }) {
     const config = {
-        Cellulaire: { color: "info", icon: "fa-signal", label: "Mobile" },
-        "Wi-fi": { color: "primary", icon: "fa-wifi", label: "Internet" },
-        TV: { color: "link", icon: "fa-tv", label: "TV" },
+        Cellulaire: { color: "info is-light", icon: "fa-signal", label: "Mobile" },
+        "Wi-fi": { color: "primary is-light", icon: "fa-wifi", label: "Internet" },
+        TV: { color: "link is-light", icon: "fa-tv", label: "TV" },
     };
 
     const { color, icon, label } = config[forfait.typeService] || {};

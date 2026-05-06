@@ -79,7 +79,7 @@ export default function CreeClient() {
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="box">
+        <div className="box " style={{ border: "1px solid #d6d6d6" }}>
           <p className="label mb-1">Informations du client</p>
           <p className="help has-text-grey mb-4">
             Tous les champs marqués * sont obligatoires

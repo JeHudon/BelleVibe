@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import AjouterDocuments from "../components/AjouterDocuments";
 import { ForfaitCard } from "../components/ForfaitCard";
 import { Link } from "react-router-dom";
+import FileViewer from "../components/FileViewer";
 
 function DetailsCompte() {
 	const [client, setClient] = useState(null);
@@ -12,10 +13,17 @@ function DetailsCompte() {
 	const [documents, setDocuments] = useState(null);
 	const [notes, setNotes] = useState(null);
 	const [editingDoc, setEditingDoc] = useState(null);
+	const [previewDoc, setPreviewDoc] = useState(null);
 
 	const [modalOpen, setModalOpen] = useState(false);
 	//Ajout Karel
+	//Ajout Karel
 	const [modalDemande, setModalDemande] = useState(false);
+	const [modalModifierDemande, setModalModifierDemande] = useState(false);
+	const [modalNote, setModalNote] = useState(false);
+	const [modalModifierNote, setModalModifierNote] = useState(false);
+	const [modalSupprimerNote, setModalSupprimerNote] = useState(false);
+	const [modalSupprimerDocument, setModalSupprimerDocument] = useState(false);
 	const [modalModifierDemande, setModalModifierDemande] = useState(false);
 	const [modalNote, setModalNote] = useState(false);
 	const [modalModifierNote, setModalModifierNote] = useState(false);
@@ -25,13 +33,26 @@ function DetailsCompte() {
 	const [demandeSelectionnee, setDemandeSelectionnee] = useState(null);
 	const [noteSelectionnee, setNoteSelectionnee] = useState(null);
 	const [documentSelectionne, setDocumentSelectionne] = useState(null);
+	const [demandeSelectionnee, setDemandeSelectionnee] = useState(null);
+	const [noteSelectionnee, setNoteSelectionnee] = useState(null);
+	const [documentSelectionne, setDocumentSelectionne] = useState(null);
 
 	const [formDemande, setFormDemande] = useState({
 		typeDemande: "",
 		statutDemande: "Ouverte",
 		noteInterne: "",
 	});
+	const [formDemande, setFormDemande] = useState({
+		typeDemande: "",
+		statutDemande: "Ouverte",
+		noteInterne: "",
+	});
 
+	const [formNote, setFormNote] = useState({
+		type: "",
+		titre: "",
+		note: "",
+	}); //Ajout Karel
 	const [formNote, setFormNote] = useState({
 		type: "",
 		titre: "",
@@ -142,7 +163,15 @@ function DetailsCompte() {
 		return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 	};
 	//Ajout Karel
+	//Ajout Karel
 	function getUserId() {
+		try {
+			const user = JSON.parse(atob(token.split(".")[1]));
+			return user.id;
+		} catch {
+			return null;
+		}
+	}
 		try {
 			const user = JSON.parse(atob(token.split(".")[1]));
 			return user.id;
@@ -160,13 +189,36 @@ function DetailsCompte() {
 			},
 			body: JSON.stringify(formDemande),
 		});
+	async function ajouterDemande() {
+		const res = await fetch(`/api/demandes/creerDemande/${id}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify(formDemande),
+		});
 
 		if (res.ok) {
 			setModalDemande(false);
 			window.location.reload();
 		}
 	}
+		if (res.ok) {
+			setModalDemande(false);
+			window.location.reload();
+		}
+	}
 
+	function ouvrirModifierDemande(demande) {
+		setDemandeSelectionnee(demande);
+		setFormDemande({
+			typeDemande: demande.typeDemande,
+			statutDemande: demande.statutDemande,
+			noteInterne: demande.noteInterne,
+		});
+		setModalModifierDemande(true);
+	}
 	function ouvrirModifierDemande(demande) {
 		setDemandeSelectionnee(demande);
 		setFormDemande({
@@ -186,7 +238,21 @@ function DetailsCompte() {
 			},
 			body: JSON.stringify(formDemande),
 		});
+	async function modifierDemande() {
+		const res = await fetch(`/api/demandes/modifierDemande/${demandeSelectionnee.idDemande}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify(formDemande),
+		});
 
+		if (res.ok) {
+			setModalModifierDemande(false);
+			window.location.reload();
+		}
+	}
 		if (res.ok) {
 			setModalModifierDemande(false);
 			window.location.reload();
@@ -208,13 +274,42 @@ function DetailsCompte() {
 				note: formNote.note,
 			}),
 		});
+	async function ajouterNote() {
+		const res = await fetch(`/api/notes/${id}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({
+				idDossier: id,
+				idEmploye: getUserId(),
+				type: formNote.type,
+				titre: formNote.titre,
+				note: formNote.note,
+			}),
+		});
 
 		if (res.ok) {
 			setModalNote(false);
 			window.location.reload();
 		}
 	}
+		if (res.ok) {
+			setModalNote(false);
+			window.location.reload();
+		}
+	}
 
+	function ouvrirModifierNote(note) {
+		setNoteSelectionnee(note);
+		setFormNote({
+			type: note.typeNote,
+			titre: note.titreNote,
+			note: note.note,
+		});
+		setModalModifierNote(true);
+	}
 	function ouvrirModifierNote(note) {
 		setNoteSelectionnee(note);
 		setFormNote({
@@ -240,7 +335,27 @@ function DetailsCompte() {
 				note: formNote.note,
 			}),
 		});
+	async function modifierNote() {
+		const res = await fetch(`/api/notes/${noteSelectionnee.idNote}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({
+				idDossier: id,
+				idEmploye: getUserId(),
+				type: formNote.type,
+				titre: formNote.titre,
+				note: formNote.note,
+			}),
+		});
 
+		if (res.ok) {
+			setModalModifierNote(false);
+			window.location.reload();
+		}
+	}
 		if (res.ok) {
 			setModalModifierNote(false);
 			window.location.reload();
@@ -254,7 +369,19 @@ function DetailsCompte() {
 				Authorization: `Bearer ${token}`,
 			},
 		});
+	async function supprimerNote() {
+		const res = await fetch(`/api/notes/${noteSelectionnee.idNote}`, {
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
 
+		if (res.ok) {
+			setModalSupprimerNote(false);
+			window.location.reload();
+		}
+	}
 		if (res.ok) {
 			setModalSupprimerNote(false);
 			window.location.reload();
@@ -268,7 +395,19 @@ function DetailsCompte() {
 				Authorization: `Bearer ${token}`,
 			},
 		});
+	async function supprimerDocument() {
+		const res = await fetch(`/api/documents/${documentSelectionne.idDocument}`, {
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
 
+		if (res.ok) {
+			setModalSupprimerDocument(false);
+			window.location.reload();
+		}
+	} //Ajout Karel
 		if (res.ok) {
 			setModalSupprimerDocument(false);
 			window.location.reload();
@@ -374,7 +513,12 @@ function DetailsCompte() {
 							</div>
 							<div className="level-right">
 								<div className="level-item">
-									<button className="button is-dark" onClick={() => setModalDemande(true)}>+ Créer demande</button>
+									<button
+										className="button is-dark"
+										onClick={() => setModalDemande(true)}
+									>
+										+ Créer demande
+									</button>
 								</div>
 							</div>
 						</div>
@@ -477,10 +621,18 @@ function DetailsCompte() {
 							onClose={() => {
 								setEditingDoc(null);
 								setModalOpen(false);
-								setMessage([])
+								setMessage([]);
 							}}
 							idDossier={id}
 							documentToEdit={editingDoc} // null = add mode, { id, name } = edit mode
+						/>
+
+						<FileViewer
+							id={previewDoc?.idDocument}
+							ext={previewDoc?.typeDocument}
+							fileName={previewDoc?.nomDocument}
+							isOpen={!!previewDoc}
+							onClose={() => setPreviewDoc(null)}
 						/>
 
 						<table
@@ -527,15 +679,28 @@ function DetailsCompte() {
 												>
 													<i className="fa-solid fa-pen-to-square"></i>
 												</button>
+												<a
+													className="button is-medium is-ghost"
+													style={{
+														paddingLeft: "0.5rem",
+														paddingRight: "0.5rem",
+													}}
+													href={`http://localhost:3000/download/${document.idDocument}`}
+													download={document.nomDocument}
+													title="Télécharger"
+												>
+													<i className="fa-solid fa-download"></i>
+												</a>
 												<button
 													className="button is-medium is-ghost"
 													style={{
 														paddingLeft: "0.5rem",
 														paddingRight: "0.5rem",
 													}}
-													title="Telecharger"
+													title="Aperçu"
+													onClick={() => setPreviewDoc(document)}
 												>
-													<i className="fa-solid fa-download"></i>
+													<i className="fa-solid fa-eye"></i>
 												</button>
 
 												<button

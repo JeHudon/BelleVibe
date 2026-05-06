@@ -83,7 +83,7 @@ export default function GestionCompte() {
         Liste de tous les comptes clients
       </p>
 
-      <div className="box" style={{ border: "1px solid #e8e8e8" }}>
+      <div className="box " style={{ border: "1px solid #d6d6d6" }}>
         <div className="level mb-4">
           <div className="level-left">
             <div>
