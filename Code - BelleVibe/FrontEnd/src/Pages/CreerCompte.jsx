@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from "react"
+import { ForfaitCard } from "../components/ForfaitCard";
 
 export function CreerCompte() {
     const [etape, setEtape] = useState(1);
@@ -130,103 +131,31 @@ export function CreerCompte() {
     }
 
     function affichageForfaits() {
+        const sections = [
+            { type: "TV", label: "Forfaits TV" },
+            { type: "Wi-fi", label: "Forfaits Wi-Fi" },
+            { type: "Cellulaire", label: "Forfaits Cellulaire" },
+        ];
+
         return (
             <div>
-                {typeServicesSelection.includes("TV") && (
-                    <div>
-                        <div className="title is-5 mt-4 mb-4">Forfaits TV</div>
-                        {forfaits.filter(forfait => forfait.typeService === "TV").map((forfait) => (
-                            <div key={forfait.idForfait}
-                                className="button is-light"
-                                onClick={() => selectionForfaits(forfait.idForfait, "TV")}
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    width: "100%",
-                                    height: "auto",
-                                    marginBottom: "0.5rem",
-                                    textAlign: "left",
-                                    transition: "all 0.2s ease",
-                                    ...(forfaitsSelection.includes(forfait.idForfait) && {
-                                        backgroundColor: "#62cf5fff",
-                                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
-                                    })
-                                }}>
-                                <div>
-                                    <div className="subtitle is-5 mb-0 has-text-weight-bold">{forfait.nomForfait}</div>
-                                    <div className="subtitle is-5 mb-0">{forfait.descriptionForfait}</div>
-                                </div>
-                                <div className="has-text-weight-bold">{forfait.prixForfait}$/mois</div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-                {typeServicesSelection.includes("Wi-fi") && (
-                    <div>
-                        <div className="title is-5 mt-4 mb-4">Forfaits Wi-Fi</div>
-                        {forfaits.filter(forfait => forfait.typeService === "Wi-fi").map((forfait) => (
-                            <div key={forfait.idForfait}
-                                className="button is-light"
-                                onClick={() => selectionForfaits(forfait.idForfait, "Wi-fi")}
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    width: "100%",
-                                    height: "auto",
-                                    marginBottom: "0.5rem",
-                                    textAlign: "left",
-                                    transition: "all 0.2s ease",
-                                    ...(forfaitsSelection.includes(forfait.idForfait) && {
-                                        backgroundColor: "#62cf5fff",
-                                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
-                                    })
-                                }}>
-                                <div>
-                                    <div className="subtitle is-5 mb-0 has-text-weight-bold">{forfait.nomForfait}</div>
-                                    <div className="subtitle is-5 mb-0">{forfait.descriptionForfait}</div>
-                                </div>
-                                <div className="has-text-weight-bold">{forfait.prixForfait}$/mois</div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-                {typeServicesSelection.includes("Cellulaire") && (
-                    <div>
-                        <div className="title is-5 mt-4 mb-4">Forfaits Cellulaire</div>
-                        {forfaits.filter(forfait => forfait.typeService === "Cellulaire").map((forfait) => (
-                            <div key={forfait.idForfait}
-                                className="button is-light"
-                                onClick={() => selectionForfaits(forfait.idForfait, "Cellulaire")}
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    width: "100%",
-                                    height: "auto",
-                                    marginBottom: "0.5rem",
-                                    textAlign: "left",
-                                    transition: "all 0.2s ease",
-                                    ...(forfaitsSelection.includes(forfait.idForfait) && {
-                                        backgroundColor: "#62cf5fff",
-                                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
-                                    })
-                                }}>
-                                <div>
-                                    <div className="subtitle is-5 mb-0 has-text-weight-bold">{forfait.nomForfait}</div>
-                                    <div className="subtitle is-5 mb-0">{forfait.descriptionForfait}</div>
-                                </div>
-                                <div className="has-text-weight-bold">{forfait.prixForfait}$/mois</div>
-                            </div>
-                        ))}
-                    </div>
+                {sections.map(({ type, label }) =>
+                    typeServicesSelection.includes(type) && (
+                        <div key={type}>
+                            <div className="title is-5 mt-4 mb-4">{label}</div>
+                            {forfaits.filter(f => f.typeService === type).map((forfait) => (
+                                <ForfaitCard
+                                    key={forfait.idForfait}
+                                    forfait={forfait}
+                                    isSelected={forfaitsSelection.includes(forfait.idForfait)}
+                                    onClick={() => selectionForfaits(forfait.idForfait, type)}
+                                />
+                            ))}
+                        </div>
+                    )
                 )}
             </div>
-        )
+        );
     }
 
 
@@ -354,17 +283,11 @@ export function CreerCompte() {
                                 );
                                 return (
                                     <div key={service.idService} className="mb-4">
-                                        <div className="subtitle is-5 has-text-weight-bold mb-1">{service.typeService}</div>
                                         {forfait ? (
-                                            <div className="box" style={{ backgroundColor: "#f5f5f5" }}>
-                                                <div className="is-flex is-justify-content-space-between is-align-items-center">
-                                                    <div>
-                                                        <div className="has-text-weight-bold">{forfait.nomForfait}</div>
-                                                        <div className="is-size-6">{forfait.descriptionForfait}</div>
-                                                    </div>
-                                                    <div className="has-text-weight-bold">{forfait.prixForfait}$/mois</div>
-                                                </div>
-                                            </div>
+                                            <ForfaitCard
+                                                key={forfait.idForfait}
+                                                forfait={forfait}
+                                            />
                                         ) : (
                                             <div className="has-text-danger">Aucun forfait sélectionné</div>
                                         )}
@@ -377,6 +300,7 @@ export function CreerCompte() {
                                 Total : {forfaits
                                     .filter(f => forfaitsSelection.includes(f.idForfait))
                                     .reduce((acc, f) => acc + f.prixForfait, 0)
+                                    .toFixed(2)
                                 }$/mois
                             </div>
                         </div>
@@ -387,6 +311,7 @@ export function CreerCompte() {
     }
 
     function boutonSuivant() {
+        setAfficherErreur(false)
         if (etape == 1) {
             if (!clientSelection) {
                 setAfficherErreur(true)
@@ -427,12 +352,11 @@ export function CreerCompte() {
 
     async function requeteCreerCompte() {
         const token = localStorage.getItem("token")
-
         const total = forfaits
             .filter(f => forfaitsSelection.includes(f.idForfait))
             .reduce((acc, f) => acc + f.prixForfait, 0)
 
-        setSoldeCompte(total)
+        setAfficherErreur(false)
 
         try {
             const response = await fetch(`/api/comptes/creerDossier`, {
@@ -458,38 +382,32 @@ export function CreerCompte() {
 
             const data = await response.json()
 
-            await Promise.all(forfaitsSelection.map(async (forfait) => {
-                try {
-                    const response = await fetch(`/api/forfaitsDossier/`, {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "Accept": "application/json",
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            idDossier: data.idDossier,
-                            idForfait: forfait
-                        })
+            const forfaitResults = await Promise.all(forfaitsSelection.map(async (forfait) => {
+                const r = await fetch(`/api/forfaitsDossier/`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        idDossier: data.idDossier,
+                        idForfait: forfait
                     })
-
-                    if (!response.ok) {
-                        setAfficherErreur(true)
-                        setMessageErreur("Erreur en associant le forfait au dossier")
-                        return
-                    }
-
-                } catch (err) {
-                    setAfficherErreur(true)
-                    setMessageErreur("Erreur serveur", err)
-                }
+                })
+                return r.ok
             }))
+
+            if (forfaitResults.some(ok => !ok)) {
+                setAfficherErreur(true)
+                setMessageErreur("Erreur en associant les forfaits au dossier")
+                return
+            }
 
             setAfficherSucces(true)
             setTimeout(() => setAfficherSucces(false), 6000)
 
         } catch (err) {
-            console.error("Erreur complète :", err)
             setAfficherErreur(true)
             setMessageErreur("Erreur serveur : " + err.message)
         }
@@ -530,6 +448,16 @@ export function CreerCompte() {
                     </div>
                 </div>
                 <div className="box">
+                    {afficherErreur && (
+                        <div className="notification is-danger">
+                            {messageErreur}
+                        </div>
+                    )}
+                    {afficherSucces && (
+                        <div className="notification is-success">
+                            Compte créé avec succès
+                        </div>
+                    )}
                     {affichageSelonEtape(etape)}
                 </div>
                 <div className="is-flex is-justify-content-space-between mt-4">
@@ -549,34 +477,6 @@ export function CreerCompte() {
                         <button className="button is-dark" onClick={() => requeteCreerCompte()}>Confirmer</button>
                     )}
                 </div>
-            </div>
-            <div className="notification is-danger" style={{
-                position: "fixed",
-                bottom: "1.5rem",
-                right: "1.5rem",
-                zIndex: 1000,
-                minWidth: "20rem",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-                opacity: afficherErreur ? 1 : 0,
-                transition: "opacity 0.5s ease",
-                pointerEvents: afficherErreur ? "auto" : "none",
-            }}>
-                <button className="delete" onClick={() => setAfficherErreur(false)}></button>
-                <p className="has-text-centered">{messageErreur}</p>
-            </div>
-            <div className="notification is-success" style={{
-                position: "fixed",
-                bottom: "1.5rem",
-                right: "1.5rem",
-                zIndex: 1000,
-                minWidth: "20rem",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-                opacity: afficherSucces ? 1 : 0,
-                transition: "opacity 0.5s ease",
-                pointerEvents: afficherSucces ? "auto" : "none",
-            }}>
-                <button className="delete" onClick={() => setAfficherSucces(false)}></button>
-                <p className="has-text-centered has-text-weight-bold">Compte créé avec succès !</p>
             </div>
         </div>
     )

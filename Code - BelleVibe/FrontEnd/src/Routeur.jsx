@@ -10,6 +10,7 @@ import CreeClient from "./Pages/CreerClient";
 import { LoginContext } from "./context/LoginContext.js";
 import GestionCompte from "./Pages/GestionCompte.jsx";
 import CreerEmploye from "./Pages/CreerEmploye.jsx";
+import { ModifierForfait } from "./Pages/ModifierForfait.jsx";
 
 function isTokenExpired(token) {
 	const payload = JSON.parse(atob(token.split(".")[1]));
@@ -62,6 +63,7 @@ function Routeur() {
 						<Route path="/comptes/:id/:onglet" element={<DetailsCompte />} />
 						<Route path="/clients/:id/:onglet" element={<DetailsClient />} />
 						<Route path="/CreerEmploye" element={<CreerEmploye />} />
+						<Route path="/modifierForfait/:idForfait" element={<ModifierForfait />} />
 						<Route path="*" element={<div className="section has-text-centered">Page non trouvée</div>} />
 					</Route>
 				</Routes>
