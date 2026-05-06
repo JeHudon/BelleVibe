@@ -1,4 +1,4 @@
-const { validerChamps, authentifier, authentifierAdmin, log } = require("../fonctionsCommunes.js");
+const { validerChamps, authentifier, authentifierAdmin, log, authentifierSupp } = require("../fonctionsCommunes.js");
 const { db } = require("../BD/creationBd");
 
 const express = require("express");
@@ -63,8 +63,8 @@ router.post("/nouvelleFacture", authentifier, async (req, res) => {
         // vérification que la facture n'est pas émise dans le passé
         const diffMs = Date.now() - date_emission.getTime()
         const diffJours = diffMs / (1000 * 60 * 60 * 24)
-        if (diffJours < 0){
-            return res.status(400).json({error: "La date de l'émission de la facture ne peux pas être dans le passé"})
+        if (diffJours < 0) {
+            return res.status(400).json({ error: "La date de l'émission de la facture ne peux pas être dans le passé" })
         }
         // vérification de l'authenticité du dossier donné
         const dossier = await db("dossiers").where("idDossier", idDossier)
@@ -81,7 +81,7 @@ router.post("/nouvelleFacture", authentifier, async (req, res) => {
         }
         const [idFacturation] = await db("facturation").insert(data)
         await log(req.user.id, "WRITE", "FACTURATION", Number(idFacturation))
-        return res.status(201).json({...data, idFacturation: Number(idFacturation)})
+        return res.status(201).json({ ...data, idFacturation: Number(idFacturation) })
     }
     catch (error) {
         console.error("Erreur dans POST /facturation/nouvelleFacture", error)
@@ -89,5 +89,98 @@ router.post("/nouvelleFacture", authentifier, async (req, res) => {
     }
 })
 
+// PATCH pour updater les infos de la facture, bcp utilisé pour updater le montant payé
+// utilisable seulement par des employés, infos plus critiques modifiables dans une autre route
+router.patch("/updateFacture/:idFacture", authentifier, async (req, res) => {
+    try {
+        // récupération des infos avec le params et le body
+        const idFacture = req.params.idFacture
+        const statut = req.body.statutFacture
+        const montantPaye = req.body.montantPaye
+        const datePaiement = req.body.datePaiement
+
+        const valider = validerChamps({ idFacture })
+        if (valider.error) {
+            return res.status(400).json({ error: valider.error })
+        }
+        // si rien, retourne une erreur
+        if (!statut && !montantPaye && !datePaiement) {
+            return res.status(400).json({ error: "Aucun champ n'a été entré pour modifier la facture" })
+        }
+        // si les champs existent, les ajoute au data qui va etre envoyé au backend après
+        let data = {}
+        if (statut) { data.statut = statut }
+        if (montantPaye) { data.montantPaye = montantPaye }
+        if (datePaiement) { data.datePaiement = datePaiement }
+
+        const verifierID = await db("facturation").where("idFacturation", idFacture).update()
+        if (verifierID == 0) {
+            return res.status(404).json({ error: "Facture non trouvée dans la base de données" })
+        }
+        res.status(200).json({ message: "Infos de la facture mises à jour avec succès", idFacture })
+        await log(req.user.id, "EDIT", "FACTURATION", Number(idFacture))
+    }
+    catch (error) {
+        console.error("Erreur dans PATCH /facturation/updateFacture", error)
+        res.status(500).json({ message: "Erreur serveur", error })
+    }
+})
+
+// PATCH pour updater les infos plus critiques de la facture
+router.patch("/updateFactureSupp/:idFacture", authentifierSupp, async (req, res) => {
+    try {
+        // récupération des infos avec le params et le body
+        const idFacture = req.params.idFacture
+        const dateEmission = req.body.dateEmission
+        const montantTotal = req.body.montantTotal
+
+        const valider = validerChamps({ idFacture })
+        if (valider.error) {
+            return res.status(400).json({ error: valider.error })
+        }
+        // si rien, retourne une erreur
+        if (!dateEmission && !montantTotal) {
+            return res.status(400).json({ error: "Aucun champ n'a été entré pour modifier la facture" })
+        }
+        // si les champs existent, les ajoute au data qui va etre envoyé au backend après
+        let data = {}
+        if (dateEmission) { data.dateEmission = dateEmission }
+        if (montantTotal) { data.montantTotal = montantTotal }
+
+        const verifierID = await db("facturation").where("idFacturation", idFacture).update()
+        if (verifierID == 0) {
+            return res.status(404).json({ error: "Facture non trouvée dans la base de données" })
+        }
+        res.status(200).json({ message: "Infos de la facture mises à jour avec succès", idFacture })
+        await log(req.user.id, "EDIT", "FACTURATION", Number(idFacture))
+    }
+    catch (error) {
+        console.error("Erreur dans PATCH /facturation/updateFacture", error)
+        res.status(500).json({ message: "Erreur serveur", error })
+    }
+})
+
+
+// DELETE une facture, seulement accessible par les admins
+router.delete("/deleteFacture/:idFacture", authentifierAdmin, async (req, res) => {
+    try {
+        const id = req.params.idFacture
+        const valider = validerChamps({ id })
+        if (valider.error) {
+            return res.status(400).json({ error: valider.error })
+        }
+        const verifierID = await db("facturation").where("idFacturation", id).del()
+        if (verifierID == 0) {
+            return res.status(404).json({ error: "Facture non trouvée dans la base de données" })
+        }
+        res.status(200).json({ message: "Facture supprimée avec succès", id })
+        await log(req.user.id, "DELETE", "FACTURATION", Number(id))
+
+    }
+    catch (error) {
+        console.error("Erreur dans DELETE /facturation/deleteFacture", error)
+        res.status(500).json({ message: "Erreur serveur", error })
+    }
+})
 
 module.exports = router
