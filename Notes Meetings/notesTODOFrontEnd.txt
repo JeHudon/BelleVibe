@@ -1,0 +1,42 @@
+page log in (avec drop down menus pour logins)
+side bar employé + superviseur + admin
+dashboard employé:
+	demandes ouvertes, comptes en attente, tâches en attente (highlight et liste en bas), activités récentes
+	bouttons vers pages les plus importantes/courrantes (Accès rapides)
+créer un client
+créer un compte
+page création service (choix service -> choix forfait -> confirmation)
+création note
+ajout document
+création facture
+routes + table factures
+refaire les tests ++ clean postman
+refaire documentation (/api) qui montre le swagger
+gestion des comptes (liste de tous les comptes, liens vers chaque client)
+page détails compte (contient mini dashboard avec services, solde du mois, dernier accès au dossier)
+	onglet "résumé" avec infos client
+	onglet demandes
+	onglet documents
+	onglet notes
+	onglet facturation
+
+
+			SUPERVISEUR
+nav bar employé + gestion employés, +créer employé
+dashboard superviseur (demandes en retard selon SLA, historique des employés)
+création d'un employé
+gestion employés (mini dashboard?, infos de l'employé, dossiers assignés à l'employé, historique de l'employé)
+edit employé (boutton dans gestion employé?)
+boutton suppression client
+boutton suppression dossier
+edit notes
+delete notes
+delete documents
+
+
+
+ADMIN
+navbar superviseur + gestion forfaits / services
+modification admin employé 
+boutton suppression note
+

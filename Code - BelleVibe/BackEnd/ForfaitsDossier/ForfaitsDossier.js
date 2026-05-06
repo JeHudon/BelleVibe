@@ -23,7 +23,7 @@ router.get("/:idDossier", authentifier, async (req, res) => {
 });
 
 // POST ajouter un forfait à un dossier
-router.post("/", authentifierSupp, async (req, res) => {
+router.post("/", authentifier, async (req, res) => {
     try {
         const { idDossier, idForfait } = req.body;
 

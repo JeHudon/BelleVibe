@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 export default function CreerEmploye() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    prenomEmploye: "",
-    nomEmploye: "",
-    telephoneEmploye: "",
-    courrielEmploye: "",
-    adresseEmploye: "",
-    codePostalEmploye: "",
+    prenom: "",
+    nom: "",
+    telephone: "",
+    courriel: "",
+    adresse: "",
+    codePostal: "",
     mdp: "",
     role: "commis",
   });
@@ -97,9 +97,9 @@ export default function CreerEmploye() {
                   <input
                     className="input"
                     type="text"
-                    name="prenomEmploye"
+                    name="prenom"
                     placeholder="Sophie"
-                    value={form.prenomEmploye}
+                    value={form.prenom}
                     onChange={handleChange}
                     required
                   />
@@ -113,9 +113,9 @@ export default function CreerEmploye() {
                   <input
                     className="input"
                     type="text"
-                    name="nomEmploye"
+                    name="nom"
                     placeholder="Gagnon"
-                    value={form.nomEmploye}
+                    value={form.nom}
                     onChange={handleChange}
                     required
                   />
@@ -133,9 +133,9 @@ export default function CreerEmploye() {
                   <input
                     className="input"
                     type="tel"
-                    name="telephoneEmploye"
+                    name="telephone"
                     placeholder="514-555-1234"
-                    value={form.telephoneEmploye}
+                    value={form.telephone}
                     onChange={handleChange}
                     required
                   />
@@ -149,9 +149,9 @@ export default function CreerEmploye() {
                   <input
                     className="input"
                     type="email"
-                    name="courrielEmploye"
+                    name="courriel"
                     placeholder="employe@example.com"
-                    value={form.courrielEmploye}
+                    value={form.courriel}
                     onChange={handleChange}
                     required
                   />
@@ -214,9 +214,9 @@ export default function CreerEmploye() {
                   <input
                     className="input"
                     type="text"
-                    name="adresseEmploye"
+                    name="adresse"
                     placeholder="123 Rue Saint-Laurent, Montréal, QC"
-                    value={form.adresseEmploye}
+                    value={form.adresse}
                     onChange={handleChange}
                   />
                 </div>
@@ -229,9 +229,9 @@ export default function CreerEmploye() {
                   <input
                     className="input"
                     type="text"
-                    name="codePostalEmploye"
+                    name="codePostal"
                     placeholder="H2X 2T6"
-                    value={form.codePostalEmploye}
+                    value={form.codePostal}
                     onChange={handleChange}
                     required
                   />

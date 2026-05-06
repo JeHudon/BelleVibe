@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AjouterDocuments from "../components/AjouterDocuments";
 import { ForfaitCard } from "../components/ForfaitCard";
+import { Link } from "react-router-dom";
 import FileViewer from "../components/FileViewer";
 
 function DetailsCompte() {
@@ -16,7 +17,13 @@ function DetailsCompte() {
 
 	const [modalOpen, setModalOpen] = useState(false);
 	//Ajout Karel
+	//Ajout Karel
 	const [modalDemande, setModalDemande] = useState(false);
+	const [modalModifierDemande, setModalModifierDemande] = useState(false);
+	const [modalNote, setModalNote] = useState(false);
+	const [modalModifierNote, setModalModifierNote] = useState(false);
+	const [modalSupprimerNote, setModalSupprimerNote] = useState(false);
+	const [modalSupprimerDocument, setModalSupprimerDocument] = useState(false);
 	const [modalModifierDemande, setModalModifierDemande] = useState(false);
 	const [modalNote, setModalNote] = useState(false);
 	const [modalModifierNote, setModalModifierNote] = useState(false);
@@ -26,13 +33,26 @@ function DetailsCompte() {
 	const [demandeSelectionnee, setDemandeSelectionnee] = useState(null);
 	const [noteSelectionnee, setNoteSelectionnee] = useState(null);
 	const [documentSelectionne, setDocumentSelectionne] = useState(null);
+	const [demandeSelectionnee, setDemandeSelectionnee] = useState(null);
+	const [noteSelectionnee, setNoteSelectionnee] = useState(null);
+	const [documentSelectionne, setDocumentSelectionne] = useState(null);
 
 	const [formDemande, setFormDemande] = useState({
 		typeDemande: "",
 		statutDemande: "Ouverte",
 		noteInterne: "",
 	});
+	const [formDemande, setFormDemande] = useState({
+		typeDemande: "",
+		statutDemande: "Ouverte",
+		noteInterne: "",
+	});
 
+	const [formNote, setFormNote] = useState({
+		type: "",
+		titre: "",
+		note: "",
+	}); //Ajout Karel
 	const [formNote, setFormNote] = useState({
 		type: "",
 		titre: "",
@@ -143,7 +163,15 @@ function DetailsCompte() {
 		return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 	};
 	//Ajout Karel
+	//Ajout Karel
 	function getUserId() {
+		try {
+			const user = JSON.parse(atob(token.split(".")[1]));
+			return user.id;
+		} catch {
+			return null;
+		}
+	}
 		try {
 			const user = JSON.parse(atob(token.split(".")[1]));
 			return user.id;
@@ -161,13 +189,36 @@ function DetailsCompte() {
 			},
 			body: JSON.stringify(formDemande),
 		});
+	async function ajouterDemande() {
+		const res = await fetch(`/api/demandes/creerDemande/${id}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify(formDemande),
+		});
 
 		if (res.ok) {
 			setModalDemande(false);
 			window.location.reload();
 		}
 	}
+		if (res.ok) {
+			setModalDemande(false);
+			window.location.reload();
+		}
+	}
 
+	function ouvrirModifierDemande(demande) {
+		setDemandeSelectionnee(demande);
+		setFormDemande({
+			typeDemande: demande.typeDemande,
+			statutDemande: demande.statutDemande,
+			noteInterne: demande.noteInterne,
+		});
+		setModalModifierDemande(true);
+	}
 	function ouvrirModifierDemande(demande) {
 		setDemandeSelectionnee(demande);
 		setFormDemande({
@@ -187,7 +238,21 @@ function DetailsCompte() {
 			},
 			body: JSON.stringify(formDemande),
 		});
+	async function modifierDemande() {
+		const res = await fetch(`/api/demandes/modifierDemande/${demandeSelectionnee.idDemande}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify(formDemande),
+		});
 
+		if (res.ok) {
+			setModalModifierDemande(false);
+			window.location.reload();
+		}
+	}
 		if (res.ok) {
 			setModalModifierDemande(false);
 			window.location.reload();
@@ -209,13 +274,42 @@ function DetailsCompte() {
 				note: formNote.note,
 			}),
 		});
+	async function ajouterNote() {
+		const res = await fetch(`/api/notes/${id}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({
+				idDossier: id,
+				idEmploye: getUserId(),
+				type: formNote.type,
+				titre: formNote.titre,
+				note: formNote.note,
+			}),
+		});
 
 		if (res.ok) {
 			setModalNote(false);
 			window.location.reload();
 		}
 	}
+		if (res.ok) {
+			setModalNote(false);
+			window.location.reload();
+		}
+	}
 
+	function ouvrirModifierNote(note) {
+		setNoteSelectionnee(note);
+		setFormNote({
+			type: note.typeNote,
+			titre: note.titreNote,
+			note: note.note,
+		});
+		setModalModifierNote(true);
+	}
 	function ouvrirModifierNote(note) {
 		setNoteSelectionnee(note);
 		setFormNote({
@@ -241,7 +335,27 @@ function DetailsCompte() {
 				note: formNote.note,
 			}),
 		});
+	async function modifierNote() {
+		const res = await fetch(`/api/notes/${noteSelectionnee.idNote}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({
+				idDossier: id,
+				idEmploye: getUserId(),
+				type: formNote.type,
+				titre: formNote.titre,
+				note: formNote.note,
+			}),
+		});
 
+		if (res.ok) {
+			setModalModifierNote(false);
+			window.location.reload();
+		}
+	}
 		if (res.ok) {
 			setModalModifierNote(false);
 			window.location.reload();
@@ -255,7 +369,19 @@ function DetailsCompte() {
 				Authorization: `Bearer ${token}`,
 			},
 		});
+	async function supprimerNote() {
+		const res = await fetch(`/api/notes/${noteSelectionnee.idNote}`, {
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
 
+		if (res.ok) {
+			setModalSupprimerNote(false);
+			window.location.reload();
+		}
+	}
 		if (res.ok) {
 			setModalSupprimerNote(false);
 			window.location.reload();
@@ -269,7 +395,19 @@ function DetailsCompte() {
 				Authorization: `Bearer ${token}`,
 			},
 		});
+	async function supprimerDocument() {
+		const res = await fetch(`/api/documents/${documentSelectionne.idDocument}`, {
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
 
+		if (res.ok) {
+			setModalSupprimerDocument(false);
+			window.location.reload();
+		}
+	} //Ajout Karel
 		if (res.ok) {
 			setModalSupprimerDocument(false);
 			window.location.reload();
@@ -301,7 +439,22 @@ function DetailsCompte() {
 				</div>
 				{onglet === "resume" && (
 					<div className="box" style={{ border: "1px solid #d6d6d6" }}>
-						<h2 className="title is-5 is-spaced">Informations du compte</h2>
+						<div className="level">
+							<div className="level-left">
+								<div className="level-item">
+									<div>
+										<h2 className="title is-5 is-spaced">Informations du compte</h2>
+									</div>
+								</div>
+							</div>
+							<div className="level-right">
+								<div className="level-item">
+									<Link to={`/modifierForfait/${compte.idCompte}`}>
+										<button className="button is-dark" onClick={() => setModalDemande(true)}>+ Modifier Forfait</button>
+									</Link>
+								</div>
+							</div>
+						</div>
 						<h3 className="title is-4">Forfaits actifs</h3>
 						<div style={{ marginBottom: 20 }}>
 							{forfaits && forfaits.length > 0 ? (
@@ -420,6 +573,7 @@ function DetailsCompte() {
 														paddingRight: "0.5rem",
 													}}
 													title="Modifier"
+													onClick={() => ouvrirModifierDemande(demande)}
 												>
 													<i className="fas fa-pen-to-square"></i>
 												</button>
@@ -548,6 +702,21 @@ function DetailsCompte() {
 												>
 													<i className="fa-solid fa-eye"></i>
 												</button>
+
+												<button
+	                                                className="button is-medium is-ghost has-text-danger"
+	                                                style={{
+		                                                paddingLeft: "0.5rem",
+		                                                paddingRight: "0.5rem",
+	                                                }}
+	                                                title="Supprimer"
+	                                                onClick={() => {
+		                                                setDocumentSelectionne(document);
+		                                                setModalSupprimerDocument(true);
+	                                                }}
+                                                >
+	                                                <i className="fa-solid fa-trash"></i>
+                                                </button>
 											</td>
 										</tr>
 									))
@@ -577,7 +746,7 @@ function DetailsCompte() {
 							</div>
 							<div className="level-right">
 								<div className="level-item">
-									<button className="button is-dark">+ Ajouter note</button>
+									<button className="button is-dark" onClick={() => setModalNote(true)}>+ Ajouter note</button>
 								</div>
 							</div>
 						</div>
@@ -604,7 +773,28 @@ function DetailsCompte() {
 											</p>
 										</div>
 
-										<div>{formatDate(note.created_at)}</div>
+										<div className="has-text-right">
+	                                        <div>{formatDate(note.created_at)}</div>
+
+	                                        <div className="buttons are-small mt-2">
+		                                        <button
+			                                        className="button is-ghost"
+			                                        onClick={() => ouvrirModifierNote(note)}
+		                                        >
+			                                        <i className="fa-solid fa-pen-to-square"></i>
+		                                        </button>
+
+		                                        <button
+			                                        className="button is-ghost has-text-danger"
+			                                        onClick={() => {
+				                                        setNoteSelectionnee(note);
+				                                        setModalSupprimerNote(true);
+			                                        }}
+		                                        >
+			                                        <i className="fa-solid fa-trash"></i>
+		                                        </button>
+	                                        </div>
+                                        </div>
 									</div>
 								</div>
 							))
@@ -613,6 +803,286 @@ function DetailsCompte() {
 						)}
 					</div>
 				)}
+
+{modalDemande && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalDemande(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Créer une demande</p>
+				<button className="delete" onClick={() => setModalDemande(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<div className="field">
+					<label className="label">Type de demande</label>
+					<input
+						className="input"
+						value={formDemande.typeDemande}
+						onChange={(e) =>
+							setFormDemande({ ...formDemande, typeDemande: e.target.value })
+						}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Statut</label>
+					<div className="select is-fullwidth">
+						<select
+							value={formDemande.statutDemande}
+							onChange={(e) =>
+								setFormDemande({ ...formDemande, statutDemande: e.target.value })
+							}
+						>
+							<option>Ouverte</option>
+							<option>En attente</option>
+							<option>En retard</option>
+							<option>Fermée</option>
+						</select>
+					</div>
+				</div>
+
+				<div className="field">
+					<label className="label">Note interne</label>
+					<textarea
+						className="textarea"
+						value={formDemande.noteInterne}
+						onChange={(e) =>
+							setFormDemande({ ...formDemande, noteInterne: e.target.value })
+						}
+					/>
+				</div>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-dark" onClick={ajouterDemande}>
+					Enregistrer
+				</button>
+				<button className="button" onClick={() => setModalDemande(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
+
+{modalModifierDemande && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalModifierDemande(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Modifier la demande</p>
+				<button className="delete" onClick={() => setModalModifierDemande(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<div className="field">
+					<label className="label">Type de demande</label>
+					<input
+						className="input"
+						value={formDemande.typeDemande}
+						onChange={(e) =>
+							setFormDemande({ ...formDemande, typeDemande: e.target.value })
+						}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Statut</label>
+					<div className="select is-fullwidth">
+						<select
+							value={formDemande.statutDemande}
+							onChange={(e) =>
+								setFormDemande({ ...formDemande, statutDemande: e.target.value })
+							}
+						>
+							<option>Ouverte</option>
+							<option>En attente</option>
+							<option>En retard</option>
+							<option>Fermée</option>
+						</select>
+					</div>
+				</div>
+
+				<div className="field">
+					<label className="label">Note interne</label>
+					<textarea
+						className="textarea"
+						value={formDemande.noteInterne}
+						onChange={(e) =>
+							setFormDemande({ ...formDemande, noteInterne: e.target.value })
+						}
+					/>
+				</div>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-dark" onClick={modifierDemande}>
+					Enregistrer
+				</button>
+				<button className="button" onClick={() => setModalModifierDemande(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
+
+{modalNote && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalNote(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Ajouter une note</p>
+				<button className="delete" onClick={() => setModalNote(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<div className="field">
+					<label className="label">Type</label>
+					<input
+						className="input"
+						value={formNote.type}
+						onChange={(e) => setFormNote({ ...formNote, type: e.target.value })}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Titre</label>
+					<input
+						className="input"
+						value={formNote.titre}
+						onChange={(e) => setFormNote({ ...formNote, titre: e.target.value })}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Note</label>
+					<textarea
+						className="textarea"
+						value={formNote.note}
+						onChange={(e) => setFormNote({ ...formNote, note: e.target.value })}
+					/>
+				</div>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-dark" onClick={ajouterNote}>
+					Enregistrer
+				</button>
+				<button className="button" onClick={() => setModalNote(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
+
+{modalModifierNote && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalModifierNote(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Modifier la note</p>
+				<button className="delete" onClick={() => setModalModifierNote(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<div className="field">
+					<label className="label">Type</label>
+					<input
+						className="input"
+						value={formNote.type}
+						onChange={(e) => setFormNote({ ...formNote, type: e.target.value })}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Titre</label>
+					<input
+						className="input"
+						value={formNote.titre}
+						onChange={(e) => setFormNote({ ...formNote, titre: e.target.value })}
+					/>
+				</div>
+
+				<div className="field">
+					<label className="label">Note</label>
+					<textarea
+						className="textarea"
+						value={formNote.note}
+						onChange={(e) => setFormNote({ ...formNote, note: e.target.value })}
+					/>
+				</div>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-dark" onClick={modifierNote}>
+					Enregistrer
+				</button>
+				<button className="button" onClick={() => setModalModifierNote(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
+
+{modalSupprimerNote && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalSupprimerNote(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Supprimer la note</p>
+				<button className="delete" onClick={() => setModalSupprimerNote(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<p>Voulez-vous vraiment supprimer cette note ?</p>
+				<p className="has-text-weight-bold mt-2">
+					{noteSelectionnee?.titreNote}
+				</p>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-danger" onClick={supprimerNote}>
+					Supprimer
+				</button>
+				<button className="button" onClick={() => setModalSupprimerNote(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
+
+{modalSupprimerDocument && (
+	<div className="modal is-active">
+		<div className="modal-background" onClick={() => setModalSupprimerDocument(false)}></div>
+		<div className="modal-card">
+			<header className="modal-card-head">
+				<p className="modal-card-title">Supprimer le document</p>
+				<button className="delete" onClick={() => setModalSupprimerDocument(false)}></button>
+			</header>
+
+			<section className="modal-card-body">
+				<p>Voulez-vous vraiment supprimer ce document ?</p>
+				<p className="has-text-weight-bold mt-2">
+					{documentSelectionne?.nomDocument}
+				</p>
+			</section>
+
+			<footer className="modal-card-foot">
+				<button className="button is-danger" onClick={supprimerDocument}>
+					Supprimer
+				</button>
+				<button className="button" onClick={() => setModalSupprimerDocument(false)}>
+					Annuler
+				</button>
+			</footer>
+		</div>
+	</div>
+)}
 			</div>
 		</div>
 	);
