@@ -13,29 +13,29 @@ function DetailsCompte() {
 	const [editingDoc, setEditingDoc] = useState(null);
 
 	const [modalOpen, setModalOpen] = useState(false);
-//Ajout Karel
+	//Ajout Karel
 	const [modalDemande, setModalDemande] = useState(false);
-    const [modalModifierDemande, setModalModifierDemande] = useState(false);
-    const [modalNote, setModalNote] = useState(false);
-    const [modalModifierNote, setModalModifierNote] = useState(false);
-    const [modalSupprimerNote, setModalSupprimerNote] = useState(false);
-    const [modalSupprimerDocument, setModalSupprimerDocument] = useState(false);
+	const [modalModifierDemande, setModalModifierDemande] = useState(false);
+	const [modalNote, setModalNote] = useState(false);
+	const [modalModifierNote, setModalModifierNote] = useState(false);
+	const [modalSupprimerNote, setModalSupprimerNote] = useState(false);
+	const [modalSupprimerDocument, setModalSupprimerDocument] = useState(false);
 
-    const [demandeSelectionnee, setDemandeSelectionnee] = useState(null);
-    const [noteSelectionnee, setNoteSelectionnee] = useState(null);
-    const [documentSelectionne, setDocumentSelectionne] = useState(null);
+	const [demandeSelectionnee, setDemandeSelectionnee] = useState(null);
+	const [noteSelectionnee, setNoteSelectionnee] = useState(null);
+	const [documentSelectionne, setDocumentSelectionne] = useState(null);
 
-    const [formDemande, setFormDemande] = useState({
-	    typeDemande: "",
-	    statutDemande: "Ouverte",
-	    noteInterne: "",
-    }); 
+	const [formDemande, setFormDemande] = useState({
+		typeDemande: "",
+		statutDemande: "Ouverte",
+		noteInterne: "",
+	});
 
-   const [formNote, setFormNote] = useState({
-	   type: "",
-	   titre: "",
-	   note: "",
-    }); //Ajout Karel
+	const [formNote, setFormNote] = useState({
+		type: "",
+		titre: "",
+		note: "",
+	}); //Ajout Karel
 
 	const { onglet } = useParams();
 	const { id } = useParams();
@@ -140,139 +140,139 @@ function DetailsCompte() {
 		if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
 		return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 	};
-//Ajout Karel
+	//Ajout Karel
 	function getUserId() {
-	try {
-		const user = JSON.parse(atob(token.split(".")[1]));
-		return user.id;
-	} catch {
-		return null;
+		try {
+			const user = JSON.parse(atob(token.split(".")[1]));
+			return user.id;
+		} catch {
+			return null;
+		}
 	}
-}
 
-async function ajouterDemande() {
-	const res = await fetch(`/api/demandes/creerDemande/${id}`, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
-		},
-		body: JSON.stringify(formDemande),
-	});
+	async function ajouterDemande() {
+		const res = await fetch(`/api/demandes/creerDemande/${id}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify(formDemande),
+		});
 
-	if (res.ok) {
-		setModalDemande(false);
-		window.location.reload();
+		if (res.ok) {
+			setModalDemande(false);
+			window.location.reload();
+		}
 	}
-}
 
-function ouvrirModifierDemande(demande) {
-	setDemandeSelectionnee(demande);
-	setFormDemande({
-		typeDemande: demande.typeDemande,
-		statutDemande: demande.statutDemande,
-		noteInterne: demande.noteInterne,
-	});
-	setModalModifierDemande(true);
-}
-
-async function modifierDemande() {
-	const res = await fetch(`/api/demandes/modifierDemande/${demandeSelectionnee.idDemande}`, {
-		method: "PUT",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
-		},
-		body: JSON.stringify(formDemande),
-	});
-
-	if (res.ok) {
-		setModalModifierDemande(false);
-		window.location.reload();
+	function ouvrirModifierDemande(demande) {
+		setDemandeSelectionnee(demande);
+		setFormDemande({
+			typeDemande: demande.typeDemande,
+			statutDemande: demande.statutDemande,
+			noteInterne: demande.noteInterne,
+		});
+		setModalModifierDemande(true);
 	}
-}
 
-async function ajouterNote() {
-	const res = await fetch(`/api/notes/${id}`, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
-		},
-		body: JSON.stringify({
-			idDossier: id,
-			idEmploye: getUserId(),
-			type: formNote.type,
-			titre: formNote.titre,
-			note: formNote.note,
-		}),
-	});
+	async function modifierDemande() {
+		const res = await fetch(`/api/demandes/modifierDemande/${demandeSelectionnee.idDemande}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify(formDemande),
+		});
 
-	if (res.ok) {
-		setModalNote(false);
-		window.location.reload();
+		if (res.ok) {
+			setModalModifierDemande(false);
+			window.location.reload();
+		}
 	}
-}
 
-function ouvrirModifierNote(note) {
-	setNoteSelectionnee(note);
-	setFormNote({
-		type: note.typeNote,
-		titre: note.titreNote,
-		note: note.note,
-	});
-	setModalModifierNote(true);
-}
+	async function ajouterNote() {
+		const res = await fetch(`/api/notes/${id}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({
+				idDossier: id,
+				idEmploye: getUserId(),
+				type: formNote.type,
+				titre: formNote.titre,
+				note: formNote.note,
+			}),
+		});
 
-async function modifierNote() {
-	const res = await fetch(`/api/notes/${noteSelectionnee.idNote}`, {
-		method: "PUT",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
-		},
-		body: JSON.stringify({
-			idDossier: id,
-			idEmploye: getUserId(),
-			type: formNote.type,
-			titre: formNote.titre,
-			note: formNote.note,
-		}),
-	});
-
-	if (res.ok) {
-		setModalModifierNote(false);
-		window.location.reload();
+		if (res.ok) {
+			setModalNote(false);
+			window.location.reload();
+		}
 	}
-}
 
-async function supprimerNote() {
-	const res = await fetch(`/api/notes/${noteSelectionnee.idNote}`, {
-		method: "DELETE",
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	});
-
-	if (res.ok) {
-		setModalSupprimerNote(false);
-		window.location.reload();
+	function ouvrirModifierNote(note) {
+		setNoteSelectionnee(note);
+		setFormNote({
+			type: note.typeNote,
+			titre: note.titreNote,
+			note: note.note,
+		});
+		setModalModifierNote(true);
 	}
-}
 
-async function supprimerDocument() {
-	const res = await fetch(`/api/documents/${documentSelectionne.idDocument}`, {
-		method: "DELETE",
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	});
+	async function modifierNote() {
+		const res = await fetch(`/api/notes/${noteSelectionnee.idNote}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({
+				idDossier: id,
+				idEmploye: getUserId(),
+				type: formNote.type,
+				titre: formNote.titre,
+				note: formNote.note,
+			}),
+		});
 
-	if (res.ok) {
-		setModalSupprimerDocument(false);
-		window.location.reload();
+		if (res.ok) {
+			setModalModifierNote(false);
+			window.location.reload();
+		}
 	}
-} //Ajout Karel
+
+	async function supprimerNote() {
+		const res = await fetch(`/api/notes/${noteSelectionnee.idNote}`, {
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+
+		if (res.ok) {
+			setModalSupprimerNote(false);
+			window.location.reload();
+		}
+	}
+
+	async function supprimerDocument() {
+		const res = await fetch(`/api/documents/${documentSelectionne.idDocument}`, {
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+
+		if (res.ok) {
+			setModalSupprimerDocument(false);
+			window.location.reload();
+		}
+	} //Ajout Karel
 
 	return (
 		<div className="section">
@@ -309,7 +309,9 @@ async function supprimerDocument() {
 							</div>
 							<div className="level-right">
 								<div className="level-item">
-									<button className="button is-dark" onClick={() => setModalDemande(true)}>+ Modifier Forfait</button> 
+									<Link to={`/modifierForfait/${compte.idCompte}`}>
+										<button className="button is-dark" onClick={() => setModalDemande(true)}>+ Modifier Forfait</button>
+									</Link>
 								</div>
 							</div>
 						</div>
@@ -371,7 +373,7 @@ async function supprimerDocument() {
 							</div>
 							<div className="level-right">
 								<div className="level-item">
-									<button className="button is-dark" onClick={() => setModalDemande(true)}>+ Créer demande</button> 
+									<button className="button is-dark" onClick={() => setModalDemande(true)}>+ Créer demande</button>
 								</div>
 							</div>
 						</div>
