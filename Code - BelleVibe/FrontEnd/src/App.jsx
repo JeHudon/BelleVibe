@@ -1,4 +1,8 @@
 import { Link } from "react-router-dom";
+<<<<<<< Updated upstream:Code - BelleVibe/FrontEnd/src/App.jsx
+=======
+import DashboardEmploye from "../components/DashboardEmploye";
+>>>>>>> Stashed changes:Code - BelleVibe/FrontEnd/src/Pages/App.jsx
 
 function App() {
   return (
@@ -9,6 +13,15 @@ function App() {
           Login
         </Link>
       </div>
+<<<<<<< Updated upstream:Code - BelleVibe/FrontEnd/src/App.jsx
+=======
+      <Link to={`/creerCompte`} >
+        <button type="submit" className="button is-primary">
+          Créer un compte
+        </button>
+      </Link>
+      <DashboardEmploye />
+>>>>>>> Stashed changes:Code - BelleVibe/FrontEnd/src/Pages/App.jsx
     </>
   );
 }
