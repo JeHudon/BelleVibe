@@ -1,7 +1,10 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useContext} from "react";
+import { LoginContext } from "../context/LoginContext.js";
 
 export function Login() {
+    const navigate = useNavigate();
+    const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
     const [email, setEmail] = useState("employe@bellevibe.com");
     const [mdp, setMdp] = useState("123456");
     const [role, setRole] = useState("Employé")
@@ -33,9 +36,11 @@ export function Login() {
             const data = await response.json();
             console.log(data)
             localStorage.setItem("token", data.token)
-
+            
+            setIsLoggedIn(true);
+            navigate("/dashboard");
         } catch (err) {
-            setError("Erreur réseau");
+            setError("Erreur réseau", err);
         }
     }
 
@@ -57,32 +62,32 @@ export function Login() {
         <div
             style={{
                 minHeight: "100vh",
-                position: "relative",
                 display: "flex",
                 justifyContent: "center",
-                alignItems: "center"
+                alignItems: "center",
+                position: "relative",
+                padding: "1rem",
+                backgroundColor: "#dbeafe",
             }}
         >
-            <div
+            <img
+                src="../images/logo.png"
+                alt="BelleVibe Logo"
                 style={{
                     position: "absolute",
-                    top: "-65px",
+                    top: "-4rem",
                     left: "50%",
-                    transform: "translateX(-50%)"
+                    transform: "translateX(-50%)",
+                    width: "min(600px, 70vw)",
+                    height: "auto",
                 }}
-            >
-                <img
-                    src="../images/logo.png"
-                    alt="BelleVibe Logo"
-                    style={{ width: "500px", height: "auto" }}
-                />
-            </div>
+            />
 
             <form
                 className="box"
                 style={{
-                    width: "550px",
-                    padding: "2.5rem"
+                    width: "min(550px, 90vw)",
+                    padding: "2.5rem",
                 }}
                 onSubmit={loginOnClick}
             >
@@ -166,14 +171,8 @@ export function Login() {
                 <div className="field is-grouped is-justify-content-space-between mt-5">
                     <div className="control">
                         <button type="submit" className="button is-primary">
-                            Login
+                            Se connecter
                         </button>
-                    </div>
-
-                    <div className="control">
-                        <Link to={`/`} className="button is-light">
-                            Cancel
-                        </Link>
                     </div>
                 </div>
             </form>

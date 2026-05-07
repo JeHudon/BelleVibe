@@ -199,4 +199,22 @@ router.put("/adminEdit/:idEmploye", authentifierAdmin, async (req, res) => {
     }
 })
 
+// get employé connecté (via token)
+router.get("/me", authentifier, async (req, res) => {
+    try {
+        const employe = await db("employes")
+            .where("idEmploye", req.user.id)
+            .first();
+
+        if (!employe) {
+            return res.status(404).json({ error: "Employé non trouvé" });
+        }
+
+        res.json(employe);
+    } catch (error) {
+        console.error("Erreur dans /me", error);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
 module.exports = router;

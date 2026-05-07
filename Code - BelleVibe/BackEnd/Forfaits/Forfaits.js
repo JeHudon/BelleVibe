@@ -7,7 +7,12 @@ const router = express.Router();
 // GET tous les forfaits
 router.get("/", authentifier, async (req, res) => {
     try {
-        const forfaits = await db("forfaits").select("*");
+        const forfaits = await db('forfaits')
+        .join('services', 'forfaits.idService', 'services.idService')
+        .select(
+            'forfaits.*',
+            'services.typeService as typeService'
+        )
         res.status(200).json(forfaits);
     } catch (err) {
         console.error("Erreur GET /forfaits", err);

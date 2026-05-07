@@ -100,22 +100,22 @@ router.post("/creerDemande/:idDossier", authentifier, async (req, res) => {
 })
 
 // Modifier une demande
-router.put("/modifierDemande/:idDossier", authentifierSupp, async (req, res) => {
+router.put("/modifierDemande/:idDemande", authentifierSupp, async (req, res) => {
     try {
 
         // Récupération des paramètres/body
         console.log(req.body)
         const { typeDemande, statutDemande, noteInterne } = req.body
-        const { idDossier } = req.params
+        const { idDemande } = req.params
 
         // Vérification que tous les champs sont remplis
-        const validationResult = validerChamps({ idDossier, typeDemande, statutDemande, noteInterne });
+        const validationResult = validerChamps({ idDemande, typeDemande, statutDemande, noteInterne });
         if (validationResult.error) {
             return res.status(400).json({ error: validationResult.error });
         }
 
         // Vérifie que la demande existe
-        const verifDemande = await db("demandes").where("idDossier", idDossier).first()
+        const verifDemande = await db("demandes").where("idDemande", idDemande).first()
         if (!verifDemande) {
             // Indique à l'utilisateur si la demande n'existe pas
             return res.status(404).json({ error: "Demande inexistante" })
@@ -123,16 +123,16 @@ router.put("/modifierDemande/:idDossier", authentifierSupp, async (req, res) => 
 
         // On met les infos dans une variable
         const demande = {
-            idDossier: idDossier,
+            idDemande: idDemande,
             typeDemande: typeDemande,
             statutDemande: statutDemande,
             noteInterne: noteInterne
         }
 
         // On update la demande correspondante dans la base de données
-        await db("demandes").where("idDossier", idDossier).update(demande)
-        await log(req.user.id, "UPDATE", "DEMANDES", Number(idDossier))
-        return res.status(201).json({ ...demande, idDossier: Number(idDossier) })
+        await db("demandes").where("idDemande", idDemande).update(demande)
+        await log(req.user.id, "UPDATE", "DEMANDES", Number(idDemande))
+        return res.status(201).json({ ...demande, idDemande: Number(idDemande) })
 
     } catch (error) {
         console.error("Erreur /editDemandee/:idDossier")

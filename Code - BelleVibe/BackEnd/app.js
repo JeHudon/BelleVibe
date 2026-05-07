@@ -25,8 +25,9 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 // Ajout des en-têtes CORS pour permettre les requêtes depuis le frontend (car sinon faisait des erreurs de politique de même origine et envoyait des requêtes bloquées)
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-    res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") return res.sendStatus(204);
     next();
 });
 
@@ -40,6 +41,24 @@ app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get("/", (req, res) => {
     res.send("Serveur fonctionne");
+});
+
+app.get('/files/:id', async (req, res) => {
+    const file = await db('documents').where({ idDocument: req.params.id }).first();
+
+    if (!file) return res.status(404).json({ error: 'File not found' });
+
+    const filePath = path.join(__dirname, file.cheminDocument);
+    res.sendFile(filePath);
+});
+
+app.get('/download/:id', async (req, res) => {
+    const file = await db('documents').where({ idDocument: req.params.id }).first();
+
+    if (!file) return res.status(404).json({ error: 'File not found' });
+
+    const filePath = path.join(__dirname, file.cheminDocument);
+    res.download(filePath, file.nomDocument); // utilise le vrai nom pour le téléchargement
 });
 
 
