@@ -1,25 +1,46 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 
 export default function DashboardEmploye() {
     const [activeTab, setActiveTab] = useState("demandes");
-    
+
+    function parseJwt(token) {
+        try {
+            const base64Url = token.split(".")[1];
+            const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+            const jsonPayload = decodeURIComponent(
+                atob(base64)
+                    .split("")
+                    .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+                    .join(""),
+            );
+            return JSON.parse(jsonPayload);
+        } catch {
+            return null;
+        }
+    }
+
+    const token = localStorage.getItem("token");
+    const userInfo = token ? parseJwt(token) : null;
+    const nom = userInfo ? userInfo.nom : "";
+    const prenom = userInfo ? userInfo.prenom : "";
+
+    // bs ai pour remplir les cases
+
     const demandesOuvertes = [
         { id: "NW-2024-0045", client: "Sophie Gagnon", type: "Technique", date: "Aujourd'hui, 09h14", statut: "En cours" },
         { id: "NW-2024-0044", client: "Martin Tremblay", type: "Facturation", date: "Hier, 14h30", statut: "En attente" },
     ];
-
     const comptesEnAttente = [
         { id: "NW-2024-001234", client: "Julie Leblanc", raison: "Document manquant", date: "Il y a 2 jours" },
         { id: "NW-2024-001235", client: "Kevin Nguyen", raison: "Vérification identité", date: "Il y a 3 jours" },
     ];
-
     const tachesEnAttente = [
         { id: 1, titre: "Demande technique", detail: "Compte NW-2024-001234", urgence: "warning" },
         { id: 2, titre: "Document manquant", detail: "Julie Leblanc", urgence: "danger" },
         { id: 3, titre: "Approbation compte", detail: "Kevin Nguyen", urgence: "info" },
     ];
-
     const activitesRecentes = [
         { id: 1, action: "Client créé", detail: "Sophie Gagnon", temps: "Il y a 2 heures", couleur: "is-success" },
         { id: 2, action: "Demande mise à jour", detail: "NW-2024-001234", temps: "Il y a 3 heures", couleur: "is-info" },
@@ -27,16 +48,7 @@ export default function DashboardEmploye() {
         { id: 4, action: "Compte approuvé", detail: "NW-2024-001198", temps: "Hier, 16h45", couleur: "is-primary" },
         { id: 5, action: "Document reçu", detail: "Aline Fortin", temps: "Hier, 11h00", couleur: "is-link" },
     ];
-
-    const accesRapides = [
-        { label: "Créer client", desc: "Nouveau client", icone: "", color: "is-info is-light", href: "#" },
-        { label: "Créer compte", desc: "Nouveau compte", icone: "", color: "is-primary is-light", href: "#" },
-        { label: "Ajouter note", desc: "Note au dossier", icone: "", color: "is-warning is-light", href: "#" },
-        { label: "Gestion comptes", desc: "Voir les comptes", icone: "", color: "is-success is-light", href: "#" },
-        { label: "Rechercher", desc: "Client / dossier", icone: "", color: "is-link is-light", href: "#" },
-    ];
-
-    function StatCard({ label, value, color, icone }) {
+    function CarteBoutton({ label, value, color }) {
         return (
             <div className="column">
                 <div className={`notification ${color} is-light`}>
@@ -47,50 +59,63 @@ export default function DashboardEmploye() {
                                 <p className="title">{value}</p>
                             </div>
                         </div>
-                        <div className="level-right">
-                            <span style={{ fontSize: "2rem" }}>{icone}</span>
-                        </div>
                     </div>
                 </div>
             </div>
         );
     }
 
+
     return (<>
         <section className="section">
             <div className="container is-fluid">
-
-                {/* En-tête */}
                 <div className="level mb-5">
                     <div className="level-left">
                         <div>
-                            <h1 className="title is-4 mb-1">Bonjour ${ }</h1>
+                            <h1 className="title is-4 mb-1">Bonjour {prenom + " " + nom}</h1>
                         </div>
                     </div>
                 </div>
 
-                {/* KPI Cards */}
+                {/* Cartes/bouttons du dashboard, peut etre changer pour juste avoir html direct?*/}
                 <div className="columns mb-5">
-                    <StatCard label="Demandes ouvertes" value="2" color="is-info" icone="" />
-                    <StatCard label="Comptes en attente" value="1" color="is-warning" icone="" />
-                    <StatCard label="Tâches en attente" value="3" color="is-danger" icone="" />
-                    <StatCard label="Documents à valider" value="3" color="is-success" icone="" />
+                    <CarteBoutton label="Demandes ouvertes" value="2" color="is-info" />
+                    <CarteBoutton label="Comptes en attente" value="1" color="is-warning" />
+                    <CarteBoutton label="Tâches en attente" value="3" color="is-danger" />
+                    <CarteBoutton label="Documents à valider" value="3" color="is-success" />
                 </div>
 
                 {/* Accès rapides */}
                 <div className="box mb-5">
                     <p className="title is-6 mb-1">Accès rapides</p>
-                    <p className="subtitle is-7 has-text-grey mb-4">Accédez rapidement aux tâches courantes</p>
                     <div className="columns is-mobile is-multiline">
-                        {accesRapides.map((btn) => (
-                            <div key={btn.label} className="column is-one-fifth-desktop is-half-mobile">
-                                <a href={btn.href} className={`button is-fullwidth ${btn.color} is-flex is-flex-direction-column`} style={{ height: "80px", gap: "4px" }}>
-                                    <span style={{ fontSize: "1.4rem" }}>{btn.icone}</span>
-                                    <span className="is-size-7 has-text-weight-semibold">{btn.label}</span>
-                                    <span className="is-size-7 has-text-grey">{btn.desc}</span>
-                                </a>
-                            </div>
-                        ))}
+                        <div className="column is-one-fifth-desktop is-half-mobile">
+                            <Link to={"/clients/nouveau"} className="is-info button is-fullwidth is-flex is-flex-direction-column">
+                                <span className="is-size-9 has-text-weight-semibold">Créer client</span>
+                            </Link>
+                        </div>
+                        <div className="column is-one-fifth-desktop is-half-mobile">
+                            <Link to={"/creerCompte"} className="is-primary button is-fullwidth is-flex is-flex-direction-column">
+                                <span className="is-size-9 has-text-weight-semibold">Créer compte</span>
+                            </Link>
+                        </div>
+                        <div className="column is-one-fifth-desktop is-half-mobile">
+                            {/* À MODIFIER AVEC LE BON LIEN */}
+                            <Link to={"/dashboard"} className="is-warning button is-fullwidth is-flex is-flex-direction-column">
+                                <span className="is-size-9 has-text-weight-semibold">Ajouter note</span>
+                            </Link>
+                        </div>
+                        <div className="column is-one-fifth-desktop is-half-mobile">
+                            <Link to={"/GestionCompte"} className=" is-success button is-fullwidth is-flex is-flex-direction-column">
+                                <span className="is-size-9 has-text-weight-semibold">Gestion Comptes</span>
+                            </Link>
+                        </div>
+                        <div className="column is-one-fifth-desktop is-half-mobile">
+                            {/* À MODIFIER AVEC LE BON LIEN */}
+                            <Link to={"/dashboard"} className="is-link button is-fullwidth is-flex is-flex-direction-column">
+                                <span className="is-size-9 has-text-weight-semibold">Rechercher</span>
+                            </Link>
+                        </div>
                     </div>
                 </div>
 

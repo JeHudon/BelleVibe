@@ -13,6 +13,7 @@ function App() {
           Créer un compte
         </button>
       </Link>
+      <DashboardEmploye />
     </>
   );
 }

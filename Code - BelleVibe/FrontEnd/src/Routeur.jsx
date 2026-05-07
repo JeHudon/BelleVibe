@@ -1,6 +1,3 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import App from "./App.jsx";
-import { Login } from "./Login.jsx";
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import App from "./Pages/App.jsx";
