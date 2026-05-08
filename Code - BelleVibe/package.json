@@ -12,6 +12,7 @@
   "dependencies": {
     "js-yaml": "^4.1.1",
     "nodemon": "^3.1.14",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "vite": "^8.0.11"
   }
 }

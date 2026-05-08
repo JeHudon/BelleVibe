@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 
 export default function DashboardEmploye() {
-    const [activeTab, setActiveTab] = useState("demandes");
+    const [activeTab, setActiveTab] = useState("demandes")
+    const [demandesOuvertes, setDemandesOuvertes] = useState(null)
+    const [comptesEnAttente, setComptesEnAttente] = useState(null)
+    const []
 
+    // fonction pour etre capable de lire le token
     function parseJwt(token) {
         try {
             const base64Url = token.split(".")[1];
@@ -20,14 +24,23 @@ export default function DashboardEmploye() {
             return null;
         }
     }
-
+    //infos tirées du token
     const token = localStorage.getItem("token");
     const userInfo = token ? parseJwt(token) : null;
     const nom = userInfo ? userInfo.nom : "";
     const prenom = userInfo ? userInfo.prenom : "";
 
-    // bs ai pour remplir les cases
+    // loading des infos
+    useEffect(()=>{
+        const serveur = "http://localhost:3000"
+        async function loadDemandesEnAttente(){
+            const rep = await fetch(`${serveur}/demandes/getDemandesOuvertes`)
+            
+        }
 
+    },[])
+
+    // bs ai pour remplir les cases
     const demandesOuvertes = [
         { id: "NW-2024-0045", client: "Sophie Gagnon", type: "Technique", date: "Aujourd'hui, 09h14", statut: "En cours" },
         { id: "NW-2024-0044", client: "Martin Tremblay", type: "Facturation", date: "Hier, 14h30", statut: "En attente" },

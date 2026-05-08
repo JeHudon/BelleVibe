@@ -51,7 +51,7 @@ router.post("/nouvelleFacture", authentifier, async (req, res) => {
     try {
         // prends juste ces 3 valeurs au départ puisqu'on assume que
         // la facture ne sera jamais payée instantanéement
-        const { idDossier, montant_total, dateEmission } = req.body()
+        const { idDossier, montant_total, dateEmission } = req.body
         // id de l'employé récuppéré avec le token
         const idEmploye = req.user.id
         const valider = validerChamps({ idDossier, montant_total, dateEmission })
@@ -160,7 +160,6 @@ router.patch("/updateFactureSupp/:idFacture", authentifierSupp, async (req, res)
     }
 })
 
-
 // DELETE une facture, seulement accessible par les admins
 router.delete("/deleteFacture/:idFacture", authentifierAdmin, async (req, res) => {
     try {
@@ -179,6 +178,23 @@ router.delete("/deleteFacture/:idFacture", authentifierAdmin, async (req, res) =
     }
     catch (error) {
         console.error("Erreur dans DELETE /facturation/deleteFacture", error)
+        res.status(500).json({ message: "Erreur serveur", error })
+    }
+})
+
+// GET les factures en retard (>31 jours depuis la date d'émission de la facture)
+router.get("/facturesRetards", authentifier, async (req, res)=>{
+    try{
+        // check dans la table facturation les factures qui n'ont pas étés payés (null ou 0), & ou la difference de jours est plus grande que 31 jours.
+        const factures = await db("facturation").where(function(){this.whereNull("montant_paye").orWhere("montant_paye",0)})
+        .whereRaw("date_emission <= date('now', '-31 days')").select("*")
+        if(factures.length == 0){
+            return res.status(204).json({message: "Aucune facture en retard"})
+        }
+        res.status(200).json(factures)
+    }
+    catch (error) {
+        console.error("Erreur dans GET /facturation/facturesRetards", error)
         res.status(500).json({ message: "Erreur serveur", error })
     }
 })
