@@ -324,7 +324,8 @@ function DetailsCompte() {
 								<div className="level-item">
 									<div>
 										<h2 className="title is-5 is-spaced">
-											Informations du compte
+											Informations du compte -{" "}
+											{client?.prenomClient + " " + client?.nomClient}
 										</h2>
 									</div>
 								</div>
@@ -360,7 +361,9 @@ function DetailsCompte() {
 								{compte?.soldeDossier} $
 							</p>
 						</div>
-						<h3 className="title is-4">Informations clients</h3>
+						<h3 className="title is-4">
+							Informations clients - {client?.prenomClient + " " + client?.nomClient}
+						</h3>
 						<div className="columns">
 							<div className="column is-6">
 								<label>Email :</label>
