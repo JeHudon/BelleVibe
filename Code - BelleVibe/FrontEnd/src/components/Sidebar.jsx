@@ -5,6 +5,7 @@ const menuItems = [
 	{ to: "/dashboard", label: "Tableau de bord", icon: "fa-chart-line" },
 	{ to: "/clients/nouveau", label: "Créer client", icon: "fa-user-plus" },
 	{ to: "/creerCompte", label: "Créer compte", icon: "fa-wallet" },
+	{ to: "/GestionClients", label: "Gestion des clients", icon: "fa-users" },
 	{ to: "/GestionCompte", label: "Gestion du compte", icon: "fa-folder" },
 	{ to: "/CreerEmploye", label: "Créer employé", icon: "fa-user-tie", roles: ["superviseur", "admin"] },
 ];
