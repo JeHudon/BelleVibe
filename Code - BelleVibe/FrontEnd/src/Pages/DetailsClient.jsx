@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ForfaitCard } from "../components/ForfaitCard";
 import { Link } from "react-router-dom";
@@ -9,6 +9,8 @@ function DetailsClient() {
   const [forfaitsParCompte, setForfaitsParCompte] = useState({});
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [formModif, setFormModif] = useState({});
+  const [erreurModif, setErreurModif] = useState("");
 
   const { onglet } = useParams();
   const { id } = useParams();
@@ -89,6 +91,43 @@ function DetailsClient() {
     chargerForfaits();
   }, [comptes]);
 
+  function ouvrirModification() {
+    setFormModif({
+      nomClient: client.nomClient,
+      prenomClient: client.prenomClient,
+      courrielClient: client.courrielClient,
+      telephoneClient: client.telephoneClient,
+      adresseClient: client.adresseClient,
+      codePostalClient: client.codePostalClient,
+    });
+    setErreurModif("");
+    setModalOpen(true);
+  }
+
+  async function sauvegarderModification(e) {
+    e.preventDefault();
+    setErreurModif("");
+    try {
+      const res = await fetch(`/api/clients/modifierClient/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formModif),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErreurModif(data.error || "Erreur lors de la modification.");
+        return;
+      }
+      setClient((prev) => ({ ...prev, ...formModif }));
+      setModalOpen(false);
+    } catch {
+      setErreurModif("Impossible de joindre le serveur.");
+    }
+  }
+
   const formatSize = (bytes) => {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -98,7 +137,19 @@ function DetailsClient() {
   return (
     <div className="section">
       <div className="container">
-        <h1 className="title">Détails du client</h1>
+        <div className="level mb-4">
+          <div className="level-left">
+            <h1 className="title mb-0">Détails du client</h1>
+          </div>
+          <div className="level-right">
+            {client && (
+              <button className="button is-dark" onClick={ouvrirModification}>
+                <span className="icon"><i className="fas fa-edit" /></span>
+                <span>Modifier le client</span>
+              </button>
+            )}
+          </div>
+        </div>
         <div className="tabs is-toggle is-toggle-rounded is-fullwidth">
           <ul>
             <li className={onglet === "resume" ? "is-active" : ""}>
@@ -199,6 +250,116 @@ function DetailsClient() {
           </div>
         )}
       </div>
+
+      {modalOpen && (
+        <div className="modal is-active">
+          <div className="modal-background" onClick={() => setModalOpen(false)} />
+          <div className="modal-card">
+            <header className="modal-card-head">
+              <p className="modal-card-title">Modifier le client</p>
+              <button className="delete" onClick={() => setModalOpen(false)} />
+            </header>
+            <form onSubmit={sauvegarderModification}>
+              <section className="modal-card-body">
+                {erreurModif && (
+                  <div className="notification is-danger is-light mb-4">
+                    {erreurModif}
+                  </div>
+                )}
+                <div className="columns">
+                  <div className="column">
+                    <div className="field">
+                      <label className="label">Prénom *</label>
+                      <div className="control">
+                        <input
+                          className="input"
+                          value={formModif.prenomClient}
+                          onChange={(e) => setFormModif((p) => ({ ...p, prenomClient: e.target.value }))}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="field">
+                      <label className="label">Nom *</label>
+                      <div className="control">
+                        <input
+                          className="input"
+                          value={formModif.nomClient}
+                          onChange={(e) => setFormModif((p) => ({ ...p, nomClient: e.target.value }))}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column">
+                    <div className="field">
+                      <label className="label">Courriel *</label>
+                      <div className="control">
+                        <input
+                          className="input"
+                          type="email"
+                          value={formModif.courrielClient}
+                          onChange={(e) => setFormModif((p) => ({ ...p, courrielClient: e.target.value }))}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="field">
+                      <label className="label">Téléphone *</label>
+                      <div className="control">
+                        <input
+                          className="input"
+                          type="tel"
+                          value={formModif.telephoneClient}
+                          onChange={(e) => setFormModif((p) => ({ ...p, telephoneClient: e.target.value }))}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="columns">
+                  <div className="column is-8">
+                    <div className="field">
+                      <label className="label">Adresse</label>
+                      <div className="control">
+                        <input
+                          className="input"
+                          value={formModif.adresseClient}
+                          onChange={(e) => setFormModif((p) => ({ ...p, adresseClient: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="column">
+                    <div className="field">
+                      <label className="label">Code postal *</label>
+                      <div className="control">
+                        <input
+                          className="input"
+                          value={formModif.codePostalClient}
+                          onChange={(e) => setFormModif((p) => ({ ...p, codePostalClient: e.target.value }))}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <footer className="modal-card-foot">
+                <button className="button is-dark" type="submit">Sauvegarder</button>
+                <button className="button" type="button" onClick={() => setModalOpen(false)}>Annuler</button>
+              </footer>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
