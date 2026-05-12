@@ -66,20 +66,6 @@ function DetailsCompte() {
 	}
 
 	useEffect(() => {
-		// async function fetchClient() {
-		// 	const data = await fetch(
-		// 		`/api/clients/getClient
-		// 		/${id}`,
-		// 		{
-		// 			method: "GET",
-		// 			headers: {
-		// 				"Content-Type": "application/json",
-		// 				Authorization: `Bearer ${token}`,
-		// 			},
-		// 		},
-		// 	).then((res) => res.json());
-		// 	setClient(data);
-		// }
 		async function fetchCompte() {
 			const data = await fetch(`/api/comptes/getDossier/${id}`, {
 				method: "GET",
@@ -138,6 +124,26 @@ function DetailsCompte() {
 		fetchDocuments();
 		fetchNotes();
 	}, [onglet, id]);
+
+	useEffect(() => {
+		async function fetchClient() {
+			const data = await fetch(
+				`/api/clients/getClient
+				/${compte?.idClient}`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			).then((res) => res.json());
+			setClient(data);
+		}
+		if (compte?.idClient) {
+			fetchClient(compte.idClient);
+		}
+	}, [compte?.idClient]);
 
 	const formatSize = (bytes) => {
 		if (bytes < 1024) return `${bytes} B`;
@@ -325,7 +331,7 @@ function DetailsCompte() {
 							</div>
 							<div className="level-right">
 								<div className="level-item">
-									<Link to={`/modifierForfait/${compte.idCompte}`}>
+									<Link to={`/modifierForfait/${compte?.idClient}`}>
 										<button
 											className="button is-dark"
 											onClick={() => setModalDemande(true)}
