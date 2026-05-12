@@ -11,6 +11,7 @@ import { LoginContext } from "./context/LoginContext.js";
 import GestionCompte from "./Pages/GestionCompte.jsx";
 import CreerEmploye from "./Pages/CreerEmploye.jsx";
 import { ModifierForfait } from "./Pages/ModifierForfait.jsx";
+import GestionEmploye from "./Pages/GestionEmploye.jsx";
 import DetailsCompteModalComponent from "./Pages/DetailsCompteModalComponent.jsx"
 
 function isTokenExpired(token) {
@@ -61,6 +62,8 @@ function Routeur() {
 						<Route path="/clients/nouveau" element={<CreeClient />} />
 						<Route path="/creerCompte" element={<CreerCompte />} />
 						<Route path="/GestionCompte" element={<GestionCompte />} />
+						<Route path="/GestionEmploye" element={<GestionEmploye />} />
+						{/* <Route path="/GestionClient" element={<GestionClient />} /> */}
 						<Route path="/comptes/:id/:onglet" element={<DetailsCompteModalComponent />} />
 						<Route path="/clients/:id/:onglet" element={<DetailsClient />} />
 						<Route path="/CreerEmploye" element={<CreerEmploye />} />
