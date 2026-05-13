@@ -247,7 +247,7 @@ function DetailsCompteModalComponent() {
 							</div>
 							<div className="level-right">
 								<Link to={`/modifierForfait/${compte?.idClient}`}>
-									<button className="button is-dark">+ Modifier Forfait</button>
+									<button className="button is-dark">+ Modifier forfaits</button>
 								</Link>
 							</div>
 						</div>

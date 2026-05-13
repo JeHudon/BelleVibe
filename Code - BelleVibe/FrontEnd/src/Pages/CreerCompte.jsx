@@ -404,7 +404,7 @@ export function CreerCompte() {
             }
 
             setAfficherSucces(true)
-            setTimeout(() => (setAfficherSucces(false), window.location.replace("/dashboard")), 1500)
+            setTimeout(() => (setAfficherSucces(false), window.location.replace("/dashboard")), 2200)
 
         } catch (err) {
             setAfficherErreur(true)

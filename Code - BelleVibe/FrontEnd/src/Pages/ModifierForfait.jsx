@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { ForfaitCard } from "../components/ForfaitCard";
 
 export function ModifierForfait() {
+    const [confirme, setConfirme] = useState(false)
     const [afficherSucces, setAfficherSucces] = useState(false);
     const [afficherErreur, setAfficherErreur] = useState(false);
     const [messageErreur, setMessageErreur] = useState("");
@@ -40,13 +41,6 @@ export function ModifierForfait() {
             setServicesSelection([...servicesSelection, idService])
             setTypeServicesSelection([...typeServicesSelection, typeService])
         }
-    }
-
-    function setInfosCompte() {
-        forfaitsCompte.map((forfaitCompte) => {
-            selectionService(forfaitCompte.idService, forfaitCompte.typeService)
-            selectionForfaits(forfaitCompte.idForfait, forfaitCompte.typeService)
-        })
     }
 
     useEffect(() => {
@@ -157,14 +151,17 @@ export function ModifierForfait() {
                     typeServicesSelection.includes(type) && (
                         <div key={type}>
                             <div className="title is-5 mt-4 mb-4">{label}</div>
-                            {forfaits.filter(f => f.typeService === type).map((forfait) => (
-                                <ForfaitCard
-                                    key={forfait.idForfait}
-                                    forfait={forfait}
-                                    isSelected={forfaitsSelection.includes(forfait.idForfait)}
-                                    onClick={() => selectionForfaits(forfait.idForfait, type)}
-                                />
-                            ))}
+                            {forfaits
+                                .filter(f => f.typeService === type)
+                                .filter(f => confirme ? forfaitsSelection.includes(f.idForfait) : true)
+                                .map((forfait) => (
+                                    <ForfaitCard
+                                        key={forfait.idForfait}
+                                        forfait={forfait}
+                                        isSelected={forfaitsSelection.includes(forfait.idForfait)}
+                                        onClick={() => selectionForfaits(forfait.idForfait, type)}
+                                    />
+                                ))}
                         </div>
                     )
                 )}
@@ -174,60 +171,33 @@ export function ModifierForfait() {
 
     async function requeteModifierForfait() {
         const token = localStorage.getItem("token")
-        const total = forfaits
-            .filter(f => forfaitsSelection.includes(f.idForfait))
-            .reduce((acc, f) => acc + f.prixForfait, 0)
-
         setAfficherErreur(false)
 
         try {
-            const response = await fetch(`/api/comptes/creerDossier`, {
-                method: "POST",
+            const response = await fetch(`/api/forfaitsDossier/${id}`, {
+                method: "PATCH",
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "Accept": "application/json",
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    idClient: clientSelection,
-                    typeDossier: typeCompte,
-                    statutDossier: "actif",
-                    soldeDossier: total
+                    forfaits: forfaitsSelection
                 })
             })
 
             if (!response.ok) {
                 setAfficherErreur(true)
-                setMessageErreur("Erreur en créant le nouveau compte")
-                return
-            }
-
-            const data = await response.json()
-
-            const forfaitResults = await Promise.all(forfaitsSelection.map(async (forfait) => {
-                const r = await fetch(`/api/forfaitsDossier/`, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Accept": "application/json",
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        idDossier: data.idDossier,
-                        idForfait: forfait
-                    })
-                })
-                return r.ok
-            }))
-
-            if (forfaitResults.some(ok => !ok)) {
-                setAfficherErreur(true)
-                setMessageErreur("Erreur en associant les forfaits au dossier")
+                setMessageErreur("Erreur en modifiant les forfaits")
                 return
             }
 
             setAfficherSucces(true)
-            setTimeout(() => (setAfficherSucces(false), window.location.replace("/dashboard")), 1500)
+            setConfirme(true)
+            setTimeout(() => {
+                setAfficherSucces(false)
+                window.location.replace("/dashboard")
+            }, 2200)
 
         } catch (err) {
             setAfficherErreur(true)
@@ -248,38 +218,49 @@ export function ModifierForfait() {
                     )}
                     {afficherSucces && (
                         <div className="notification is-success">
-                            Compte créé avec succès
+                            Compte modifié avec succès
                         </div>
                     )}
-                    <h3 className="title is-4">Modifier les services</h3>
-                    <div className="subtitle is-5 mt-2">Sélectionner un ou plusieurs services</div>
-                    <div className="is-flex" style={{ gap: "1rem", flexWrap: "wrap" }}>
-                        {services.map((service) => (
-                            <div
-                                key={service.idService}
-                                onClick={() => selectionService(service.idService, service.typeService)}
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    padding: "0.75rem 1.25rem",
-                                    borderRadius: "8px",
-                                    border: `2px solid ${servicesSelection.includes(service.idService) ? "#62cf5fff" : "#dbdbdb"}`,
-                                    backgroundColor: servicesSelection.includes(service.idService) ? "#62cf5fff" : "white",
-                                    boxShadow: servicesSelection.includes(service.idService) ? "inset 0 2px 4px rgba(0,0,0,0.2)" : "none",
-                                    cursor: "pointer",
-                                    transition: "all 0.2s ease",
-                                    fontWeight: "bold",
-                                }}
-                            >
-                                {service.typeService}
+                    {!confirme && (
+                        <>
+                            <h3 className="title is-4">Modifier les services</h3>
+                            <div className="subtitle is-5 mt-2">Sélectionner un ou plusieurs services</div>
+                            <div className="is-flex" style={{ gap: "1rem", flexWrap: "wrap" }}>
+                                {services.map((service) => (
+                                    <div
+                                        key={service.idService}
+                                        onClick={() => selectionService(service.idService, service.typeService)}
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            padding: "0.75rem 1.25rem",
+                                            borderRadius: "8px",
+                                            border: `2px solid ${servicesSelection.includes(service.idService) ? "#62cf5fff" : "#dbdbdb"}`,
+                                            backgroundColor: servicesSelection.includes(service.idService) ? "#62cf5fff" : "white",
+                                            boxShadow: servicesSelection.includes(service.idService) ? "inset 0 2px 4px rgba(0,0,0,0.2)" : "none",
+                                            cursor: "pointer",
+                                            transition: "all 0.2s ease",
+                                            fontWeight: "bold",
+                                        }}
+                                    >
+                                        {service.typeService}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                    <div className="mt-5">
-                        <h3 className="title is-4">Sélection des forfaits</h3>
-                        <div className="subtitle is-5 mt-2">Sélectionner un forfait pour chaque service</div>
+                        </>
+                    )}
+                    <div className="mt-5" style={{ pointerEvents: confirme ? "none" : "auto" }}>
+                        <h3 className="title is-4">{confirme ? "Forfaits confirmés" : "Sélection des forfaits"}</h3>
+                        <div className="subtitle is-5 mt-2">
+                            {confirme ? "Voici les forfaits de ce compte" : "Sélectionner un forfait pour chaque service"}
+                        </div>
                         {affichageForfaits()}
                     </div>
+                </div>
+                <div className="is-flex is-justify-content-flex-end mt-4">
+                    <button className="button is-dark" onClick={() => requeteModifierForfait()}>
+                        Confirmer les modifications
+                    </button>
                 </div>
             </div>
         </div>
