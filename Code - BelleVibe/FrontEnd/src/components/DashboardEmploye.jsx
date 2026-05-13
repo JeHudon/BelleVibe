@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 
 export default function DashboardEmploye() {
     const [activeTab, setActiveTab] = useState("demandes")
-    const [demandesOuvertes, setDemandesOuvertes] = useState(null)
+  /*  const [demandesOuvertes, setDemandesOuvertes] = useState(null)
     const [comptesEnAttente, setComptesEnAttente] = useState(null)
-    const []
-
+    // const []
+ */
     // fonction pour etre capable de lire le token
     function parseJwt(token) {
         try {

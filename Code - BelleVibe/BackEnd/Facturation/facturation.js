@@ -10,12 +10,11 @@ const router = express.Router();
 router.get("/getFactures/:idDossier", authentifier, async (req, res) => {
     try {
         const idDossier = req.params.idDossier
-        const valider = validerChamps({ idDossier })
-        if (valider.error) {
-            return res.status(400).json({ error: valider.error })
+        if (!idDossier || isNaN(Number(idDossier))) {
+            return res.status(400).json({ error: "idDossier invalide ou manquant" })
         }
-        const rep = await db("facturation").where("idDossier", idDossier)
-        if (!rep.ok) {
+        const rep = await (await db("facturation").where("idDossier", idDossier))
+        if (rep.length == 0) {
             return res.status(404).json({ error: "Dossier non trouvé" })
         }
         res.status(200).json(rep)
@@ -30,12 +29,11 @@ router.get("/getFactures/:idDossier", authentifier, async (req, res) => {
 router.get("/getFacture/:idFacture", authentifier, async (req, res) => {
     try {
         const idFacture = req.params.idFacture
-        const valider = validerChamps({ idFacture })
-        if (valider.error) {
-            return res.status(400).json({ error: valider.error })
+        if (!idFacture || isNaN(Number(idFacture))) {
+            return res.status(400).json({ error: "idFacture invalide ou manquant" })
         }
-        const rep = await db("facturation").where("idFacturation", idFacture)
-        if (!rep.ok) {
+        const rep = await db("facturation").where("idFacturation", idFacture).first()
+        if (!rep) {
             return res.status(404).json({ error: "Facture non trouvé" })
         }
         res.status(200).json(rep)
@@ -60,15 +58,17 @@ router.post("/nouvelleFacture", authentifier, async (req, res) => {
         }
         // mise en forme de date
         const date_emission = new Date(dateEmission)
-        // vérification que la facture n'est pas émise dans le passé
-        const diffMs = Date.now() - date_emission.getTime()
-        const diffJours = diffMs / (1000 * 60 * 60 * 24)
-        if (diffJours < 0) {
+        // Ajuste l'hr à minuit de la journée, sinon disait que si la même journée = dans le passé.
+        date_emission.setHours(0, 0, 0, 0)
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        if (date_emission < today) {
             return res.status(400).json({ error: "La date de l'émission de la facture ne peux pas être dans le passé" })
         }
+
         // vérification de l'authenticité du dossier donné
         const dossier = await db("dossiers").where("idDossier", idDossier)
-        if (!dossier) {
+        if (dossier == 0) {
             return res.status(404).json({ error: "Numéro de dossier non trouvé" })
         }
         const data = {
@@ -76,8 +76,8 @@ router.post("/nouvelleFacture", authentifier, async (req, res) => {
             idEmploye,
             statut_facture: "Emise",
             montant_total,
-            montant_paye: 0,
-            date_emission
+            paiement_recu: false,
+            date_emission: date_emission.toISOString().split("T")[0]
         }
         const [idFacturation] = await db("facturation").insert(data)
         await log(req.user.id, "WRITE", "FACTURATION", Number(idFacturation))
@@ -96,24 +96,23 @@ router.patch("/updateFacture/:idFacture", authentifier, async (req, res) => {
         // récupération des infos avec le params et le body
         const idFacture = req.params.idFacture
         const statut = req.body.statutFacture
-        const montantPaye = req.body.montantPaye
+        const paiement_recu = req.body.paiement
         const datePaiement = req.body.datePaiement
 
-        const valider = validerChamps({ idFacture })
-        if (valider.error) {
-            return res.status(400).json({ error: valider.error })
+        if (!idFacture || isNaN(Number(idFacture))) {
+            return res.status(400).json({ error: "idFacture invalide ou manquant" })
         }
         // si rien, retourne une erreur
-        if (!statut && !montantPaye && !datePaiement) {
+        if (!statut && !paiement_recu && !datePaiement) {
             return res.status(400).json({ error: "Aucun champ n'a été entré pour modifier la facture" })
         }
         // si les champs existent, les ajoute au data qui va etre envoyé au backend après
         let data = {}
-        if (statut) { data.statut = statut }
-        if (montantPaye) { data.montantPaye = montantPaye }
-        if (datePaiement) { data.datePaiement = datePaiement }
+        if (statut) { data.statut_facture = statut }
+        if (paiement_recu) { data.paiement_recu = paiement_recu }
+        if (datePaiement) { data.date_paiement = datePaiement }
 
-        const verifierID = await db("facturation").where("idFacturation", idFacture).update()
+        const verifierID = await db("facturation").where("idFacturation", idFacture).update(data)
         if (verifierID == 0) {
             return res.status(404).json({ error: "Facture non trouvée dans la base de données" })
         }
@@ -134,9 +133,8 @@ router.patch("/updateFactureSupp/:idFacture", authentifierSupp, async (req, res)
         const dateEmission = req.body.dateEmission
         const montantTotal = req.body.montantTotal
 
-        const valider = validerChamps({ idFacture })
-        if (valider.error) {
-            return res.status(400).json({ error: valider.error })
+        if (!idFacture || isNaN(Number(idFacture))) {
+            return res.status(400).json({ error: "idFacture invalide ou manquant" })
         }
         // si rien, retourne une erreur
         if (!dateEmission && !montantTotal) {
@@ -164,9 +162,8 @@ router.patch("/updateFactureSupp/:idFacture", authentifierSupp, async (req, res)
 router.delete("/deleteFacture/:idFacture", authentifierAdmin, async (req, res) => {
     try {
         const id = req.params.idFacture
-        const valider = validerChamps({ id })
-        if (valider.error) {
-            return res.status(400).json({ error: valider.error })
+        if (!id || isNaN(Number(id))) {
+            return res.status(400).json({ error: "idFacture invalide ou manquant" })
         }
         const verifierID = await db("facturation").where("idFacturation", id).del()
         if (verifierID == 0) {
@@ -183,18 +180,42 @@ router.delete("/deleteFacture/:idFacture", authentifierAdmin, async (req, res) =
 })
 
 // GET les factures en retard (>31 jours depuis la date d'émission de la facture)
-router.get("/facturesRetards", authentifier, async (req, res)=>{
-    try{
+router.get("/facturesRetards", authentifier, async (req, res) => {
+    try {
         // check dans la table facturation les factures qui n'ont pas étés payés (null ou 0), & ou la difference de jours est plus grande que 31 jours.
-        const factures = await db("facturation").where(function(){this.whereNull("montant_paye").orWhere("montant_paye",0)})
-        .whereRaw("date_emission <= date('now', '-31 days')").select("*")
-        if(factures.length == 0){
-            return res.status(204).json({message: "Aucune facture en retard"})
+        const factures = await db("facturation").where(function () { this.where("paiement_recu", false) })
+            .whereRaw("date_emission <= date('now', '-31 days')")
+        if (factures.length == 0) {
+            return res.status(204).json({ message: "Aucune facture en retard" })
         }
         res.status(200).json(factures)
     }
     catch (error) {
         console.error("Erreur dans GET /facturation/facturesRetards", error)
+        res.status(500).json({ message: "Erreur serveur", error })
+    }
+})
+
+// GET les factures à faire pour ce mois ci,
+// si + que 21 jours depuis la derniere facture émise
+// 21 jours pour donner du temps aux employés de faire la facture
+router.get("/facturesAFaire", authentifier, async (req, res) => {
+    try {
+        // check dans la table facturation les factures 
+        // qui ont plus de 21 jours depuis la dernière émise
+        // check par id de dossier
+        const factures = await db("facturation")
+            .select("idDossier")
+            .max("date_emission as derniere_facture")
+            .groupBy("idDossier")
+            .havingRaw("date(derniere_facture) <= date('now', '-21 days')")
+        if (factures.length == 0) {
+            return res.status(204).json({ message: "Aucune factures à faire dans les 10 prochains jours" })
+        }
+        res.status(200).json(factures)
+    }
+    catch (error) {
+        console.error("Erreur dans GET /facturation/facturesAFaire", error)
         res.status(500).json({ message: "Erreur serveur", error })
     }
 })
