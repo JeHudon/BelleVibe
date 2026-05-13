@@ -1,12 +1,23 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FormModal, ConfirmModal } from "../components/Modals";
 
 const STATUTS = ["Tous les statuts", "Actif", "Inactif", "Suspendu"];
 const ROLES = ["Tous les rôles", "Commis", "Superviseur", "Admin"];
 
+const FIELDS_EMPLOYE = [
+	{ key: "role", label: "Role", type: "select", options: ["Commis", "Superviseur", "Admin"] },
+	{
+		key: "statut",
+		label: "Statut",
+		type: "select",
+		options: ["Actif", "Inactif", "Suspendu"],
+	},
+];
+
 function formatNumeroEmploye(idEmploye, created_at) {
 	const year = new Date(created_at).getFullYear();
-	return `EMP-${year}-${String(idEmploye).padStart(6, "0")}`;
+	return `EMP-${year}-${String(idEmploye).padStart(4, "0")}`;
 }
 
 function formatDate(dateString) {
@@ -20,17 +31,19 @@ function formatDate(dateString) {
 }
 
 function BadgeStatut({ statut }) {
-	if (statut === "actif") return <span className="tag is-dark">Actif</span>;
-	if (statut === "inactif") return <span className="tag is-light">Inactif</span>;
-	if (statut === "suspendu") return <span className="tag">Suspendu</span>;
+	const statutLower = statut.toLowerCase();
+	if (statutLower === "actif") return <span className="tag is-dark">Actif</span>;
+	if (statutLower === "inactif") return <span className="tag is-light">Inactif</span>;
+	if (statutLower === "suspendu") return <span className="tag is-danger">Suspendu</span>;
 	return <span className="tag">{statut}</span>;
 }
 
 export default function GestionEmploye() {
 	const [employes, setEmployes] = useState(null);
+	const [user, setUser] = useState(null);
 	const [recherche, setRecherche] = useState("");
 	const [filtreStatut, setFiltreStatut] = useState("Tous les statuts");
-	const [filtreRole, setFiltreRole] = useState("Tous les rôles"); // FIX: was missing, caused crash
+	const [filtreRole, setFiltreRole] = useState("Tous les rôles");
 	const [chargement, setChargement] = useState(true);
 	const navigate = useNavigate();
 	const token = localStorage.getItem("token");
@@ -38,6 +51,21 @@ export default function GestionEmploye() {
 	const [modalModifierEmploye, setModalModifierEmploye] = useState(false);
 	const [modalSupprimerEmploye, setModalSupprimerEmploye] = useState(false);
 	const [employeSelectionnee, setEmployeSelectionnee] = useState(null);
+
+	const [formEmploye, setFormEmploye] = useState({
+		role: "",
+		statut: "",
+	});
+
+	useEffect(() => {
+		if (!token) return;
+		fetch("/api/employes/me", {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+			.then((r) => r.json())
+			.then((data) => setUser(data))
+			.catch(() => {});
+	}, [token]);
 
 	useEffect(() => {
 		async function fetchEmployes() {
@@ -54,50 +82,61 @@ export default function GestionEmploye() {
 		fetchEmployes();
 	}, []);
 
-	function ouvrirModifierEmploye(e) {
-		setEmployeSelectionnee(e);
+	async function apiCall({ url, method = "GET", body, onSuccess, onError, onClose }) {
+		const res = await fetch(url, {
+			method,
+			headers: {
+				...(method !== "DELETE" && { "Content-Type": "application/json" }),
+				Authorization: `Bearer ${token}`,
+			},
+			body: body ? JSON.stringify(body) : undefined,
+		});
+		const data = await res.json();
+
+		if (res.ok) {
+			onSuccess(data.message);
+			setTimeout(() => {
+				onClose();
+				window.location.reload();
+			}, 1500);
+		} else {
+			onError(data.error);
+		}
+	}
+
+	function handleChangeEmploye(key, val) {
+		setFormEmploye((prev) => ({ ...prev, [key]: val }));
+	}
+
+	function ouvrirModifierEmploye(employe) {
+		setEmployeSelectionnee(employe);
 		setFormEmploye({
-			nom: e.nomEmploye,
-			prenom: e.prenomEmploye,
-			courriel: e.courrielEmploye,
-			telephone: e.telephoneEmploye,
-			adresse: e.adresseEmploye,
-			codePostal: e.codePostalEmploye,
+			role: employe.roleEmploye,
+			statut: employe.statutEmploye,
 		});
 		setModalModifierEmploye(true);
 	}
 
-	async function modifierEmploye() {
-		const res = await fetch(`/api/employe/${employeSelectionnee.idEmploye}`, {
-			method: "PUT",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
-			},
-			body: JSON.stringify({
-				nom: formEmploye.nom,
-				prenom: formEmploye.prenom,
-				courriel: formEmploye.courriel,
-				telephone: formEmploye.telephone,
-				adresse: formEmploye.adresse,
-				codePostal: formEmploye.codePostal,
-			}),
+	async function modifierEmploye({ onSuccess, onError }) {
+		await apiCall({
+			url: `/api/employes/adminEdit/${employeSelectionnee.idEmploye}`,
+			method: "PATCH",
+			body: formEmploye,
+			onSuccess,
+			onError,
+			onClose: () => setModalModifierEmploye(false),
 		});
-
-		if (res.ok) {
-			setModalModifierNote(false);
-			window.location.reload();
-		}
 	}
 
-	const [formEmploye, setFormEmploye] = useState({
-		nom: "",
-		prenom: "",
-		courriel: "",
-		telephone: "",
-		adresse: "",
-		codePostal: "",
-	});
+	async function supprimerEmploye({ onSuccess, onError }) {
+		await apiCall({
+			url: `/api/employe/${employeSelectionnee.idEmploye}`,
+			method: "DELETE",
+			onSuccess,
+			onError,
+			onClose: () => setModalSupprimerEmploye(false),
+		});
+	}
 
 	const employesFiltres = employes?.filter((e) => {
 		const numero = formatNumeroEmploye(e.idEmploye, e.created_at).toLowerCase();
@@ -116,314 +155,193 @@ export default function GestionEmploye() {
 
 	return (
 		<div className="section">
-			<h1 className="title">Gestion des employes</h1>
-			<p className="subtitle is-6 has-text-link">Liste de tous les employes</p>
+			<div className="container">
+				<h1 className="title">Gestion des employés</h1>
+				<p className="subtitle is-6 has-text-link">Liste de tous les employés</p>
 
-			<div className="box" style={{ border: "1px solid #d6d6d6" }}>
-				<div className="level mb-4">
-					<div className="level-left">
-						<div>
-							<p className="title is-5 mb-1">Employes ({employesFiltres?.length})</p>
-							<p className="subtitle is-6 has-text-grey">
-								Recherchez et gérez les employes
-							</p>
+				<div className="box" style={{ border: "1px solid #d6d6d6" }}>
+					<div className="level mb-4">
+						<div className="level-left">
+							<div>
+								<p className="title is-5 mb-1">
+									Employés ({employesFiltres?.length})
+								</p>
+								<p className="subtitle is-6 has-text-grey">
+									Recherchez et gérez les employés
+								</p>
+							</div>
+						</div>
+						<div className="level-right">
+							<Link to="/creerEmploye" className="button is-dark">
+								+ Créer Employé
+							</Link>
 						</div>
 					</div>
-					<div className="level-right">
-						<Link to="/creerEmploye" className="button is-dark">
-							+ Créer Employe
-						</Link>
-					</div>
-				</div>
 
-				<div
-					className="is-flex is-align-items-center mb-4"
-					style={{ gap: "0.75rem", flexWrap: "wrap" }}
-				>
-					<div className="control has-icons-left" style={{ flex: 1, minWidth: "250px" }}>
-						<input
-							className="input"
-							type="text"
-							placeholder="Rechercher par numéro, nom de l'employe..."
-							value={recherche}
-							onChange={(e) => setRecherche(e.target.value)}
-						/>
-						<span className="icon is-left">
-							<i className="fas fa-search" />
-						</span>
-					</div>
-
-					<div className="select">
-						<select
-							value={filtreStatut}
-							onChange={(e) => setFiltreStatut(e.target.value)}
+					<div
+						className="is-flex is-align-items-center mb-4"
+						style={{ gap: "0.75rem", flexWrap: "wrap" }}
+					>
+						<div
+							className="control has-icons-left"
+							style={{ flex: 1, minWidth: "250px" }}
 						>
-							{STATUTS.map((s) => (
-								<option key={s}>{s}</option>
-							))}
-						</select>
+							<input
+								className="input"
+								type="text"
+								placeholder="Rechercher par numéro, nom de l'employé..."
+								value={recherche}
+								onChange={(e) => setRecherche(e.target.value)}
+							/>
+							<span className="icon is-left">
+								<i className="fas fa-search" />
+							</span>
+						</div>
+
+						<div className="select">
+							<select
+								value={filtreStatut}
+								onChange={(e) => setFiltreStatut(e.target.value)}
+							>
+								{STATUTS.map((s) => (
+									<option key={s}>{s}</option>
+								))}
+							</select>
+						</div>
+
+						<div className="select">
+							<select
+								value={filtreRole}
+								onChange={(e) => setFiltreRole(e.target.value)}
+							>
+								{ROLES.map((r) => (
+									<option key={r}>{r}</option>
+								))}
+							</select>
+						</div>
 					</div>
 
-					<div className="select">
-						{/* FIX: was calling setFiltreType (undefined), now correctly calls setFiltreRole */}
-						<select value={filtreRole} onChange={(e) => setFiltreRole(e.target.value)}>
-							{ROLES.map((r) => (
-								<option key={r}>{r}</option>
-							))}
-						</select>
-					</div>
-				</div>
-
-				<table className="table is-fullwidth is-hoverable" style={{ tableLayout: "fixed" }}>
-					<thead>
-						<tr>
-							<th style={{ width: "120px" }}># Employé</th>
-							<th style={{ width: "110px" }}>Employe</th>
-							<th style={{ width: "70px" }}>Role</th>
-							<th style={{ width: "50px" }}>Statut</th>
-							<th style={{ width: "150px" }}>Courriel</th>
-							<th style={{ width: "100px" }}>Téléphone</th>
-							<th style={{ width: "80px" }}>Adresse</th>
-							<th style={{ width: "80px" }}>Code Postal</th>
-							<th style={{ width: "120px" }}>Ajouté le</th>
-							<th style={{ width: "80px" }}>Actions</th>
-						</tr>
-					</thead>
-					<tbody>
-						{chargement ? (
+					<table
+						className="table is-fullwidth is-hoverable"
+						style={{ tableLayout: "fixed" }}
+					>
+						<thead>
 							<tr>
-								<td colSpan="6" className="has-text-centered py-4">
-									Chargement...
-								</td>
+								<th style={{ width: "120px" }}># Employé</th>
+								<th style={{ width: "150px" }}>Employé</th>
+								<th style={{ width: "90px" }}>Role</th>
+								<th style={{ width: "90px" }}>Statut</th>
+								<th style={{ width: "150px" }}>Ajouté le</th>
+								{user?.roleEmploye === "admin" && (
+									<th style={{ width: "80px" }}>Actions</th>
+								)}
 							</tr>
-						) : employesFiltres?.length === 0 ? (
-							<tr>
-								<td colSpan="6" className="has-text-centered py-4">
-									Aucun employe trouvé.
-								</td>
-							</tr>
-						) : (
-							employesFiltres?.map((e) => (
-								<tr
-									key={e.idEmploye}
-									style={{ height: "55px", cursor: "pointer" }}
-									// onClick={() => navigate(`/employe/${e.idEmploye}/resume`)}
-								>
-									<td className="is-vcentered">
-										<span className="has-text-weight-semibold">
-											{formatNumeroEmploye(e.idEmploye, e.created_at)}
-										</span>
-									</td>
-									<td className="is-vcentered">
-										{e.prenomEmploye + " " + e.nomEmploye}
-									</td>
-									<td className="is-vcentered">
-										<span className="tag is-light">{e.roleEmploye}</span>
-									</td>
-									<td className="is-vcentered">
-										<BadgeStatut statut={e.statutEmploye} />
-									</td>
-									<td className="is-vcentered">{e.courrielEmploye}</td>
-									<td className="is-vcentered">{e.telephoneEmploye}</td>
-									<td className="is-vcentered">{e.adresseEmploye}</td>
-									<td className="is-vcentered">{e.codePostalEmploye}</td>
-									<td className="is-vcentered has-text-grey">
-										{formatDate(e.updated_at || e.created_at)}
-									</td>
-									<td className="is-vcentered">
-										<button
-											className="button is-medium is-ghost"
-											style={{
-												paddingLeft: "0.5rem",
-												paddingRight: "0.5rem",
-											}}
-											title="Modifier"
-											onClick={() => ouvrirModifierEmploye(e)}
-										>
-											<i className="fa-solid fa-pen-to-square"></i>
-										</button>
-										<button
-											className="button is-ghost"
-											style={{
-												paddingLeft: "0.5rem",
-												paddingRight: "0.5rem",
-											}}
-											onClick={() => {
-												setEmployeSelectionnee(e);
-												setModalSupprimerEmploye(true);
-											}}
-										>
-											<i className="fa-solid fa-trash"></i>
-										</button>
+						</thead>
+						<tbody>
+							{chargement ? (
+								<tr>
+									<td colSpan="6" className="has-text-centered py-4">
+										Chargement...
 									</td>
 								</tr>
-							))
-						)}
-					</tbody>
-				</table>
+							) : employesFiltres?.length === 0 ? (
+								<tr>
+									<td colSpan="6" className="has-text-centered py-4">
+										Aucun employé trouvé.
+									</td>
+								</tr>
+							) : (
+								employesFiltres?.map((employe) => (
+									<tr
+										key={employe.idEmploye}
+										style={{ height: "55px", cursor: "pointer" }}
+										onClick={() => navigate(`/employes/${employe.idEmploye}`)}
+									>
+										<td className="is-vcentered">
+											<span className="has-text-weight-semibold">
+												{formatNumeroEmploye(
+													employe.idEmploye,
+													employe.created_at,
+												)}
+											</span>
+										</td>
+										<td className="is-vcentered">
+											{employe.prenomEmploye + " " + employe.nomEmploye}
+										</td>
+										<td className="is-vcentered">
+											<span className="tag is-light is-capitalized">
+												{employe.roleEmploye}
+											</span>
+										</td>
+										<td className="is-vcentered">
+											<BadgeStatut statut={employe.statutEmploye} />
+										</td>
+										<td className="is-vcentered has-text-grey">
+											{formatDate(employe.updated_at || employe.created_at)}
+										</td>
+										{user?.roleEmploye === "admin" && (
+											<td className="is-vcentered">
+												<button
+													className="button is-medium is-ghost"
+													style={{
+														paddingLeft: "0.5rem",
+														paddingRight: "0.5rem",
+													}}
+													title="Modifier"
+													onClick={(ev) => {
+														ev.stopPropagation();
+														ouvrirModifierEmploye(employe);
+													}}
+												>
+													<i className="fa-solid fa-pen-to-square"></i>
+												</button>
+												<button
+													className="button is-medium is-ghost"
+													style={{
+														paddingLeft: "0.5rem",
+														paddingRight: "0.5rem",
+													}}
+													title="Supprimer"
+													onClick={(ev) => {
+														ev.stopPropagation();
+														setEmployeSelectionnee(employe);
+														setModalSupprimerEmploye(true);
+													}}
+												>
+													<i className="fa-solid fa-trash"></i>
+												</button>
+											</td>
+										)}
+									</tr>
+								))
+							)}
+						</tbody>
+					</table>
+				</div>
+
+				<FormModal
+					isOpen={modalModifierEmploye}
+					title="Modifier l'employé"
+					fields={FIELDS_EMPLOYE}
+					values={formEmploye}
+					onChange={handleChangeEmploye}
+					onConfirm={modifierEmploye}
+					onClose={() => setModalModifierEmploye(false)}
+				/>
+
+				<ConfirmModal
+					isOpen={modalSupprimerEmploye}
+					title="Supprimer l'employé"
+					description="Voulez-vous vraiment supprimer cet employé ?"
+					itemName={
+						employeSelectionnee
+							? `${employeSelectionnee.prenomEmploye} ${employeSelectionnee.nomEmploye}`
+							: ""
+					}
+					onConfirm={supprimerEmploye}
+					onClose={() => setModalSupprimerEmploye(false)}
+				/>
 			</div>
-
-			{modalModifierEmploye && (
-				<div className="modal is-active">
-					<div
-						className="modal-background"
-						onClick={() => setModalModifierEmploye(false)}
-					></div>
-					<div className="modal-card">
-						<header className="modal-card-head">
-							<p className="modal-card-title">Modifier l'employé</p>
-							<button
-								className="delete"
-								onClick={() => setModalModifierEmploye(false)}
-							></button>
-						</header>
-
-						<section className="modal-card-body">
-							<div className="field">
-								<label className="label">Prénom</label>
-								<input
-									className="input"
-									value={formEmploye.prenom}
-									onChange={(e) =>
-										setFormEmploye({ ...formEmploye, prenom: e.target.value })
-									}
-								/>
-							</div>
-							<div className="field">
-								<label className="label">Nom</label>
-								<input
-									className="input"
-									value={formEmploye.nom}
-									onChange={(e) =>
-										setFormEmploye({ ...formEmploye, nom: e.target.value })
-									}
-								/>
-							</div>
-
-							{/* <div className="field">
-								<label className="label">Role</label>
-								<input
-									className="input"
-									value={formEmploye.role}
-									onChange={(e) =>
-										setFormEmploye({ ...formEmploye, role: e.target.value })
-									}
-								/>
-							</div>
-
-							<div className="field">
-								<label className="label">Statut</label>
-								<input
-									className="input"
-									value={formEmploye.statut}
-									onChange={(e) =>
-										setFormEmploye({ ...formEmploye, statut: e.target.value })
-									}
-								/>
-							</div> */}
-
-							<div className="field">
-								<label className="label">Courriel</label>
-								<input
-									className="input"
-									value={formEmploye.courriel}
-									onChange={(e) =>
-										setFormEmploye({ ...formEmploye, courriel: e.target.value })
-									}
-								/>
-							</div>
-
-							<div className="field">
-								<label className="label">Téléphone</label>
-								<input
-									className="input"
-									value={formEmploye.telephone}
-									onChange={(e) =>
-										setFormEmploye({
-											...formEmploye,
-											telephone: e.target.value,
-										})
-									}
-								/>
-							</div>
-
-							<div className="field">
-								<label className="label">Adresse</label>
-								<input
-									className="input"
-									value={formEmploye.adresse}
-									onChange={(e) =>
-										setFormEmploye({ ...formEmploye, adresse: e.target.value })
-									}
-								/>
-							</div>
-
-							<div className="field">
-								<label className="label">Code Postal</label>
-								<input
-									className="input"
-									value={formEmploye.codePostal}
-									onChange={(e) =>
-										setFormEmploye({
-											...formEmploye,
-											codePostal: e.target.value,
-										})
-									}
-								/>
-							</div>
-						</section>
-
-						<footer className="modal-card-foot">
-							<button className="button is-dark" onClick={modifierEmploye}>
-								Enregistrer
-							</button>
-							<button
-								className="button"
-								onClick={() => setModalModifierEmploye(false)}
-							>
-								Annuler
-							</button>
-						</footer>
-					</div>
-				</div>
-			)}
-
-			{modalSupprimerEmploye && (
-				<div className="modal is-active">
-					<div
-						className="modal-background"
-						onClick={() => setModalSupprimerEmploye(false)}
-					></div>
-					<div className="modal-card">
-						<header className="modal-card-head">
-							<p className="modal-card-title">Supprimer la note</p>
-							<button
-								className="delete"
-								onClick={() => setModalSupprimerEmploye(false)}
-							></button>
-						</header>
-
-						<section className="modal-card-body">
-							<p>Voulez-vous vraiment supprimer cette note ?</p>
-							<p className="has-text-weight-bold mt-2">
-								{noteSelectionnee?.titreNote}
-							</p>
-						</section>
-
-						<footer className="modal-card-foot">
-							<button className="button is-danger" onClick={supprimerNote}>
-								Supprimer
-							</button>
-							<button
-								className="button"
-								onClick={() => setModalSupprimerEmploye(false)}
-							>
-								Annuler
-							</button>
-						</footer>
-					</div>
-				</div>
-			)}
 		</div>
 	);
 }
