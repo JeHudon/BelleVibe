@@ -2,13 +2,40 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation, Outlet } from "react-router-dom";
 
 const menuItems = [
-	{ to: "/dashboard", label: "Tableau de bord", icon: "fa-chart-line" },
-	{ to: "/clients/nouveau", label: "Créer client", icon: "fa-user-plus" },
-	{ to: "/creerCompte", label: "Créer compte", icon: "fa-wallet" },
-	{ to: "/CreerEmploye", label: "Créer employé", icon: "fa-user-tie", roles: ["superviseur", "admin"] },
-	{ to: "/GestionClient", label: "Gestion des clients", icon: "fa-user" },
-	{ to: "/GestionCompte", label: "Gestion du compte", icon: "fa-folder" },
-	{ to: "/GestionEmploye", label: "Gestion des employés", icon: "fa-user-tie", roles: ["superviseur", "admin"] },
+	{ to: "/dashboard", label: "Tableau de bord", icon: "fa-chart-line", active: ["/dashboard"] },
+	{
+		to: "/clients/nouveau",
+		label: "Créer client",
+		icon: "fa-user-plus",
+		active: ["/clients/nouveau"],
+	},
+	{ to: "/creerCompte", label: "Créer compte", icon: "fa-wallet", active: ["/creerCompte"] },
+	{
+		to: "/CreerEmploye",
+		label: "Créer employé",
+		icon: "fa-user-tie",
+		roles: ["superviseur", "admin"],
+		active: ["/CreerEmploye"],
+	},
+	{
+		to: "/GestionClient",
+		label: "Gestion des clients",
+		icon: "fa-user",
+		active: ["/GestionClient", "/clients/"],
+	},
+	{
+		to: "/GestionCompte",
+		label: "Gestion du compte",
+		icon: "fa-folder",
+		active: ["/GestionCompte", "/comptes/"],
+	},
+	{
+		to: "/GestionEmploye",
+		label: "Gestion des employés",
+		icon: "fa-user-tie",
+		roles: ["superviseur", "admin"],
+		active: ["/GestionEmploye", "/employes/"],
+	},
 ];
 
 const serviceIcons = [
@@ -56,13 +83,13 @@ export default function Sidebar() {
 	const employeNom = employe
 		? `${employe.prenomEmploye} ${employe.nomEmploye}`
 		: userInfo
-		? `Employé #${userInfo.id}`
-		: "Invité";
+			? `Employé #${userInfo.id}`
+			: "Invité";
 
 	const activeItem = menuItems.reduce((best, item) => {
-		const matches =
-			location.pathname === item.to ||
-			location.pathname.startsWith(item.to + "/");
+		const matches = item.active.some(
+			(path) => location.pathname === path || location.pathname.startsWith(path),
+		);
 		if (matches && item.to.length > (best?.to.length ?? -1)) return item;
 		return best;
 	}, null);
@@ -76,10 +103,7 @@ export default function Sidebar() {
 							<div className="media">
 								<div className="media-left">
 									<span className="icon is-large">
-										<img
-											src="../images/logo.png"
-											alt="Logo"
-										/>
+										<img src="../images/logo.png" alt="Logo" />
 									</span>
 								</div>
 								<div className="media-content">
@@ -105,22 +129,32 @@ export default function Sidebar() {
 
 						<nav className="menu">
 							<ul className="menu-list">
-								{menuItems.filter((item) => !item.roles || item.roles.includes(employeRole)).map((item) => {
-									const isActive = activeItem !== null && item.to === activeItem.to;
-									return (
-										<li key={item.to}>
-											<Link
-												to={item.to}
-												className={`button is-fullwidth is-justify-content-flex-start mb-2 pl-4 ${isActive ? "has-background-link has-text-white" : "is-white has-text-dark"}`}
-											>
-												<span className="icon is-small">
-													<i className={`fa-solid ${item.icon}`} />
-												</span>
-												<span>{item.label}</span>
-											</Link>
-										</li>
-									);
-								})}
+								{menuItems
+									.filter(
+										(item) => !item.roles || item.roles.includes(employeRole),
+									)
+									.map((item) => {
+										const isActive =
+											activeItem !== null &&
+											item.active.some(
+												(path) =>
+													location.pathname === path ||
+													location.pathname.startsWith(path),
+											);
+										return (
+											<li key={item.to}>
+												<Link
+													to={item.to}
+													className={`button is-fullwidth is-justify-content-flex-start mb-2 pl-4 ${isActive ? "has-background-link has-text-white" : "is-white has-text-dark"}`}
+												>
+													<span className="icon is-small">
+														<i className={`fa-solid ${item.icon}`} />
+													</span>
+													<span>{item.label}</span>
+												</Link>
+											</li>
+										);
+									})}
 							</ul>
 						</nav>
 					</div>

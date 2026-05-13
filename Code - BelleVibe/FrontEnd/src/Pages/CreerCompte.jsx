@@ -446,7 +446,7 @@ export function CreerCompte() {
                         ))}
                     </div>
                 </div>
-                <div className="box">
+                <div className="box" style={{ border: "1px solid #d6d6d6" }}>
                     {afficherErreur && (
                         <div className="notification is-danger">
                             {messageErreur}
