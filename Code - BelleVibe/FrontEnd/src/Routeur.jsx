@@ -9,7 +9,7 @@ import Sidebar from "./components/Sidebar";
 import CreeClient from "./Pages/CreerClient";
 import { LoginContext } from "./context/LoginContext.js";
 import GestionCompte from "./Pages/GestionCompte.jsx";
-import GestionClients from "./Pages/GestionClients.jsx";
+import GestionClient from "./Pages/GestionClient.jsx";
 import CreerEmploye from "./Pages/CreerEmploye.jsx";
 import { ModifierForfait } from "./Pages/ModifierForfait.jsx";
 import GestionEmploye from "./Pages/GestionEmploye.jsx";
@@ -59,7 +59,8 @@ function Routeur() {
 						<Route path="/clients/nouveau" element={<CreeClient />} />
 						<Route path="/creerCompte" element={<CreerCompte />} />
 						<Route path="/GestionCompte" element={<GestionCompte />} />
-						<Route path="/GestionClients" element={<GestionClients />} />
+						<Route path="/GestionClient" element={<GestionClient />} />
+						<Route path="/GestionEmploye" element={<GestionEmploye />} />
 						<Route path="/comptes/:id/:onglet" element={<DetailsCompte />} />
 						<Route path="/clients/:id/:onglet" element={<DetailsClient />} />
 						<Route path="/employes/:id" element={<DetailsEmploye />} />
