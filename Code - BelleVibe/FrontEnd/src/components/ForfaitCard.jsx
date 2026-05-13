@@ -1,8 +1,8 @@
 export function ForfaitCard({ forfait, isSelected, onClick }) {
     const config = {
-        Cellulaire: { color: "info is-light", icon: "fa-signal", label: "Mobile" },
-        "Wi-fi": { color: "primary is-light", icon: "fa-wifi", label: "Internet" },
-        TV: { color: "link is-light", icon: "fa-tv", label: "TV" },
+        Cellulaire: { color: "info", icon: "fa-signal", label: "Mobile" },
+        "Wi-fi": { color: "primary", icon: "fa-wifi", label: "Internet" },
+        TV: { color: "link", icon: "fa-tv", label: "TV" },
     };
 
     const { color, icon, label } = config[forfait.typeService] || {};
@@ -14,8 +14,9 @@ export function ForfaitCard({ forfait, isSelected, onClick }) {
             style={{
                 cursor: "pointer",
                 transition: "transform 0.2s ease, opacity 0.2s ease",
-                transform: isSelected ? "scale(0.99)" : "scale(1)", 
-                opacity: isSelected ? 1 : 1,
+                transform: isSelected ? "scale(0.98)" : "scale(1)", 
+                opacity: isSelected ? 0.70 : 1,
+                // boxShadow: isSelected ? "2px 2px 5px #888888" : ""
             }}
         >
             <div className={`notification is-${color} ${isSelected ? "" : "is-light"} mb-2`}>

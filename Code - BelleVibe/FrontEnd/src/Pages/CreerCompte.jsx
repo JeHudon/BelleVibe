@@ -5,7 +5,6 @@ export function CreerCompte() {
     const [etape, setEtape] = useState(1);
     const [clients, setClients] = useState([]);
     const [typeCompte, setTypeCompte] = useState("");
-    const [soldeCompte, setSoldeCompte] = useState(0);
     const [services, setServices] = useState([]);
     const [forfaits, setForfaits] = useState([]);
     const [clientSelection, setClientSelection] = useState(null);
@@ -405,7 +404,7 @@ export function CreerCompte() {
             }
 
             setAfficherSucces(true)
-            setTimeout(() => setAfficherSucces(false), 6000)
+            setTimeout(() => (setAfficherSucces(false), window.location.replace("/dashboard")), 2200)
 
         } catch (err) {
             setAfficherErreur(true)
@@ -447,7 +446,7 @@ export function CreerCompte() {
                         ))}
                     </div>
                 </div>
-                <div className="box">
+                <div className="box" style={{ border: "1px solid #d6d6d6" }}>
                     {afficherErreur && (
                         <div className="notification is-danger">
                             {messageErreur}

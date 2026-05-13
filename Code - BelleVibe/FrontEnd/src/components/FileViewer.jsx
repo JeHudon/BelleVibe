@@ -10,18 +10,18 @@ export default function FileViewer({ id, ext, fileName, isOpen, onClose }) {
 			return <img src={fileUrl} alt="aperçu" style={{ maxWidth: "100%" }} />;
 		}
 		if (extension === "pdf") {
-			return <iframe src={fileUrl} width="100%" height="600px" width="1000px" style={{ border: "none" }} />;
+			return <iframe src={fileUrl} height="600px" width="1000px" style={{ border: "none" }} />;
 		}
-		if (["doc", "docx", "xls", "xlsx"].includes(extension)) {
-			return (
-				<iframe
-					src={`https://docs.google.com/gviewer?url=${encodeURIComponent(fileUrl)}&embedded=true`}
-					width="100%"
-					height="600px"
-					style={{ border: "none" }}
-				/>
-			);
-		}
+		// if (["doc", "docx", "xls", "xlsx"].includes(extension)) {
+		// 	return (
+		// 		<iframe
+		// 			src={`https://docs.google.com/gviewer?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+		// 			width="100%"
+		// 			height="600px"
+		// 			style={{ border: "none" }}
+		// 		/>
+		// 	);
+		// }
 		return <p>Aperçu non disponible pour ce type de fichier.</p>;
 	};
 

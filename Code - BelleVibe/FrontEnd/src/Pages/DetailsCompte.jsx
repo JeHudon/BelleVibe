@@ -66,20 +66,6 @@ function DetailsCompte() {
 	}
 
 	useEffect(() => {
-		// async function fetchClient() {
-		// 	const data = await fetch(
-		// 		`/api/clients/getClient
-		// 		/${id}`,
-		// 		{
-		// 			method: "GET",
-		// 			headers: {
-		// 				"Content-Type": "application/json",
-		// 				Authorization: `Bearer ${token}`,
-		// 			},
-		// 		},
-		// 	).then((res) => res.json());
-		// 	setClient(data);
-		// }
 		async function fetchCompte() {
 			const data = await fetch(`/api/comptes/getDossier/${id}`, {
 				method: "GET",
@@ -138,6 +124,26 @@ function DetailsCompte() {
 		fetchDocuments();
 		fetchNotes();
 	}, [onglet, id]);
+
+	useEffect(() => {
+		async function fetchClient() {
+			const data = await fetch(
+				`/api/clients/getClient
+				/${compte?.idClient}`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			).then((res) => res.json());
+			setClient(data);
+		}
+		if (compte?.idClient) {
+			fetchClient(compte.idClient);
+		}
+	}, [compte?.idClient]);
 
 	const formatSize = (bytes) => {
 		if (bytes < 1024) return `${bytes} B`;
@@ -318,19 +324,20 @@ function DetailsCompte() {
 								<div className="level-item">
 									<div>
 										<h2 className="title is-5 is-spaced">
-											Informations du compte
+											Informations du compte -{" "}
+											{client?.prenomClient + " " + client?.nomClient}
 										</h2>
 									</div>
 								</div>
 							</div>
 							<div className="level-right">
 								<div className="level-item">
-									<Link to={`/modifierForfait/${compte.idCompte}`}>
+									<Link to={`/modifierForfait/${compte?.idClient}`}>
 										<button
 											className="button is-dark"
 											onClick={() => setModalDemande(true)}
 										>
-											+ Modifier Forfait
+											+ Modifier forfaits
 										</button>
 									</Link>
 								</div>
@@ -354,7 +361,9 @@ function DetailsCompte() {
 								{compte?.soldeDossier} $
 							</p>
 						</div>
-						<h3 className="title is-4">Informations clients</h3>
+						<h3 className="title is-4">
+							Informations clients - {client?.prenomClient + " " + client?.nomClient}
+						</h3>
 						<div className="columns">
 							<div className="column is-6">
 								<label>Email :</label>

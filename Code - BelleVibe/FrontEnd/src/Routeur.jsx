@@ -3,17 +3,22 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom
 import App from "./Pages/App.jsx";
 import DetailsCompte from "./Pages/DetailsCompte.jsx";
 import DetailsClient from "./Pages/DetailsClient.jsx";
-import { Login }  from "./Pages/Login.jsx";
+import { Login } from "./Pages/Login.jsx";
 import { CreerCompte } from "./Pages/CreerCompte.jsx";
 import Sidebar from "./components/Sidebar";
 import CreeClient from "./Pages/CreerClient";
 import { LoginContext } from "./context/LoginContext.js";
 import GestionCompte from "./Pages/GestionCompte.jsx";
+import GestionClient from "./Pages/GestionClient.jsx";
 import CreerEmploye from "./Pages/CreerEmploye.jsx";
 import { ModifierForfait } from "./Pages/ModifierForfait.jsx";
 import DashboardEmploye from "./components/DashboardEmploye.jsx";
 import DashboardSuperviseur from "./components/DashboardSuperviseur.jsx";
 import DashboardAdmin from "./components/DashboardAdmin.jsx";
+import GestionEmploye from "./Pages/GestionEmploye.jsx";
+import DetailsCompteModalComponent from "./Pages/DetailsCompteModalComponent.jsx";
+import DetailsEmploye from "./Pages/DetailsEmploye.jsx";
+// import { GestionClient } from "./Pages/GestionClient.jsx";
 
 function isTokenExpired(token) {
 	const payload = JSON.parse(atob(token.split(".")[1]));
@@ -51,23 +56,25 @@ function Routeur() {
 						path="/login"
 						element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Login />}
 					/>
-					<Route
-						element={
-							isLoggedIn
-								? <Sidebar />
-								: <Navigate to="/login" replace />
-						}
-					>
+					<Route element={isLoggedIn ? <Sidebar /> : <Navigate to="/login" replace />}>
 						<Route index element={<Navigate to="/dashboard" replace />} />
 						<Route path="/dashboard" element={<App />} />
 						<Route path="/clients/nouveau" element={<CreeClient />} />
 						<Route path="/creerCompte" element={<CreerCompte />} />
 						<Route path="/GestionCompte" element={<GestionCompte />} />
+						<Route path="/GestionClient" element={<GestionClient />} />
+						<Route path="/GestionEmploye" element={<GestionEmploye />} />
 						<Route path="/comptes/:id/:onglet" element={<DetailsCompte />} />
 						<Route path="/clients/:id/:onglet" element={<DetailsClient />} />
+						<Route path="/employes/:id" element={<DetailsEmploye />} />
 						<Route path="/CreerEmploye" element={<CreerEmploye />} />
-						<Route path="/modifierForfait/:idForfait" element={<ModifierForfait />} />
-						<Route path="*" element={<div className="section has-text-centered">Page non trouvée</div>} />
+						<Route path="/modifierForfait/:id" element={<ModifierForfait />} />
+						<Route
+							path="*"
+							element={
+								<div className="section has-text-centered">Page non trouvée</div>
+							}
+						/>
 					</Route>
 				</Routes>
 			</BrowserRouter>
