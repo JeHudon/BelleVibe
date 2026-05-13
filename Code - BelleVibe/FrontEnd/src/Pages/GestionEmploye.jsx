@@ -15,9 +15,8 @@ const FIELDS_EMPLOYE = [
 	},
 ];
 
-function formatNumeroEmploye(idEmploye, created_at) {
-	const year = new Date(created_at).getFullYear();
-	return `EMP-${year}-${String(idEmploye).padStart(4, "0")}`;
+function formatNumeroEmploye(idEmploye) {
+	return `EMP-${String(idEmploye).padStart(4, "0")}`;
 }
 
 function formatDate(dateString) {
@@ -139,7 +138,7 @@ export default function GestionEmploye() {
 	}
 
 	const employesFiltres = employes?.filter((e) => {
-		const numero = formatNumeroEmploye(e.idEmploye, e.created_at).toLowerCase();
+		const numero = formatNumeroEmploye(e.idEmploye).toLowerCase();
 		const nom = e.nomEmploye.toLowerCase();
 		const prenom = e.prenomEmploye.toLowerCase();
 		const q = recherche.toLowerCase();
@@ -227,7 +226,7 @@ export default function GestionEmploye() {
 					>
 						<thead>
 							<tr>
-								<th style={{ width: "120px" }}># Employé</th>
+								<th style={{ width: "100px" }}># Employé</th>
 								<th style={{ width: "150px" }}>Employé</th>
 								<th style={{ width: "90px" }}>Role</th>
 								<th style={{ width: "90px" }}>Statut</th>
@@ -259,10 +258,7 @@ export default function GestionEmploye() {
 									>
 										<td className="is-vcentered">
 											<span className="has-text-weight-semibold">
-												{formatNumeroEmploye(
-													employe.idEmploye,
-													employe.created_at,
-												)}
+												{formatNumeroEmploye(employe.idEmploye)}
 											</span>
 										</td>
 										<td className="is-vcentered">
