@@ -37,7 +37,7 @@ const authentifier = (req, res, next) => {
         // décode le token et le renvoye dans la requête dans user
         const userDecoded = jwt.verify(token, jwt_mdp)
         req.user = userDecoded
-        if (req.user.statut != "actif") {
+        if (req.user.statut.toLowerCase() != "actif") {
             return res.status(403).json({ message: "Accès refusé. Compte employé inactif"})
         }
         next()
@@ -57,11 +57,11 @@ const authentifierSupp = (req, res, next) => {
     try {
         const userDecoded = jwt.verify(token, jwt_mdp)
         req.user = userDecoded
-        if (req.user.statut != "actif") {
+        if (req.user.statut.toLowerCase() != "actif") {
             return res.status(403).json({ message: "Accès refusé. Compte employé inactif"})
         }
         // si superviseur ou admin, refuse les employés standards ("commis")
-        if (req.user.role == "superviseur" || req.user.role == "admin") {
+        if (req.user.role.toLowerCase() == "superviseur" || req.user.role == "admin") {
             next()
         }
         else {
@@ -83,11 +83,11 @@ const authentifierAdmin = (req, res, next) => {
     try {
         const userDecoded = jwt.verify(token, jwt_mdp)
         req.user = userDecoded
-        if (req.user.statut != "actif") {
+        if (req.user.statut.toLowerCase() != "actif") {
             return res.status(403).json({ message: "Accès refusé. Compte employé inactif"})
         }
         // si admin, refuse les employés standards ("commis") ou superviseurs 
-        if (req.user.role == "admin") {
+        if (req.user.role.toLowerCase() == "admin") {
             next()
         }
         else {

@@ -4,92 +4,92 @@ import { ForfaitCard } from "../components/ForfaitCard";
 import { Link } from "react-router-dom";
 
 function DetailsClient() {
-  const [client, setClient] = useState(null);
-  const [comptes, setComptes] = useState(null);
-  const [forfaitsParCompte, setForfaitsParCompte] = useState({});
+	const [client, setClient] = useState(null);
+	const [comptes, setComptes] = useState(null);
+	const [forfaitsParCompte, setForfaitsParCompte] = useState({});
 
   const [modalOpen, setModalOpen] = useState(false);
   const [formModif, setFormModif] = useState({});
   const [erreurModif, setErreurModif] = useState("");
 
-  const { onglet } = useParams();
-  const { id } = useParams();
+	const { onglet } = useParams();
+	const { id } = useParams();
 
-  const token = localStorage.getItem("token");
+	const token = localStorage.getItem("token");
 
-  const navigate = useNavigate();
+	const navigate = useNavigate();
 
-  const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+	const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-  function updateFilters(onglet) {
-    navigate(`/clients/${id}/${onglet}`);
-  }
+	function updateFilters(onglet) {
+		navigate(`/clients/${id}/${onglet}`);
+	}
 
-  function formatDate(dateString) {
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return new Date(dateString).toLocaleDateString("fr-FR", options);
-  }
+	function formatDate(dateString) {
+		const options = {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+		};
+		return new Date(dateString).toLocaleDateString("fr-FR", options);
+	}
 
-  async function fetchForfaits(idCompte) {
-    const data = await fetch(`/api/forfaitsDossier/${idCompte}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }).then((res) => res.json());
-    return data;
-  }
+	async function fetchForfaits(idCompte) {
+		const data = await fetch(`/api/forfaitsDossier/${idCompte}`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+		}).then((res) => res.json());
+		return data;
+	}
 
-  useEffect(() => {
-    async function fetchClient() {
-      const data = await fetch(`/api/clients/getClient/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }).then((res) => res.json());
-      setClient(data);
-    }
+	useEffect(() => {
+		async function fetchClient() {
+			const data = await fetch(`/api/clients/getClient/${id}`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			}).then((res) => res.json());
+			setClient(data);
+		}
 
-    async function fetchComptes() {
-      const data = await fetch(`/api/comptes/getDossiers/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }).then((res) => res.json());
-      setComptes(data);
-    }
+		async function fetchComptes() {
+			const data = await fetch(`/api/comptes/getDossiers/${id}`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			}).then((res) => res.json());
+			setComptes(data);
+		}
 
-    fetchClient();
-    fetchComptes();
-  }, [onglet, id]);
+		fetchClient();
+		fetchComptes();
+	}, [onglet, id]);
 
-  useEffect(() => {
-    if (!comptes || comptes.length === 0) return;
+	useEffect(() => {
+		if (!comptes || comptes.length === 0) return;
 
-    async function chargerForfaits() {
-      const results = {};
-      await Promise.all(
-        comptes.map(async (c) => {
-          const forfaits = await fetchForfaits(c.idDossier);
-          results[c.idDossier] = forfaits;
-        }),
-      );
-      setForfaitsParCompte(results);
-    }
+		async function chargerForfaits() {
+			const results = {};
+			await Promise.all(
+				comptes.map(async (c) => {
+					const forfaits = await fetchForfaits(c.idDossier);
+					results[c.idDossier] = forfaits;
+				}),
+			);
+			setForfaitsParCompte(results);
+		}
 
-    chargerForfaits();
-  }, [comptes]);
+		chargerForfaits();
+	}, [comptes]);
 
   function ouvrirModification() {
     setFormModif({

@@ -93,6 +93,7 @@ export default function AjouterDocuments({ isOpen, onClose, idDossier, documentT
 			setTimeout(() => {
 				setFiles([]);
 				onClose();
+				window.location.reload();
 			}, 1500);
 		} catch (err) {
 			console.error("Upload error:", err);
@@ -106,6 +107,7 @@ export default function AjouterDocuments({ isOpen, onClose, idDossier, documentT
 		setIsDragging(false);
 		setMessage([]); 
 		onClose();
+		window.location.reload();
 	};
 
 	const formatSize = (bytes) => {
