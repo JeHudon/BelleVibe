@@ -3,8 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import AjouterDocuments from "../components/AjouterDocuments";
 import { ForfaitCard } from "../components/ForfaitCard";
 import FileViewer from "../components/FileViewer";
-import { FormModal } from "../components/modifierModal";
-import { ConfirmModal } from "../components/deleteModal";
+import { FormModal, ConfirmModal } from "../components/Modals";
 
 // Field configs defined outside component so they don't re-create on every render
 const FIELDS_DEMANDE = [
@@ -121,18 +120,6 @@ function DetailsCompteModalComponent() {
 		setFormNote((prev) => ({ ...prev, [key]: val }));
 	}
 
-	async function ajouterDemande() {
-		const res = await fetch(`/api/demandes/creerDemande/${id}`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-			body: JSON.stringify(formDemande),
-		});
-		if (res.ok) {
-			setModalDemande(false);
-			window.location.reload();
-		}
-	}
-
 	function ouvrirModifierDemande(demande) {
 		setDemandeSelectionnee(demande);
 		setFormDemande({
@@ -143,68 +130,97 @@ function DetailsCompteModalComponent() {
 		setModalModifierDemande(true);
 	}
 
-	async function modifierDemande() {
-		const res = await fetch(`/api/demandes/modifierDemande/${demandeSelectionnee.idDemande}`, {
-			method: "PUT",
-			headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-			body: JSON.stringify(formDemande),
-		});
-		if (res.ok) {
-			setModalModifierDemande(false);
-			window.location.reload();
-		}
-	}
-
-	async function ajouterNote() {
-		const res = await fetch(`/api/notes/${id}`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-			body: JSON.stringify({ idDossier: id, idEmploye: getUserId(), ...formNote }),
-		});
-		if (res.ok) {
-			setModalNote(false);
-			window.location.reload();
-		}
-	}
-
 	function ouvrirModifierNote(note) {
 		setNoteSelectionnee(note);
 		setFormNote({ type: note.typeNote, titre: note.titreNote, note: note.note });
 		setModalModifierNote(true);
 	}
 
-	async function modifierNote() {
-		const res = await fetch(`/api/notes/${noteSelectionnee.idNote}`, {
+	async function apiCall({ url, method = "GET", body, onSuccess, onError, onClose }) {
+		const res = await fetch(url, {
+			method,
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+				...(method === "DELETE" && { "Content-Type": undefined }),
+			},
+			body: body ? JSON.stringify(body) : undefined,
+		});
+		const data = await res.json();
+
+		if (res.ok) {
+			onSuccess(data.message);
+			setTimeout(() => {
+				onClose();
+				window.location.reload();
+			}, 1500);
+		} else {
+			onError(data.error);
+		}
+	}
+
+	async function ajouterDemande({ onSuccess, onError }) {
+		await apiCall({
+			url: `/api/demandes/creerDemande/${id}`,
+			method: "POST",
+			body: formDemande,
+			onSuccess,
+			onError,
+			onClose: () => setModalDemande(false),
+		});
+	}
+
+	async function modifierDemande({ onSuccess, onError }) {
+		await apiCall({
+			url: `/api/demandes/modifierDemande/${demandeSelectionnee.idDemande}`,
 			method: "PUT",
-			headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-			body: JSON.stringify({ idDossier: id, idEmploye: getUserId(), ...formNote }),
+			body: formDemande,
+			onSuccess,
+			onError,
+			onClose: () => setModalModifierDemande(false),
 		});
-		if (res.ok) {
-			setModalModifierNote(false);
-			window.location.reload();
-		}
 	}
 
-	async function supprimerNote() {
-		const res = await fetch(`/api/notes/${noteSelectionnee.idNote}`, {
-			method: "DELETE",
-			headers: { Authorization: `Bearer ${token}` },
+	async function ajouterNote({ onSuccess, onError }) {
+		await apiCall({
+			url: `/api/notes/${id}`,
+			method: "POST",
+			body: { idDossier: id, idEmploye: getUserId(), ...formNote },
+			onSuccess,
+			onError,
+			onClose: () => setModalNote(false),
 		});
-		if (res.ok) {
-			setModalSupprimerNote(false);
-			window.location.reload();
-		}
 	}
 
-	async function supprimerDocument() {
-		const res = await fetch(`/api/documents/${documentSelectionne.idDocument}`, {
-			method: "DELETE",
-			headers: { Authorization: `Bearer ${token}` },
+	async function modifierNote({ onSuccess, onError }) {
+		await apiCall({
+			url: `/api/notes/${noteSelectionnee.idNote}`,
+			method: "PUT",
+			body: { idDossier: id, idEmploye: getUserId(), ...formNote },
+			onSuccess,
+			onError,
+			onClose: () => setModalModifierNote(false),
 		});
-		if (res.ok) {
-			setModalSupprimerDocument(false);
-			window.location.reload();
-		}
+	}
+
+	async function supprimerNote({ onSuccess, onError }) {
+		await apiCall({
+			url: `/api/notes/${noteSelectionnee.idNote}`,
+			method: "DELETE",
+			onSuccess,
+			onError,
+			onClose: () => setModalSupprimerNote(false),
+		});
+	}
+
+	async function supprimerDocument({ onSuccess, onError }) {
+		await apiCall({
+			url: `/api/documents/${documentSelectionne.idDocument}`,
+			method: "DELETE",
+			onSuccess,
+			onError,
+			onClose: () => setModalSupprimerDocument(false),
+		});
 	}
 
 	return (
