@@ -48,6 +48,40 @@ router.post("/", authentifier, async (req, res) => {
     }
 });
 
+router.patch("/:idDossier", authentifier, async (req, res) => {
+    try {
+        const { idDossier } = req.params;
+        const { forfaits } = req.body; 
+
+        const validation = validerChamps({ idDossier });
+        if (validation.error) {
+            return res.status(400).json({ error: validation.error });
+        }
+
+        if (!Array.isArray(forfaits) || forfaits.length === 0) {
+            return res.status(400).json({ error: "Aucun forfait fourni" });
+        }
+
+        await db("forfaitsDossier").where({ idDossier }).delete();
+
+        const nouveauxForfaits = forfaits.map(idForfait => ({ idDossier, idForfait }));
+        const ids = await db("forfaitsDossier").insert(nouveauxForfaits);
+
+        await log(req.user.id, "WRITE", "forfaitsDossier", idDossier);
+
+        res.status(200).json({
+            message: "Forfaits du dossier mis à jour avec succès.",
+            idDossier,
+            forfaits
+        });
+
+    } catch (err) {
+        console.error("Erreur PATCH /forfaitsDossier/:idDossier", err);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
+
 // DELETE supprimer un forfait d’un dossier
 router.delete("/:idForfaitDossier", authentifierSupp, async (req, res) => {
     try {
