@@ -4,3 +4,10 @@ insert into employes ( roleEmploye, statutEmploye, nomEmploye, prenomEmploye, co
 insert into dossiers ( idClient, idEmploye,typeDossier, statutDossier, soldeDossier) values (1, 1, 'Personnel', 'Actif', 0);
 
 update dossiers set soldeDossier = 299.97 where idDossier = 3
+
+insert into facturation (idDossier,
+idEmploye,
+statut_facture,
+montant_total,
+paiement_recu,
+date_emission) values ('3', '6', 'Emise', '100', 0, '2026-04-13')
