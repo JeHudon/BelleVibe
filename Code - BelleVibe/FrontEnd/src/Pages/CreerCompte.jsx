@@ -5,7 +5,6 @@ export function CreerCompte() {
     const [etape, setEtape] = useState(1);
     const [clients, setClients] = useState([]);
     const [typeCompte, setTypeCompte] = useState("");
-    const [soldeCompte, setSoldeCompte] = useState(0);
     const [services, setServices] = useState([]);
     const [forfaits, setForfaits] = useState([]);
     const [clientSelection, setClientSelection] = useState(null);

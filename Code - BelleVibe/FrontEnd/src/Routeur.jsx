@@ -65,7 +65,7 @@ function Routeur() {
 						<Route path="/clients/:id/:onglet" element={<DetailsClient />} />
 						<Route path="/employes/:id" element={<DetailsEmploye />} />
 						<Route path="/CreerEmploye" element={<CreerEmploye />} />
-						<Route path="/modifierForfait/:idForfait" element={<ModifierForfait />} />
+						<Route path="/modifierForfait/:id" element={<ModifierForfait />} />
 						<Route
 							path="*"
 							element={
