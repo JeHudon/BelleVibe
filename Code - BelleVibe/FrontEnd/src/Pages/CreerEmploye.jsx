@@ -11,7 +11,7 @@ export default function CreerEmploye() {
     adresse: "",
     codePostal: "",
     mdp: "",
-    role: "commis",
+    role: "Commis",
   });
   const [erreur, setErreur] = useState("");
   const [succes, setSucces] = useState(false);
@@ -168,9 +168,9 @@ export default function CreerEmploye() {
                 <div className="control">
                   <div className="select is-fullwidth">
                     <select name="role" value={form.role} onChange={handleChange} required>
-                      <option value="commis">Commis</option>
-                      <option value="superviseur">Superviseur</option>
-                      <option value="admin">Admin</option>
+                      <option value="Commis">Commis</option>
+                      <option value="Superviseur">Superviseur</option>
+                      <option value="Admin">Admin</option>
                     </select>
                   </div>
                 </div>

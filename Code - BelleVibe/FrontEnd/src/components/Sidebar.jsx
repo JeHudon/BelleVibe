@@ -12,7 +12,7 @@ const menuItems = [
 ];
 
 const serviceIcons = [
-	{ icon: "fa-chart-bar", label: "Analytics" },
+	{ icon: "fa-signal", label: "Mobile" },
 	{ icon: "fa-wifi", label: "Wi-Fi" },
 	{ icon: "fa-tv", label: "TV" },
 ];
@@ -111,7 +111,7 @@ export default function Sidebar() {
 										<li key={item.to}>
 											<Link
 												to={item.to}
-												className={`button is-fullwidth has-text-left mb-2 ${isActive ? "has-background-link has-text-white" : "is-white has-text-dark"}`}
+												className={`button is-fullwidth is-justify-content-flex-start mb-2 pl-4 ${isActive ? "has-background-link has-text-white" : "is-white has-text-dark"}`}
 											>
 												<span className="icon is-small">
 													<i className={`fa-solid ${item.icon}`} />
@@ -141,7 +141,7 @@ export default function Sidebar() {
 					<div className="columns is-mobile is-multiline is-variable is-1">
 						{serviceIcons.map((service) => (
 							<div key={service.label} className="column is-4">
-								<div className="box has-text-centered">
+								<div className="box" style={{ border: "1px solid #d6d6d6" }}>
 									<span className="icon is-large has-text-link">
 										<i className={`fa-solid ${service.icon} fa-lg`} />
 									</span>
