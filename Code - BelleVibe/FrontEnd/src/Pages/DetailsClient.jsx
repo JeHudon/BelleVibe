@@ -91,6 +91,13 @@ function DetailsClient() {
 		chargerForfaits();
 	}, [comptes]);
 
+    useEffect(() => {
+      const onglets = ["resume", "comptes"];
+      if (!onglets.includes(onglet)) {
+        navigate(`/clients/${id}/resume`);
+      }
+    }, [onglet]);
+
   function ouvrirModification() {
     setFormModif({
       nomClient: client.nomClient,

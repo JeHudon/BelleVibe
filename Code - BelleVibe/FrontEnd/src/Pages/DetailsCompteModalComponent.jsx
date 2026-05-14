@@ -23,6 +23,22 @@ const FIELDS_NOTE = [
 	{ key: "note", label: "Note", type: "textarea" },
 ];
 
+const FIELDS_NOUVELLE_FACTURE = [
+	{ key: "montant_total", label: "Montant total ($)", type: "number" },
+	{ key: "dateEmission", label: "Date d'émission", type: "date" },
+];
+
+const FIELDS_MODIFIER_FACTURE = [
+	{
+		key: "statutFacture",
+		label: "Statut",
+		type: "select",
+		options: ["Emise", "Payée", "En retard", "Annulée"],
+	},
+	{ key: "datePaiement", label: "Date de paiement", type: "date" },
+	{ key: "paiement", label: "Paiement reçu", type: "checkbox" },
+];
+
 function DetailsCompteModalComponent() {
 	const [client, setClient] = useState(null);
 	const [compte, setCompte] = useState(null);
@@ -30,6 +46,7 @@ function DetailsCompteModalComponent() {
 	const [demandes, setDemandes] = useState(null);
 	const [documents, setDocuments] = useState(null);
 	const [notes, setNotes] = useState(null);
+	const [factures, setFactures] = useState(null);
 	const [editingDoc, setEditingDoc] = useState(null);
 	const [previewDoc, setPreviewDoc] = useState(null);
 
@@ -40,6 +57,15 @@ function DetailsCompteModalComponent() {
 	const [modalModifierNote, setModalModifierNote] = useState(false);
 	const [modalSupprimerNote, setModalSupprimerNote] = useState(false);
 	const [modalSupprimerDocument, setModalSupprimerDocument] = useState(false);
+
+	const [factureSelectionnee, setFactureSelectionnee] = useState(null);
+	const [modalNouvelleFacture, setModalNouvelleFacture] = useState(false);
+	const [modalModifierFacture, setModalModifierFacture] = useState(false);
+	const [modalSupprimerFacture, setModalSupprimerFacture] = useState(false);
+	const [formFacture, setFormFacture] = useState({
+		montant_total: "",
+		dateEmission: "",
+	});
 
 	const [demandeSelectionnee, setDemandeSelectionnee] = useState(null);
 	const [noteSelectionnee, setNoteSelectionnee] = useState(null);
@@ -100,6 +126,7 @@ function DetailsCompteModalComponent() {
 		get(`/api/demandes/getDemande/${id}`).then(setDemandes);
 		get(`/api/documents/${id}`).then(setDocuments);
 		get(`/api/notes/${id}`).then(setNotes);
+		get(`/api/facturation/getFactures/${id}`).then(setFactures);
 	}, [onglet, id]);
 
 	useEffect(() => {
@@ -112,12 +139,50 @@ function DetailsCompteModalComponent() {
 			.then(setClient);
 	}, [compte?.idClient]);
 
+	useEffect(() => {
+		const onglets = ["resume", "notes", "documents", "demandes", "facturation"];
+		if (!onglets.includes(onglet)) {
+			navigate(`/comptes/${id}/resume`);
+		}
+	}, [onglet]);
+
 	// Generic onChange handler for both forms
 	function handleChangeDemande(key, val) {
 		setFormDemande((prev) => ({ ...prev, [key]: val }));
 	}
 	function handleChangeNote(key, val) {
 		setFormNote((prev) => ({ ...prev, [key]: val }));
+	}
+	function handleChangeFacture(key, val) {
+		setFormFacture((prev) => {
+			const next = { ...prev, [key]: val };
+
+			// Syncing statut <-> paiement
+			if (key === "statutFacture") {
+				if (val === "Payée") {
+					next.paiement = true;
+					if (!prev.datePaiement) {
+						next.datePaiement = new Date().toISOString().split("T")[0];
+					}
+				} else {
+					next.paiement = false;
+				}
+			}
+
+			if (key === "paiement") {
+				if (val === true) {
+					next.statutFacture = "Payée";
+					if (!prev.datePaiement) {
+						next.datePaiement = new Date().toISOString().split("T")[0];
+					}
+				} else {
+					next.statutFacture = "Emise";
+					next.datePaiement = "";
+				}
+			}
+
+			return next;
+		});
 	}
 
 	function ouvrirModifierDemande(demande) {
@@ -134,6 +199,21 @@ function DetailsCompteModalComponent() {
 		setNoteSelectionnee(note);
 		setFormNote({ type: note.typeNote, titre: note.titreNote, note: note.note });
 		setModalModifierNote(true);
+	}
+
+	function ouvrirModifierFacture(facture) {
+		setFactureSelectionnee(facture);
+		setFormFacture({
+			statutFacture: facture.statut_facture,
+			paiement: facture.paiement_recu,
+			datePaiement: facture.date_paiement || "",
+		});
+		setModalModifierFacture(true);
+	}
+
+	function ouvrirSupprimerFacture(facture) {
+		setFactureSelectionnee(facture);
+		setModalSupprimerFacture(true);
 	}
 
 	async function apiCall({ url, method = "GET", body, onSuccess, onError, onClose }) {
@@ -220,6 +300,42 @@ function DetailsCompteModalComponent() {
 			onSuccess,
 			onError,
 			onClose: () => setModalSupprimerDocument(false),
+		});
+	}
+
+	async function creerFacture({ onSuccess, onError }) {
+		await apiCall({
+			url: `/api/facturation/nouvelleFacture`,
+			method: "POST",
+			body: { idDossier: id, ...formFacture },
+			onSuccess,
+			onError,
+			onClose: () => setModalNouvelleFacture(false),
+		});
+	}
+
+	async function modifierFacture({ onSuccess, onError }) {
+		await apiCall({
+			url: `/api/facturation/updateFacture/${factureSelectionnee.idFacturation}`,
+			method: "PATCH",
+			body: {
+				...formFacture,
+				paiement: formFacture.paiement ? 1 : 0,
+				datePaiement: formFacture.datePaiement || null,
+			},
+			onSuccess,
+			onError,
+			onClose: () => setModalModifierFacture(false),
+		});
+	}
+
+	async function supprimerFacture({ onSuccess, onError }) {
+		await apiCall({
+			url: `/api/facturation/deleteFacture/${factureSelectionnee.idFacturation}`,
+			method: "DELETE",
+			onSuccess,
+			onError,
+			onClose: () => setModalSupprimerFacture(false),
 		});
 	}
 
@@ -579,6 +695,114 @@ function DetailsCompteModalComponent() {
 					</div>
 				)}
 
+				{onglet === "facturation" && (
+					<div className="box" style={{ border: "1px solid #d6d6d6" }}>
+						<div className="level">
+							<div className="level-left">
+								<div>
+									<h2 className="title is-5">Factures</h2>
+									<p className="subtitle is-6">
+										Gérer les factures pour ce dossier
+									</p>
+								</div>
+							</div>
+							<div className="level-right">
+								<button
+									className="button is-dark"
+									onClick={() => {
+										setFormFacture({ montant_total: "", dateEmission: "" });
+										setModalNouvelleFacture(true);
+									}}
+								>
+									+ Créer facture
+								</button>
+							</div>
+						</div>
+						<table
+							className="table is-fullwidth is-striped is-hoverable"
+							style={{ tableLayout: "fixed" }}
+						>
+							<thead>
+								<tr>
+									<th style={{ width: "80px" }}>ID</th>
+									<th style={{ width: "130px" }}>Montant total</th>
+									<th style={{ width: "100px" }}>Statut</th>
+									<th style={{ width: "130px" }}>Date d'émission</th>
+									<th style={{ width: "130px" }}>Date de paiement</th>
+									<th style={{ width: "80px" }}>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{factures?.length > 0 ? (
+									factures.map((facture) => (
+										<tr style={{ height: "55px" }} key={facture.idFacturation}>
+											<td className="is-vcentered">
+												<strong>#{facture.idFacturation}</strong>
+											</td>
+											<td className="is-vcentered">
+												{Number(facture.montant_total).toFixed(2)} $
+											</td>
+											<td className="is-vcentered">
+												<span
+													className={
+														facture.statut_facture === "Payée"
+															? "tag is-success"
+															: facture.statut_facture === "Emise"
+																? "tag is-info"
+																: facture.statut_facture ===
+																	  "En retard"
+																	? "tag is-danger"
+																	: "tag is-dark"
+													}
+													style={{ fontWeight: "500" }}
+												>
+													{facture.statut_facture}
+												</span>
+											</td>
+											<td className="is-vcentered">
+												{formatDate(facture.date_emission)}
+											</td>
+											<td className="is-vcentered">
+												{facture.date_paiement
+													? formatDate(facture.date_paiement)
+													: "—"}
+											</td>
+											<td className="is-vcentered">
+												<button
+													className="button is-medium is-ghost"
+													style={{
+														paddingLeft: "0.5rem",
+														paddingRight: "0.5rem",
+													}}
+													onClick={() => ouvrirModifierFacture(facture)}
+												>
+													<i className="fas fa-pen-to-square"></i>
+												</button>
+												<button
+													className="button is-medium is-ghost"
+													style={{
+														paddingLeft: "0.5rem",
+														paddingRight: "0.5rem",
+													}}
+													onClick={() => ouvrirSupprimerFacture(facture)}
+												>
+													<i className="fas fa-trash"></i>
+												</button>
+											</td>
+										</tr>
+									))
+								) : (
+									<tr>
+										<td colSpan="6">Aucune facture pour ce dossier.</td>
+									</tr>
+								)}
+							</tbody>
+						</table>
+					</div>
+				)}
+
+				{onglet}
+
 				{/* --- MODALS --- */}
 				<>
 					<FormModal
@@ -619,6 +843,35 @@ function DetailsCompteModalComponent() {
 						onChange={handleChangeNote}
 						onConfirm={modifierNote}
 						onClose={() => setModalModifierNote(false)}
+					/>
+
+					<FormModal
+						isOpen={modalNouvelleFacture}
+						title="Créer une facture"
+						fields={FIELDS_NOUVELLE_FACTURE}
+						values={formFacture}
+						onChange={handleChangeFacture}
+						onConfirm={creerFacture}
+						onClose={() => setModalNouvelleFacture(false)}
+					/>
+
+					<FormModal
+						isOpen={modalModifierFacture}
+						title="Modifier la facture"
+						fields={FIELDS_MODIFIER_FACTURE}
+						values={formFacture}
+						onChange={handleChangeFacture}
+						onConfirm={modifierFacture}
+						onClose={() => setModalModifierFacture(false)}
+					/>
+
+					<ConfirmModal
+						isOpen={modalSupprimerFacture}
+						title="Supprimer la facture"
+						description="Voulez-vous vraiment supprimer cette facture ?"
+						itemName={`Facture #${factureSelectionnee?.idFacturation}`}
+						onConfirm={supprimerFacture}
+						onClose={() => setModalSupprimerFacture(false)}
 					/>
 
 					<ConfirmModal

@@ -64,7 +64,7 @@ function Routeur() {
 						<Route path="/GestionCompte" element={<GestionCompte />} />
 						<Route path="/GestionClient" element={<GestionClient />} />
 						<Route path="/GestionEmploye" element={<GestionEmploye />} />
-						<Route path="/comptes/:id/:onglet" element={<DetailsCompte />} />
+						<Route path="/comptes/:id/:onglet" element={<DetailsCompteModalComponent />} />
 						<Route path="/clients/:id/:onglet" element={<DetailsClient />} />
 						<Route path="/employes/:id" element={<DetailsEmploye />} />
 						<Route path="/CreerEmploye" element={<CreerEmploye />} />
