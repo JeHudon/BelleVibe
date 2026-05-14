@@ -3,14 +3,13 @@ import { Link } from "react-router-dom";
 
 
 export default function DashboardEmploye() {
-    const serveur = "http://localhost:3000"
     const [activeTab, setActiveTab] = useState("demandes")
     const [demandesOuvertes, setDemandesOuvertes] = useState(null)
     const [comptesEnAttente, setComptesEnAttente] = useState(null)
     const [facturesAFaire, setFacturesAFaire] = useState(null)
     const [infosEmploye, setInfosEmploye] = useState(null)
     // retourne un nbre random entre 100 & 900
-    const pauseCloppes = Math.floor(Math.random() * 100)
+    const pauseCloppes = Math.floor(Math.random() * 1000)
 
     // récupérer le token pour les tt les requêtes au serveur
     const token = localStorage.getItem("token");
@@ -19,45 +18,45 @@ export default function DashboardEmploye() {
     useEffect(() => {
         // demandes en attentes
         async function loadDemandesEnAttente() {
-            const rep = await fetch(`${serveur}/demandes/getDemandesOuvertes`, { headers: { Authorization: `Bearer ${token}` } })
+            const rep = await fetch(`/api/demandes/getDemandesOuvertes`, { headers: { Authorization: `Bearer ${token}` } })
             if (rep.ok) {
-                if (rep.length != 0){
-                    const data = await rep.json()
-                    setDemandesOuvertes(data)
+                if (rep.status == 204){
+                    setDemandesOuvertes([])
+                    return
                 }
-                else{setDemandesOuvertes(0)}
+                const data = await rep.json()
+                setDemandesOuvertes(data)
             }
         }
         // infos de l'employé
         async function loadInfosEmploye() {
-            const rep = await fetch(`${serveur}/employes/me`, { headers: { Authorization: `Bearer ${token}` } })
+            const rep = await fetch(`/api/employes/me`, { headers: { Authorization: `Bearer ${token}` } })
             if (rep.ok) {
                 const data = await rep.json()
-                console.log(data)
                 setInfosEmploye(data)
-                console.log(infosEmploye)
             }
         }
         // comptes en attente
         async function loadComptesEnAttente() {
-            const rep = await fetch(`${serveur}/comptes/dossiersAttente`, { headers: { Authorization: `Bearer ${token}` } })
+            const rep = await fetch(`/api/comptes/dossiersAttente`, { headers: { Authorization: `Bearer ${token}` } })
             if (rep.ok) {
-                if (rep.length != 0){
-                    const data = await rep.json()
-                    setComptesEnAttente(data)
+                if (rep.status==204){
+                    setComptesEnAttente([])
+                    return
                 }
-                else{setComptesEnAttente(0)}
+                const data = await rep.json()
+                setComptesEnAttente(data)
             }
         }
         // Factures à faire
         async function loadFacturesAFaire() {
-            const rep = await fetch(`${serveur}/facturation/facturesAFaire`, { headers: { Authorization: `Bearer ${token}` } })
+            const rep = await fetch(`/api/facturation/facturesAFaire`, { headers: { Authorization: `Bearer ${token}` } })
             if (rep.ok) {
                 const data = await rep.json()
                 setFacturesAFaire(data)
             }
         }
-        
+
         loadDemandesEnAttente()
         loadInfosEmploye()
         loadComptesEnAttente()
@@ -103,27 +102,29 @@ export default function DashboardEmploye() {
     }
 
 
+
     return (<>
-        { infosEmploye != null &&
+        {infosEmploye != null &&
             <section className="section">
                 <div className="container is-fluid">
                     <div className="level mb-5">
                         <div className="level-left">
                             <div>
-                                <h1 className="title is-4 mb-1">Bonjour {infosEmploye.prenom + " " + infosEmploye.nom}</h1>
+                                <h1 className="title is-4 mb-1">Bonjour, {infosEmploye.prenomEmploye + " " + infosEmploye.nomEmploye}</h1>
                             </div>
                         </div>
                     </div>
 
                     {/* Cartes/bouttons du dashboard, peut etre changer pour juste avoir html direct?*/}
                     <div className="columns mb-5">
-                        <CarteBoutton label="Demandes ouvertes" value="2" color="is-info" />
-                        <CarteBoutton label="Comptes en attente" value="1" color="is-warning" />
-                        <CarteBoutton label="Tâches en attente" value="3" color="is-danger" />
-                        <CarteBoutton label="Documents à valider" value="3" color="is-success" />
+                        <CarteBoutton label="Demandes ouvertes" value={demandesOuvertes.length} color="is-info" />
+                        <CarteBoutton label="Comptes en attente" value={comptesEnAttente.length} color="is-warning" />
+                        
+                        <CarteBoutton label="Factures à venir" value="3" color="is-danger" />
+                        <CarteBoutton label="Pauses cloppes cette semaine" value={pauseCloppes} color="is-success" />
                     </div>
 
-                    {/* Accès rapides */}
+                    {/* Accès r/apides */}
                     <div className="box mb-5">
                         <p className="title is-6 mb-1">Accès rapides</p>
                         <div className="columns is-mobile is-multiline">
