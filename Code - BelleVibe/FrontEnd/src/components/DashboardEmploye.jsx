@@ -119,7 +119,6 @@ export default function DashboardEmploye() {
                     <div className="columns mb-5">
                         <CarteBoutton label="Demandes ouvertes" value={demandesOuvertes.length} color="is-info" />
                         <CarteBoutton label="Comptes en attente" value={comptesEnAttente.length} color="is-warning" />
-                        
                         <CarteBoutton label="Factures à venir" value="3" color="is-danger" />
                         <CarteBoutton label="Pauses cloppes cette semaine" value={pauseCloppes} color="is-success" />
                     </div>
