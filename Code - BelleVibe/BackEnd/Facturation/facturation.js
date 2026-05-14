@@ -77,7 +77,7 @@ router.post("/nouvelleFacture", authentifier, async (req, res) => {
             statut_facture: "Emise",
             montant_total,
             paiement_recu: false,
-            date_emission: date_emission.toISOString().split("T")[0]
+            date_emission: date_emission.toLocaleDateString("en-CA", { timeZone: "America/Toronto" })
         }
         const [idFacturation] = await db("facturation").insert(data)
         await log(req.user.id, "WRITE", "FACTURATION", Number(idFacturation))
@@ -109,8 +109,8 @@ router.patch("/updateFacture/:idFacture", authentifier, async (req, res) => {
         // si les champs existent, les ajoute au data qui va etre envoyé au backend après
         let data = {}
         if (statut) { data.statut_facture = statut }
-        if (paiement_recu) { data.paiement_recu = paiement_recu }
-        if (datePaiement) { data.date_paiement = datePaiement }
+        data.paiement_recu = paiement_recu ?? 0
+        data.date_paiement = datePaiement ?? null
 
         const verifierID = await db("facturation").where("idFacturation", idFacture).update(data)
         if (verifierID == 0) {
