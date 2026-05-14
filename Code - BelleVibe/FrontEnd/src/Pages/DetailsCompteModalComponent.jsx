@@ -40,6 +40,7 @@ const FIELDS_MODIFIER_FACTURE = [
 ];
 
 function DetailsCompteModalComponent() {
+	const [user, setUser] = useState(null);
 	const [client, setClient] = useState(null);
 	const [compte, setCompte] = useState(null);
 	const [forfaits, setForfaits] = useState(null);
@@ -116,6 +117,16 @@ function DetailsCompteModalComponent() {
 			return null;
 		}
 	}
+
+	useEffect(() => {
+		if (!token) return;
+		fetch("/api/employes/me", {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+			.then((r) => r.json())
+			.then((data) => setUser(data))
+			.catch(() => {});
+	}, [token]);
 
 	useEffect(() => {
 		const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
@@ -590,20 +601,22 @@ function DetailsCompteModalComponent() {
 												>
 													<i className="fa-solid fa-eye"></i>
 												</button>
-												<button
-													className="button is-medium is-ghost"
-													style={{
-														paddingLeft: "0.5rem",
-														paddingRight: "0.5rem",
-													}}
-													title="Supprimer"
-													onClick={() => {
-														setDocumentSelectionne(document);
-														setModalSupprimerDocument(true);
-													}}
-												>
-													<i className="fa-solid fa-trash"></i>
-												</button>
+												{user?.roleEmploye === "admin" && (
+													<button
+														className="button is-medium is-ghost"
+														style={{
+															paddingLeft: "0.5rem",
+															paddingRight: "0.5rem",
+														}}
+														title="Supprimer"
+														onClick={() => {
+															setDocumentSelectionne(document);
+															setModalSupprimerDocument(true);
+														}}
+													>
+														<i className="fa-solid fa-trash"></i>
+													</button>
+												)}
 											</td>
 										</tr>
 									))
@@ -671,19 +684,21 @@ function DetailsCompteModalComponent() {
 												>
 													<i className="fa-solid fa-pen-to-square"></i>
 												</button>
-												<button
-													className="button is-ghost"
-													style={{
-														paddingLeft: "0.5rem",
-														paddingRight: "0.5rem",
-													}}
-													onClick={() => {
-														setNoteSelectionnee(note);
-														setModalSupprimerNote(true);
-													}}
-												>
-													<i className="fa-solid fa-trash"></i>
-												</button>
+												{user?.roleEmploye === "admin" && (
+													<button
+														className="button is-ghost"
+														style={{
+															paddingLeft: "0.5rem",
+															paddingRight: "0.5rem",
+														}}
+														onClick={() => {
+															setNoteSelectionnee(note);
+															setModalSupprimerNote(true);
+														}}
+													>
+														<i className="fa-solid fa-trash"></i>
+													</button>
+												)}
 											</div>
 										</div>
 									</div>
@@ -778,16 +793,20 @@ function DetailsCompteModalComponent() {
 												>
 													<i className="fas fa-pen-to-square"></i>
 												</button>
-												<button
-													className="button is-medium is-ghost"
-													style={{
-														paddingLeft: "0.5rem",
-														paddingRight: "0.5rem",
-													}}
-													onClick={() => ouvrirSupprimerFacture(facture)}
-												>
-													<i className="fas fa-trash"></i>
-												</button>
+												{user?.roleEmploye === "admin" && (
+													<button
+														className="button is-medium is-ghost"
+														style={{
+															paddingLeft: "0.5rem",
+															paddingRight: "0.5rem",
+														}}
+														onClick={() =>
+															ouvrirSupprimerFacture(facture)
+														}
+													>
+														<i className="fas fa-trash"></i>
+													</button>
+												)}
 											</td>
 										</tr>
 									))
