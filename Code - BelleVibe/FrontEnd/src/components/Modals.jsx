@@ -123,8 +123,8 @@ export function FormModal({
 						onClose={() => setNotif({ message: "", type: "" })}
 					/>
 					{fields.map(({ key, label, type = "text", options }) => (
-						<div className="field" key={key}>
-							<label className="label">{label}</label>
+						<div className={"field" + (type === "checkbox" ? " mt-5" : "")} key={key}>
+							{type !== "checkbox" && <label className="label">{label}</label>}
 							{type === "textarea" ? (
 								<textarea
 									className="textarea"
@@ -142,6 +142,19 @@ export function FormModal({
 										))}
 									</select>
 								</div>
+							) : type === "checkbox" ? (
+								<label
+									className="checkbox"
+									style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+								>
+									<input
+										type="checkbox"
+										checked={!!values[key]}
+										onChange={(e) => onChange(key, e.target.checked)}
+										style={{ width: "1rem", height: "1rem", cursor: "pointer" }}
+									/>
+									{label}
+								</label>
 							) : (
 								<input
 									className="input"
