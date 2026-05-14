@@ -5,7 +5,6 @@ export function CreerCompte() {
     const [etape, setEtape] = useState(1);
     const [clients, setClients] = useState([]);
     const [typeCompte, setTypeCompte] = useState("");
-    const [soldeCompte, setSoldeCompte] = useState(0);
     const [services, setServices] = useState([]);
     const [forfaits, setForfaits] = useState([]);
     const [clientSelection, setClientSelection] = useState(null);
@@ -405,7 +404,7 @@ export function CreerCompte() {
             }
 
             setAfficherSucces(true)
-            setTimeout(() => (setAfficherSucces(false), window.location.replace("/dashboard")), 1500)
+            setTimeout(() => (setAfficherSucces(false), window.location.replace("/dashboard")), 2200)
 
         } catch (err) {
             setAfficherErreur(true)

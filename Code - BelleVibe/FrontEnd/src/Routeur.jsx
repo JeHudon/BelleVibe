@@ -12,6 +12,9 @@ import GestionCompte from "./Pages/GestionCompte.jsx";
 import GestionClient from "./Pages/GestionClient.jsx";
 import CreerEmploye from "./Pages/CreerEmploye.jsx";
 import { ModifierForfait } from "./Pages/ModifierForfait.jsx";
+import DashboardEmploye from "./components/DashboardEmploye.jsx";
+import DashboardSuperviseur from "./components/DashboardSuperviseur.jsx";
+import DashboardAdmin from "./components/DashboardAdmin.jsx";
 import GestionEmploye from "./Pages/GestionEmploye.jsx";
 import DetailsCompteModalComponent from "./Pages/DetailsCompteModalComponent.jsx";
 import DetailsEmploye from "./Pages/DetailsEmploye.jsx";
@@ -65,7 +68,7 @@ function Routeur() {
 						<Route path="/clients/:id/:onglet" element={<DetailsClient />} />
 						<Route path="/employes/:id" element={<DetailsEmploye />} />
 						<Route path="/CreerEmploye" element={<CreerEmploye />} />
-						<Route path="/modifierForfait/:idForfait" element={<ModifierForfait />} />
+						<Route path="/modifierForfait/:id" element={<ModifierForfait />} />
 						<Route
 							path="*"
 							element={

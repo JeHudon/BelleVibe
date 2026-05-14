@@ -137,6 +137,8 @@ router.post("/login", async (req, res) => {
 			id: employe.idEmploye,
 			role: employe.roleEmploye,
 			statut: employe.statutEmploye,
+            nom: employe.nomEmploye,
+            prenom: employe.prenomEmploye,
 		};
 		// création du token, peut modifier/enlever l'expiration si on veut
 		const token = jwt.sign(payload, jwt_mdp, { expiresIn: "2h" });

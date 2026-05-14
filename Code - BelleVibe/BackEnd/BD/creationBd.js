@@ -183,12 +183,13 @@ async function createTables() {
             table.integer("idEmploye").references("idEmploye").inTable("employes")
             table.string("statut_facture").notNullable()
             table.float("montant_total").notNullable()
-            table.float("montant_paye").notNullable()
+            table.boolean("paiement_recu").notNullable()
             table.date("date_emission").notNullable()
             // peut etre null puisque la facture peut ne pas etre payée
             table.date("date_paiement")
             table.timestamps(true, true)
         })
+        console.log("Table 'facturation' créée. ")
     }
 }
 

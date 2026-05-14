@@ -337,7 +337,7 @@ function DetailsCompte() {
 											className="button is-dark"
 											onClick={() => setModalDemande(true)}
 										>
-											+ Modifier Forfait
+											+ Modifier forfaits
 										</button>
 									</Link>
 								</div>
