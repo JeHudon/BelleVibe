@@ -197,52 +197,86 @@ export default function App() {
               </table>
             )}
 
-            {activeTab === "comptes" && (
-              <table className="table is-fullwidth is-hoverable is-striped">
+            {activeTab === "comptes" && comptesEnAttente != null && (
+              <table className="table is-fullwidth is-hoverable" style={{ tableLayout: "fixed" }}>
                 <thead>
                   <tr>
-                    <th>N° Compte</th>
-                    <th>Client</th>
-                    <th>Raison</th>
-                    <th>Depuis</th>
-                    <th></th>
+                    <th style={{ width: "150px" }}>N° du compte</th>
+                    <th style={{ width: "180px" }}>Client</th>
+                    <th style={{ width: "180px" }}>Durée d'attente</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {comptesEnAttente.map((c) => (
-                    <tr key={c.id}>
-                      <td><span className="tag is-light">{c.id}</span></td>
-                      <td>{c.client}</td>
-                      <td><span className="tag is-warning is-light">{c.raison}</span></td>
-                      <td className="has-text-grey is-size-7">{c.date}</td>
-                      <td><button className="button is-small is-warning is-outlined">Traiter</button></td>
-                    </tr>
-                  ))}
+                  {historique.map((a) => {
+                    return (
+                      <tr key={a.idHistorique} style={{ height: "55px" }}>
+                        <td className="is-vcentered">HIST-{String(a.idHistorique).padStart(5, '0')}</td>
+                        <td className="is-vcentered">{a.actionEntree}</td>
+                        <td className="is-vcentered">{a.table}</td>
+                        <td className="is-vcentered">{a.idTransaction}</td>
+                        <td className="is-vcentered">{a.created_at}</td>
+                      </tr>
+                    )
+                  }
+                  )}
                 </tbody>
               </table>
             )}
 
+            <table className="table is-fullwidth is-hoverable is-striped">
+              <thead>
+                <tr>
+                  <th>N° Compte</th>
+                  <th>Client</th>
+                  <th>Raison</th>
+                  <th>Depuis</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {comptesEnAttente.map((c) => (
+                  <tr key={c.id}>
+                    <td><span className="tag is-light">{c.id}</span></td>
+                    <td>{c.client}</td>
+                    <td><span className="tag is-warning is-light">{c.raison}</span></td>
+                    <td className="has-text-grey is-size-7">{c.date}</td>
+                    <td><button className="button is-small is-warning is-outlined">Traiter</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
             {activeTab === "activite" && historique != null && (
-              <div>
-                {historique.map((a) => (
-                <div className="is-flex is-align-items-center mb-3 pb-3" style={{ borderBottom: "1px solid #f0f0f0" }}>
-                    <span className={`tag is-light mr-3`} style={{ minWidth: "8px", minHeight: "8px", borderRadius: "50%", padding: 0, width: "10px", height: "10px" }}></span>
-                    <div className="is-flex-grow-1 columns">
-                      <p className="column is-3 is-size-7">{`HIST-0${a.idHistorique}`}</p>
-                      <p className="column is-3 is-size-7">{a.actionEntree}</p>
-                      <p className="column is-3 is-size-7">{a.table}</p>
-                      <p className="column is-3 is-size-7">{a.idTransaction}</p>
-                    </div>
-                    <span className="is-size-7 has-text-grey-light">{a.created_at}</span>
-                  </div>
-                  ))
-                }
-              </div>
+              <table className="table is-fullwidth is-hoverable" style={{ tableLayout: "fixed" }}>
+                <thead>
+                  <tr>
+                    <th style={{ width: "150px" }}>#Transaction</th>
+                    <th style={{ width: "180px" }}>Action</th>
+                    <th style={{ width: "150px" }}>Table</th>
+                    <th style={{ width: "180px" }}>Id du dossier</th>
+                    <th style={{ width: "180px" }}>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historique.map((a) => {
+                    return (
+                      <tr key={a.idHistorique} style={{ height: "55px" }}>
+                        <td className="is-vcentered">HIST-{String(a.idHistorique).padStart(5, '0')}</td>
+                        <td className="is-vcentered">{a.actionEntree}</td>
+                        <td className="is-vcentered">{a.table}</td>
+                        <td className="is-vcentered">{a.idTransaction}</td>
+                        <td className="is-vcentered">{a.created_at}</td>
+                      </tr>
+                    )
+                  }
+                  )}
+                </tbody>
+              </table>
             )}
           </div>
 
         </div>
-      </section>
+      </section >
     }
   </>
   );
