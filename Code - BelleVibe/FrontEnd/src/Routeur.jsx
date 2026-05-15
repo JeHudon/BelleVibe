@@ -16,7 +16,7 @@ import DashboardEmploye from "./components/DashboardEmploye.jsx";
 import DashboardSuperviseur from "./components/DashboardSuperviseur.jsx";
 import DashboardAdmin from "./components/DashboardAdmin.jsx";
 import GestionEmploye from "./Pages/GestionEmploye.jsx";
-import DetailsCompteModalComponent from "./Pages/DetailsCompteModalComponent.jsx";
+// import DetailsCompteModalComponent from "./Pages/DetailsCompte.jsx";
 import DetailsEmploye from "./Pages/DetailsEmploye.jsx";
 // import { GestionClient } from "./Pages/GestionClient.jsx";
 
@@ -64,7 +64,7 @@ function Routeur() {
 						<Route path="/GestionCompte" element={<GestionCompte />} />
 						<Route path="/GestionClient" element={<GestionClient />} />
 						<Route path="/GestionEmploye" element={<GestionEmploye />} />
-						<Route path="/comptes/:id/:onglet" element={<DetailsCompteModalComponent />} />
+						<Route path="/comptes/:id/:onglet" element={<DetailsCompte />} />
 						<Route path="/clients/:id/:onglet" element={<DetailsClient />} />
 						<Route path="/employes/:id" element={<DetailsEmploye />} />
 						<Route path="/CreerEmploye" element={<CreerEmploye />} />

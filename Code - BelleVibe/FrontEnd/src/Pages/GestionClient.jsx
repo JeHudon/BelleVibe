@@ -245,7 +245,7 @@ export default function GestionClient() {
 															paddingLeft: "0.5rem",
 															paddingRight: "0.5rem",
 														}}
-														onClick={() => {
+														onClick={(ev) => {
 															(ev.stopPropagation(),
 																setClientASupprimer(c));
 														}}
@@ -401,7 +401,7 @@ export default function GestionClient() {
 									</div>
 								</section>
 								<footer className="modal-card-foot">
-									<button className="button is-dark" type="submit">
+									<button className="button is-dark mr-2" type="submit">
 										Sauvegarder
 									</button>
 									<button
@@ -444,7 +444,7 @@ export default function GestionClient() {
 								</p>
 							</section>
 							<footer className="modal-card-foot">
-								<button className="button is-danger" onClick={supprimerClient}>
+								<button className="button is-danger mr-2" onClick={supprimerClient}>
 									Supprimer
 								</button>
 								<button

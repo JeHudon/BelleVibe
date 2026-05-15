@@ -22,7 +22,7 @@ const FIELDS_DOSSIER = [
 
 function formatNumeroCompte(idDossier, created_at) {
 	const year = new Date(created_at).getFullYear();
-	return `NW-${year}-${String(idDossier).padStart(4, "0")}`;
+	return `CMPT-${year}-${String(idDossier).padStart(4, "0")}`;
 }
 
 function formatDate(dateString) {
