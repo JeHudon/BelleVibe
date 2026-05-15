@@ -98,6 +98,18 @@ function DetailsEmploye() {
 	return (
 		<div className="section">
 			<div className="container">
+				<div className="mb-4">
+					<button
+						className="button is-white px-2"
+						onClick={() => navigate("/GestionEmploye")}
+						type="button"
+					>
+						<span className="icon">
+							<i className="fa-solid fa-arrow-left" />
+						</span>
+					</button>
+				</div>
+
 				<h1 className="title">Détails de l'employé</h1>
 				<div className="box" style={{ border: "1px solid #d6d6d6" }}>
 					<div className="level mb-4">

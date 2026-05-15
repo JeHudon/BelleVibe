@@ -418,7 +418,7 @@ export function CreerCompte() {
 
     return (
         <div className="section">
-            <div className="container is-centered mt-3">
+            <div className="container is-centered mt-3" style={{maxWidth: 1100}}>
                 <h1 className="title">Créer un nouveau compte</h1>
                 <h2 className="subtitle is-5 is-spaced">Assistant de création du compte</h2>
                 <div className="columns is-centered">

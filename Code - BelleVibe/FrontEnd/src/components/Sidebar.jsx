@@ -21,7 +21,7 @@ const menuItems = [
 		to: "/GestionClient",
 		label: "Gestion des clients",
 		icon: "fa-user",
-		active: ["/GestionClient", "/clients/"],
+		active: ["/GestionClient", /^\/clients\/(\d+)/],
 	},
 	{
 		to: "/GestionCompte",
@@ -87,8 +87,10 @@ export default function Sidebar() {
 			: "Invité";
 
 	const activeItem = menuItems.reduce((best, item) => {
-		const matches = item.active.some(
-			(path) => location.pathname === path || location.pathname.startsWith(path),
+		const matches = item.active.some((path) =>
+			path instanceof RegExp
+				? path.test(location.pathname)
+				: location.pathname === path || location.pathname.startsWith(path),
 		);
 		if (matches && item.to.length > (best?.to.length ?? -1)) return item;
 		return best;
@@ -136,10 +138,11 @@ export default function Sidebar() {
 									.map((item) => {
 										const isActive =
 											activeItem !== null &&
-											item.active.some(
-												(path) =>
-													location.pathname === path ||
-													location.pathname.startsWith(path),
+											item.active.some((path) =>
+												path instanceof RegExp
+													? path.test(location.pathname)
+													: location.pathname === path ||
+														location.pathname.startsWith(path),
 											);
 										return (
 											<li key={item.to}>
