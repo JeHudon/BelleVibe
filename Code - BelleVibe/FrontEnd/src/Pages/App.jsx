@@ -64,6 +64,11 @@ export default function App() {
     }
     async function loadHistorique() {
       const rep = await fetch("/api/historique/historique", { headers: { Authorization: `Bearer ${token}` } })
+      if (rep.ok) {
+        const data = await rep.json()
+        // donne seulement les 20 dernies évenements dans l'historique, pour pas flood la page 
+        setHistorique(data.splice(0, 20))
+      }
     }
 
     loadDemandesEnAttente()
@@ -74,25 +79,10 @@ export default function App() {
   }, [token])
 
   // bs ai pour remplir les cases
-  /* const demandesOuvertes = [
-      { id: "NW-2024-0045", client: "Sophie Gagnon", type: "Technique", date: "Aujourd'hui, 09h14", statut: "En cours" },
-      { id: "NW-2024-0044", client: "Martin Tremblay", type: "Facturation", date: "Hier, 14h30", statut: "En attente" },
-  ];
-  const comptesEnAttente = [
-      { id: "NW-2024-001234", client: "Julie Leblanc", raison: "Document manquant", date: "Il y a 2 jours" },
-      { id: "NW-2024-001235", client: "Kevin Nguyen", raison: "Vérification identité", date: "Il y a 3 jours" },
-  ]; */
   const tachesEnAttente = [
     { id: 1, titre: "Demande technique", detail: "Compte NW-2024-001234", urgence: "warning" },
     { id: 2, titre: "Document manquant", detail: "Julie Leblanc", urgence: "danger" },
     { id: 3, titre: "Approbation compte", detail: "Kevin Nguyen", urgence: "info" },
-  ];
-  const activitesRecentes = [
-    { id: 1, action: "Client créé", detail: "Sophie Gagnon", temps: "Il y a 2 heures", couleur: "is-success" },
-    { id: 2, action: "Demande mise à jour", detail: "NW-2024-001234", temps: "Il y a 3 heures", couleur: "is-info" },
-    { id: 3, action: "Note ajoutée", detail: "Martin Tremblay", temps: "Il y a 5 heures", couleur: "is-warning" },
-    { id: 4, action: "Compte approuvé", detail: "NW-2024-001198", temps: "Hier, 16h45", couleur: "is-primary" },
-    { id: 5, action: "Document reçu", detail: "Aline Fortin", temps: "Hier, 11h00", couleur: "is-link" },
   ];
 
   return (<>
@@ -235,15 +225,18 @@ export default function App() {
             {activeTab === "activite" && historique != null && (
               <div>
                 {historique.map((a) => (
-                  <div key={a.id} className="is-flex is-align-items-center mb-3 pb-3" style={{ borderBottom: "1px solid #f0f0f0" }}>
-                    <span className={`tag ${a.couleur} is-light mr-3`} style={{ minWidth: "8px", minHeight: "8px", borderRadius: "50%", padding: 0, width: "10px", height: "10px" }}></span>
-                    <div className="is-flex-grow-1">
-                      <p className="is-size-7 has-text-weight-semibold mb-0">{a.action}</p>
-                      <p className="is-size-7 has-text-grey">{a.detail}</p>
+                <div className="is-flex is-align-items-center mb-3 pb-3" style={{ borderBottom: "1px solid #f0f0f0" }}>
+                    <span className={`tag is-light mr-3`} style={{ minWidth: "8px", minHeight: "8px", borderRadius: "50%", padding: 0, width: "10px", height: "10px" }}></span>
+                    <div className="is-flex-grow-1 columns">
+                      <p className="column is-3 is-size-7">{`HIST-0${a.idHistorique}`}</p>
+                      <p className="column is-3 is-size-7">{a.actionEntree}</p>
+                      <p className="column is-3 is-size-7">{a.table}</p>
+                      <p className="column is-3 is-size-7">{a.idTransaction}</p>
                     </div>
-                    <span className="is-size-7 has-text-grey-light">{a.temps}</span>
+                    <span className="is-size-7 has-text-grey-light">{a.created_at}</span>
                   </div>
-                ))}
+                  ))
+                }
               </div>
             )}
           </div>
