@@ -10,6 +10,7 @@ export default function App() {
   const [facturesAFaire, setFacturesAFaire] = useState(null)
   const [infosEmploye, setInfosEmploye] = useState(null)
   const [historique, setHistorique] = useState(null)
+
   // retourne un nbre random entre 100 & 900
   const pauseCloppes = Math.floor(Math.random() * 100)
 
@@ -18,43 +19,93 @@ export default function App() {
 
   // loading de toutes les infos
   useEffect(() => {
-    // demandes en attentes
-    async function loadDemandesEnAttente() {
-      const rep = await fetch(`/api/demandes/getDemandesOuvertes`, { headers: { Authorization: `Bearer ${token}` } })
-      if (rep.ok) {
-        if (rep.status == 204) {
-          setDemandesOuvertes([])
-          return
-        }
-        const data = await rep.json()
-        setDemandesOuvertes(data)
-      }
+    async function getNomClientLocal(idClient) {
+      const rep = await fetch(`/api/clients/getClient/${idClient}`, {
+        headers: { Authorization: `Bearer ${token} ` }
+      })
+
+      if (!rep.ok) return ""
+
+      const data = await rep.json()
+      return `${data.prenomClient} ${data.nomClient} `
     }
-    // infos de l'employé
+
+    async function getNomClientDepuisDossier(idDossier) {
+      const rep = await fetch(`/api/comptes/getDossier/${idDossier}`, {
+        headers: { Authorization: `Bearer ${token} ` }
+      })
+
+      if (!rep.ok) return ""
+
+      const data = await rep.json()
+      return await getNomClientLocal(data.idClient)
+    }
+
+    async function loadDemandesEnAttente() {
+      const rep = await fetch(`/api/demandes/getDemandesOuvertes`, {
+        headers: { Authorization: `Bearer ${token} ` }
+      })
+
+      if (!rep.ok) return
+
+      if (rep.status === 204) {
+        setDemandesOuvertes([])
+        return
+      }
+
+      const data = await rep.json()
+
+      const demandesAvecNom = await Promise.all(
+        data.map(async (d) => ({
+          ...d,
+          nomClient: await getNomClientDepuisDossier(d.idDossier)
+        }))
+      )
+
+      setDemandesOuvertes(demandesAvecNom)
+    }
+
     async function loadInfosEmploye() {
-      const rep = await fetch(`/api/employes/me`, { headers: { Authorization: `Bearer ${token}` } })
+      const rep = await fetch(`/api/employes/me`, {
+        headers: { Authorization: `Bearer ${token} ` }
+      })
+
       if (rep.ok) {
         const data = await rep.json()
         setInfosEmploye(data)
       }
     }
-    // comptes en attente
+
     async function loadComptesEnAttente() {
-      const rep = await fetch(`/api/comptes/dossiersAttente`, { headers: { Authorization: `Bearer ${token}` } })
-      if (rep.ok) {
-        if (rep.status == 204) {
-          setComptesEnAttente([])
-          return
-        }
-        const data = await rep.json()
-        setComptesEnAttente(data)
+      const rep = await fetch(`/api/comptes/dossiersAttente`, {
+        headers: { Authorization: `Bearer ${token} ` }
+      })
+
+      if (!rep.ok) return
+
+      if (rep.status === 204) {
+        setComptesEnAttente([])
+        return
       }
+
+      const data = await rep.json()
+
+      const comptesAvecNom = await Promise.all(
+        data.map(async (a) => ({
+          ...a,
+          nomClient: await getNomClientLocal(a.idClient)
+        }))
+      )
+
+      setComptesEnAttente(comptesAvecNom)
     }
-    // Factures à faire
+
     async function loadFacturesAFaire() {
-      const rep = await fetch(`/api/facturation/facturesAFaire`, { headers: { Authorization: `Bearer ${token}` } })
+      const rep = await fetch(`/api/facturation/facturesAFaire`, {
+        headers: { Authorization: `Bearer ${token} ` }
+      })
       if (rep.ok) {
-        if (rep.status == 204) {
+        if (rep.status === 204) {
           setFacturesAFaire([])
           return
         }
@@ -62,12 +113,14 @@ export default function App() {
         setFacturesAFaire(data)
       }
     }
+
     async function loadHistorique() {
-      const rep = await fetch("/api/historique/historique", { headers: { Authorization: `Bearer ${token}` } })
+      const rep = await fetch(`/api/historique/historique`, {
+        headers: { Authorization: `Bearer ${token} ` }
+      })
       if (rep.ok) {
         const data = await rep.json()
-        // donne seulement les 20 dernies évenements dans l'historique, pour pas flood la page 
-        setHistorique(data.splice(0, 20))
+        setHistorique(data.slice(0, 20))
       }
     }
 
@@ -77,13 +130,6 @@ export default function App() {
     loadFacturesAFaire()
     loadHistorique()
   }, [token])
-
-  // bs ai pour remplir les cases
-  const tachesEnAttente = [
-    { id: 1, titre: "Demande technique", detail: "Compte NW-2024-001234", urgence: "warning" },
-    { id: 2, titre: "Document manquant", detail: "Julie Leblanc", urgence: "danger" },
-    { id: 3, titre: "Approbation compte", detail: "Kevin Nguyen", urgence: "info" },
-  ];
 
   return (<>
     {infosEmploye != null &&
@@ -149,24 +195,30 @@ export default function App() {
                 <li className={activeTab === "demandes" ? "is-active" : ""}>
                   <a onClick={() => setActiveTab("demandes")}>
                     <span>Demandes ouvertes</span>
-                    <span className="tag is-info is-light ml-2">2</span>
+                    {demandesOuvertes !== null &&
+                      <span className="tag is-info is-light ml-2">{demandesOuvertes.length}</span>
+                    }
                   </a>
                 </li>
                 <li className={activeTab === "comptes" ? "is-active" : ""}>
                   <a onClick={() => setActiveTab("comptes")}>
                     <span>Comptes en attente</span>
-                    <span className="tag is-warning is-light ml-2">2</span>
+                    {comptesEnAttente !== null &&
+                      <span className="tag is-warning is-light ml-2">{comptesEnAttente.length}</span>
+                    }
                   </a>
                 </li>
                 <li className={activeTab === "activite" ? "is-active" : ""}>
                   <a onClick={() => setActiveTab("activite")}>
-                    <span>Activité récente</span>
+                    {historique !== null &&
+                      <span>Activité récente</span>
+                    }
                   </a>
                 </li>
               </ul>
             </div>
 
-            {activeTab === "demandes" && (
+            {activeTab === "demandes" && demandesOuvertes !== null && (
               <table className="table is-fullwidth is-hoverable is-striped">
                 <thead>
                   <tr>
@@ -174,22 +226,16 @@ export default function App() {
                     <th>Client</th>
                     <th>Type</th>
                     <th>Date</th>
-                    <th>Statut</th>
                     <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {demandesOuvertes.map((d) => (
                     <tr key={d.id}>
-                      <td><span className="tag is-light">{d.id}</span></td>
-                      <td>{d.client}</td>
-                      <td>{d.type}</td>
-                      <td className="has-text-grey is-size-7">{d.date}</td>
-                      <td>
-                        <span className={`tag ${d.statut === "En cours" ? "is-info is-light" : "is-warning is-light"}`}>
-                          {d.statut}
-                        </span>
-                      </td>
+                      <td><span className="tag is-light">{d.idDemande}</span></td>
+                      <td>{d.nomClient}</td>
+                      <td>{d.typeDemande}</td>
+                      <td className="has-text-grey is-size-7">{d.created_at}</td>
                       <td><button className="button is-small is-primary is-outlined">Voir</button></td>
                     </tr>
                   ))}
@@ -197,54 +243,37 @@ export default function App() {
               </table>
             )}
 
+            {/* check pour s'assurer que les trucs sont loadés pour pas crash */}
             {activeTab === "comptes" && comptesEnAttente != null && (
-              <table className="table is-fullwidth is-hoverable" style={{ tableLayout: "fixed" }}>
-                <thead>
-                  <tr>
-                    <th style={{ width: "150px" }}>N° du compte</th>
-                    <th style={{ width: "180px" }}>Client</th>
-                    <th style={{ width: "180px" }}>Durée d'attente</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historique.map((a) => {
-                    return (
-                      <tr key={a.idHistorique} style={{ height: "55px" }}>
-                        <td className="is-vcentered">HIST-{String(a.idHistorique).padStart(5, '0')}</td>
-                        <td className="is-vcentered">{a.actionEntree}</td>
-                        <td className="is-vcentered">{a.table}</td>
-                        <td className="is-vcentered">{a.idTransaction}</td>
-                        <td className="is-vcentered">{a.created_at}</td>
-                      </tr>
-                    )
-                  }
-                  )}
-                </tbody>
-              </table>
+              // check IF pour s'assurer qu'il y a des comptes en attente
+              comptesEnAttente.length !== 0 ? (
+                <table className="table is-fullwidth is-hoverable" style={{ tableLayout: "fixed" }}>
+                  <thead>
+                    <tr>
+                      <th style={{ width: "150px" }}>N° du compte</th>
+                      <th style={{ width: "180px" }}>Client</th>
+                      <th style={{ width: "180px" }}>Type du compte</th>
+                      <th style={{ width: "180px" }}>En attente depuis</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {comptesEnAttente.map((a) => {
+                      return (
+                        <tr key={a.idDossier} style={{ height: "55px" }}>
+                          <td className="is-vcentered">CMPT-{String(a.idDossier).padStart(4, '0')}</td>
+                          <td className="is-vcentered">{a.nomClient}</td>
+                          <td className="is-vcentered">{a.typeDossier}</td>
+                          <td className="is-vcentered">{a.updated_at}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+                // sinon affiche qu'il n'y en a pas
+              ) : (
+                <h1 className="title is-4">Aucun comptes en attente</h1>
+              )
             )}
-
-            <table className="table is-fullwidth is-hoverable is-striped">
-              <thead>
-                <tr>
-                  <th>N° Compte</th>
-                  <th>Client</th>
-                  <th>Raison</th>
-                  <th>Depuis</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {comptesEnAttente.map((c) => (
-                  <tr key={c.id}>
-                    <td><span className="tag is-light">{c.id}</span></td>
-                    <td>{c.client}</td>
-                    <td><span className="tag is-warning is-light">{c.raison}</span></td>
-                    <td className="has-text-grey is-size-7">{c.date}</td>
-                    <td><button className="button is-small is-warning is-outlined">Traiter</button></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
 
             {activeTab === "activite" && historique != null && (
               <table className="table is-fullwidth is-hoverable" style={{ tableLayout: "fixed" }}>
@@ -274,7 +303,6 @@ export default function App() {
               </table>
             )}
           </div>
-
         </div>
       </section >
     }
