@@ -9,3 +9,5 @@
 /Code - BelleVibe/BackEnd/-- SQLite.sql
 /Code - BelleVibe/BackEnd/BD/-- SQLite.sql
 *.sql
+.openclaude/
+.claude/

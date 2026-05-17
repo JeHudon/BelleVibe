@@ -72,7 +72,10 @@ router.get("/getDossiers/:idClient", authentifier, async (req, res) => {
 // get les dossiers en attente
 router.get("/dossiersAttente", authentifier, async (req, res) => {
 	try {
-		const reponse = await db("dossiers").select("*").where("en attente");
+		const reponse = await db("dossiers").where("statutDossier", "en attente");
+		if (reponse.length == 0){
+			return res.status(204).json({message: "Aucun dossier en attente"})
+		}
 		res.status(200).json(reponse);
 	} catch (error) {
 		console.error("Erreur dans /dossiersAttente");

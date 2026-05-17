@@ -18,7 +18,7 @@ router.get("/allHistorique", authentifierSupp, async (req, res) => {
 // get pour obtenir l'historique de l'employé qui est logged in
 router.get("/historique", authentifier, async (req, res) => {
     try {
-        const reponse = await db("historiqueDossiers").where("idEmploye", req.user.id)
+        const reponse = await db("historiqueDossiers").where("idEmploye", req.user.id).orderBy("created_at", 'desc')
         res.status(200).json(reponse)
     }
     catch (error) {
