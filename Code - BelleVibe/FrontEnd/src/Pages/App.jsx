@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import CardsDashboard from "../components/CardsDashboard";
-
+import BouttonDashboard from "../components/BouttonsDashboard";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("demandes")
@@ -149,21 +149,18 @@ export default function App() {
           <div className="box mb-5">
             <p className="title is-6 mb-1">Accès rapides</p>
             <div className="columns is-mobile is-multiline">
-              <div className="column is-one-third-desktop is-half-mobile">
-                <Link to={"/clients/nouveau"} className="is-info button is-fullwidth is-flex is-flex-direction-column">
-                  <span className="is-size-9 has-text-weight-semibold">Créer client</span>
-                </Link>
-              </div>
-              <div className="column is-one-third-desktop is-half-mobile">
-                <Link to={"/creerCompte"} className="is-primary button is-fullwidth is-flex is-flex-direction-column">
-                  <span className="is-size-9 has-text-weight-semibold">Créer compte</span>
-                </Link>
-              </div>
-              <div className="column is-one-third-desktop is-half-mobile">
-                <Link to={"/GestionCompte"} className=" is-success button is-fullwidth is-flex is-flex-direction-column">
-                  <span className="is-size-9 has-text-weight-semibold">Gestion Comptes</span>
-                </Link>
-              </div>
+              {/* si employé logged in est un emp regulier */}
+              {infosEmploye.roleEmploye === "commis" ? (
+                <>
+                  <BouttonDashboard link="/clients/nouveau" couleur="is-info" texte="Créer client" />
+                  <BouttonDashboard link="/creerCompte" couleur="is-primary" texte="Créer compte" />
+                  <BouttonDashboard link="/GestionCompte" couleur="is-link" texte="Gestion des Comptes" />
+                </>
+              ) : (
+                <>
+                  {/* BOUTTONS POUR ADMIN + SUPPERVISEUR */}
+                </>
+              )}
             </div>
           </div>
 
@@ -172,34 +169,23 @@ export default function App() {
             <div className="tabs is-boxed mb-4">
               <ul>
                 <li className={activeTab === "demandes" ? "is-active" : ""}>
-                  <a onClick={() => setActiveTab("demandes")}>
-                    <span>Demandes ouvertes</span>
-                    {demandesOuvertes !== null &&
-                      <span className="tag is-info is-light ml-2">{demandesOuvertes.length}</span>
-                    }
-                  </a>
+                  <a onClick={() => setActiveTab("demandes")}>Demandes ouvertes</a>
                 </li>
                 <li className={activeTab === "comptes" ? "is-active" : ""}>
-                  <a onClick={() => setActiveTab("comptes")}>
-                    <span>Comptes en attente</span>
-                    {comptesEnAttente !== null &&
-                      <span className="tag is-warning is-light ml-2">{comptesEnAttente.length}</span>
-                    }
-                  </a>
+                  <a onClick={() => setActiveTab("comptes")}>Comptes en attente</a>
                 </li>
                 <li className={activeTab === "activite" ? "is-active" : ""}>
-                  <a onClick={() => setActiveTab("activite")}>
-                    {historique !== null &&
-                      <span>Activité récente</span>
-                    }
-                  </a>
+                  <a onClick={() => setActiveTab("activite")}>Activité récente</a>
                 </li>
               </ul>
             </div>
 
+            {/* Tab Demandes ouvertes */}
             {activeTab === "demandes" && demandesOuvertes !== null && (
+              // Conditionnal rendering: check si le length des demandes ouvertes est 0à
+              // si oui, msg qu'il y en a 0
+              // sinon, render le tableau 
               demandesOuvertes.length !== 0 ? (
-
                 <table className="table is-fullwidth is-hoverable is-striped">
                   <thead>
                     <tr>
