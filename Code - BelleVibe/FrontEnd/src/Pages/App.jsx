@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import CardsDashboard from "../components/CardsDashboard";
-
+import BouttonDashboard from "../components/BouttonsDashboard";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("demandes")
@@ -10,11 +10,28 @@ export default function App() {
   const [facturesAFaire, setFacturesAFaire] = useState(null)
   const [infosEmploye, setInfosEmploye] = useState(null)
   const [historique, setHistorique] = useState(null)
+  const [demandesRetards, setDemandesRetards] = useState(null)
+  const [historiqueAll, setHistoriqueAll] = useState(null)
 
   // retourne un nbre random entre 100 & 900
   const pauseCloppes = Math.floor(Math.random() * 100)
   // récupérer le token pour les tt les requêtes au serveur
   const token = localStorage.getItem("token");
+
+  // premier useEffect pour loader les infos de l'employé.
+  useEffect(() => {
+    async function loadInfosEmploye() {
+      const rep = await fetch(`/api/employes/me`, {
+        headers: { Authorization: `Bearer ${token} ` }
+      })
+      if (rep.ok) {
+        const data = await rep.json()
+        setInfosEmploye(data)
+      }
+    }
+
+    loadInfosEmploye()
+  }, [token])
 
   // loading de toutes les infos
   useEffect(() => {
@@ -56,16 +73,6 @@ export default function App() {
         }))
       )
       setDemandesOuvertes(demandesAvecNom)
-    }
-
-    async function loadInfosEmploye() {
-      const rep = await fetch(`/api/employes/me`, {
-        headers: { Authorization: `Bearer ${token} ` }
-      })
-      if (rep.ok) {
-        const data = await rep.json()
-        setInfosEmploye(data)
-      }
     }
 
     async function loadComptesEnAttente() {
@@ -115,12 +122,45 @@ export default function App() {
       }
     }
 
+    async function loadDemandesRetard() {
+      const rep = await fetch("/api/demandes/getDemandesEnRetard", {
+        headers: { Authorization: `Bearer ${token} ` }
+      })
+      if (rep.ok) {
+        // si retourne code 204, aucunes demandes en retard donc set pour avoir length == 0
+        if (rep.status === 204) {
+          setDemandesRetards([])
+          return
+        }
+        const data = await rep.json()
+        setDemandesRetards(data)
+      }
+    }
+    // seulement callé si l'employé logged in est un admin ou superviseur
+    async function loadHistoriqueAll() {
+      const rep = await fetch("/api/historique/allHistorique", {
+        headers: { Authorization: `Bearer ${token} ` }
+      })
+      if (rep.ok) {
+        const data = await rep.json()
+        // retourne les 40 dernieres actions pour ne pas overfill
+        setHistoriqueAll(data.slice(0, 40))
+      }
+    }
+
     loadDemandesEnAttente()
-    loadInfosEmploye()
     loadComptesEnAttente()
     loadFacturesAFaire()
     loadHistorique()
-  }, [token])
+    // doit rajouter un check sinon crash
+    if (infosEmploye != null) {
+      // loader l'historique & demandes en retard seulement si pas un commis, puisque pas besoin si oui 
+      if (infosEmploye.roleEmploye != "commis") {
+        loadDemandesRetard()
+        loadHistoriqueAll()
+      }
+    }
+  }, [infosEmploye])
 
   return (<>
     {infosEmploye != null &&
@@ -134,36 +174,43 @@ export default function App() {
             </div>
           </div>
 
-          {/* Cartes/bouttons du dashboard, peut etre changer pour juste avoir html direct?*/}
-          {/* check si les 3 données sont vides, si non, return un icone pour chaque. PauseCloppes sera jamais vide puisque pas un fetch */}
-          {demandesOuvertes != null && comptesEnAttente != null && facturesAFaire != null &&
+          {/* check si les données sont vides, si non, return une carte pour chaque. */}
+          {demandesOuvertes != null && comptesEnAttente != null && facturesAFaire != null && demandesRetards != null && (
             <div className="columns mb-5">
               <CardsDashboard label="Demandes ouvertes" value={demandesOuvertes.length} color="is-info" />
               <CardsDashboard label="Comptes en attente" value={comptesEnAttente.length} color="is-warning" />
               <CardsDashboard label="Factures à venir" value={facturesAFaire.length} color="is-danger" />
-              <CardsDashboard label="Pauses cloppes cette semaine" value={pauseCloppes} color="is-success" />
+              {infosEmploye.roleEmploye === "commis" ? (
+                <>
+                  <CardsDashboard label="Pauses cloppes cette semaine" value={pauseCloppes} color="is-success" />
+                </>
+              ) : (
+                <>
+                  <CardsDashboard label="Demandes en retard" value={demandesRetards.length} color="is-success" />
+                </>
+              )}
             </div>
-          }
-
+          )}
           {/* Accès rapides */}
           <div className="box mb-5">
             <p className="title is-6 mb-1">Accès rapides</p>
             <div className="columns is-mobile is-multiline">
-              <div className="column is-one-third-desktop is-half-mobile">
-                <Link to={"/clients/nouveau"} className="is-info button is-fullwidth is-flex is-flex-direction-column">
-                  <span className="is-size-9 has-text-weight-semibold">Créer client</span>
-                </Link>
-              </div>
-              <div className="column is-one-third-desktop is-half-mobile">
-                <Link to={"/creerCompte"} className="is-primary button is-fullwidth is-flex is-flex-direction-column">
-                  <span className="is-size-9 has-text-weight-semibold">Créer compte</span>
-                </Link>
-              </div>
-              <div className="column is-one-third-desktop is-half-mobile">
-                <Link to={"/GestionCompte"} className=" is-success button is-fullwidth is-flex is-flex-direction-column">
-                  <span className="is-size-9 has-text-weight-semibold">Gestion Comptes</span>
-                </Link>
-              </div>
+              {/* si employé logged in est un emp regulier */}
+              {infosEmploye.roleEmploye === "commis" ? (
+                <>
+                  {/* Bouttons pour les employés réguliers */}
+                  <BouttonDashboard link="/clients/nouveau" couleur="is-info" texte="Créer client" />
+                  <BouttonDashboard link="/creerCompte" couleur="is-primary" texte="Créer compte" />
+                  <BouttonDashboard link="/GestionCompte" couleur="is-link" texte="Gestion des Comptes" />
+                </>
+              ) : (
+                <>
+                  {/* Bouttons pour admins + superviseurs */}
+                  <BouttonDashboard link="/GestionEmploye" couleur="is-info" texte="Gestion des employés" />
+                  <BouttonDashboard link="/CreerEmploye" couleur="is-primary" texte="Créer employé" />
+                  <BouttonDashboard link="/GestionCompte" couleur="is-link" texte="Gestion des Comptes" />
+                </>
+              )}
             </div>
           </div>
 
@@ -172,34 +219,28 @@ export default function App() {
             <div className="tabs is-boxed mb-4">
               <ul>
                 <li className={activeTab === "demandes" ? "is-active" : ""}>
-                  <a onClick={() => setActiveTab("demandes")}>
-                    <span>Demandes ouvertes</span>
-                    {demandesOuvertes !== null &&
-                      <span className="tag is-info is-light ml-2">{demandesOuvertes.length}</span>
-                    }
-                  </a>
+                  <a onClick={() => setActiveTab("demandes")}>Demandes ouvertes</a>
                 </li>
                 <li className={activeTab === "comptes" ? "is-active" : ""}>
-                  <a onClick={() => setActiveTab("comptes")}>
-                    <span>Comptes en attente</span>
-                    {comptesEnAttente !== null &&
-                      <span className="tag is-warning is-light ml-2">{comptesEnAttente.length}</span>
-                    }
-                  </a>
+                  <a onClick={() => setActiveTab("comptes")}>Comptes en attente</a>
                 </li>
                 <li className={activeTab === "activite" ? "is-active" : ""}>
-                  <a onClick={() => setActiveTab("activite")}>
-                    {historique !== null &&
-                      <span>Activité récente</span>
-                    }
-                  </a>
+                  <a onClick={() => setActiveTab("activite")}>Votre activité récente</a>
                 </li>
+                {infosEmploye.roleEmploye != "commis" &&
+                  <li className={activeTab === "activiteAll" ? "is-active" : ""}>
+                    <a onClick={() => setActiveTab("activiteAll")}>Historique de tous les employés</a>
+                  </li>
+                }
               </ul>
             </div>
 
+            {/* Tab Demandes ouvertes */}
             {activeTab === "demandes" && demandesOuvertes !== null && (
+              // Conditionnal rendering: check si le length des demandes ouvertes est 0à
+              // si oui, msg qu'il y en a 0
+              // sinon, render le tableau 
               demandesOuvertes.length !== 0 ? (
-
                 <table className="table is-fullwidth is-hoverable is-striped">
                   <thead>
                     <tr>
@@ -264,11 +305,11 @@ export default function App() {
               <table className="table is-fullwidth is-hoverable" style={{ tableLayout: "fixed" }}>
                 <thead>
                   <tr>
-                    <th style={{ width: "150px" }}>#Transaction</th>
-                    <th style={{ width: "180px" }}>Action</th>
-                    <th style={{ width: "150px" }}>Table</th>
-                    <th style={{ width: "180px" }}>Id du dossier</th>
-                    <th style={{ width: "180px" }}>Date</th>
+                    <th>#Transaction</th>
+                    <th>Action</th>
+                    <th>Table</th>
+                    <th>Id du dossier</th>
+                    <th>Date</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -276,6 +317,35 @@ export default function App() {
                     return (
                       <tr key={a.idHistorique} style={{ height: "55px" }}>
                         <td className="is-vcentered">HIST-{String(a.idHistorique).padStart(5, '0')}</td>
+                        <td className="is-vcentered">{a.actionEntree}</td>
+                        <td className="is-vcentered">{a.table}</td>
+                        <td className="is-vcentered">{a.idTransaction}</td>
+                        <td className="is-vcentered">{a.created_at}</td>
+                      </tr>
+                    )
+                  }
+                  )}
+                </tbody>
+              </table>
+            )}
+            {activeTab === "activiteAll" && historiqueAll != null && (
+              <table className="table is-fullwidth is-hoverable" style={{ tableLayout: "fixed" }}>
+                <thead>
+                  <tr>
+                    <th>#Transaction</th>
+                    <th>Id de l'employé</th>
+                    <th>Action</th>
+                    <th>Table</th>
+                    <th>Id du dossier</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historiqueAll.map((a) => {
+                    return (
+                      <tr key={a.idHistorique} style={{ height: "55px" }}>
+                        <td className="is-vcentered">HIST-{String(a.idHistorique).padStart(5, '0')}</td>
+                        <td className="is-vcentered">EMP-{String(a.idEmploye).padStart(3, '0')}</td>
                         <td className="is-vcentered">{a.actionEntree}</td>
                         <td className="is-vcentered">{a.table}</td>
                         <td className="is-vcentered">{a.idTransaction}</td>

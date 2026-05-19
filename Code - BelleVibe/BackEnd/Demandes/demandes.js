@@ -36,6 +36,10 @@ router.get("/getDemandes", authentifier, async (req, res) => {
 router.get("/getDemandesOuvertes", authentifier, async (req, res) => {
     try {
         const demandesOuvertes = await db("demandes").select("*").where("statutDemande", "Ouverte")
+        // si aucunes demandes, code 204, pas une erreur, mais retourne rien
+        if (demandesOuvertes.length === 0) {
+            return res.status(204).send()
+        }
         res.status(200).json(demandesOuvertes)
     } catch (error) {
         console.error("Erreur /getDemandesOuvertes")
@@ -47,6 +51,10 @@ router.get("/getDemandesOuvertes", authentifier, async (req, res) => {
 router.get("/getDemandesEnRetard", authentifier, async (req, res) => {
     try {
         const demandesEnRetard = await db("demandes").select("*").where("statutDemande", "En retard")
+        // si aucunes demandes, code 204, pas une erreur, mais retourne rien
+        if (demandesEnRetard.length === 0) {
+            return res.status(204).send()
+        }
         res.status(200).json(demandesEnRetard)
     } catch (error) {
         console.error("Erreur /getDemandesEnRetard")
@@ -58,6 +66,10 @@ router.get("/getDemandesEnRetard", authentifier, async (req, res) => {
 router.get("/getDemandesEnAttente", authentifier, async (req, res) => {
     try {
         const demandesEnAttente = await db("demandes").select("*").where("statutDemande", "En attente")
+        // si aucunes demandes, code 204, pas une erreur, mais retourne rien
+        if (demandesEnAttente.length === 0) {
+            return res.status(204).send()
+        }
         res.status(200).json(demandesEnAttente)
     } catch (error) {
         console.error("Erreur /getDemandesEnAttente")
