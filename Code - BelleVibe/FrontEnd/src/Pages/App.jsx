@@ -152,11 +152,11 @@ export default function App() {
     loadComptesEnAttente()
     loadFacturesAFaire()
     loadHistorique()
+    loadDemandesRetard()
     // doit rajouter un check sinon crash
     if (infosEmploye != null) {
-      // loader l'historique & demandes en retard seulement si pas un commis, puisque pas besoin si oui 
+      // loader l'historique si pas un commis 
       if (infosEmploye.roleEmploye != "commis") {
-        loadDemandesRetard()
         loadHistoriqueAll()
       }
     }
