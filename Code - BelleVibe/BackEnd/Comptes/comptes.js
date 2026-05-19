@@ -74,7 +74,7 @@ router.get("/dossiersAttente", authentifier, async (req, res) => {
 	try {
 		const reponse = await db("dossiers").where("statutDossier", "en attente");
 		if (reponse.length == 0){
-			return res.status(204).json({message: "Aucun dossier en attente"})
+			return res.status(204).send()
 		}
 		res.status(200).json(reponse);
 	} catch (error) {

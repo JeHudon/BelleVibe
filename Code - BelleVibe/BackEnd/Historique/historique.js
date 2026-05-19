@@ -6,7 +6,7 @@ const router = express.Router();
 // route pour obtenir tous l'historique, utilisable seulement par superviseur ++
 router.get("/allHistorique", authentifierSupp, async (req, res) => {
     try {
-        const reponse = await db("historiqueDossiers").select("*")
+        const reponse = await db("historiqueDossiers").select("*").orderBy("created_at", 'desc')
         res.status(200).json(reponse)
     }
     catch (error) {
