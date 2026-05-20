@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import CardsDashboard from "../components/CardsDashboard";
 import BouttonDashboard from "../components/BouttonsDashboard";
 
+// retourne un nbre random entre 100 & 900
+const pauseCloppes = Math.floor(Math.random() * 100)
+
 export default function App() {
   const [activeTab, setActiveTab] = useState("demandes")
   const [demandesOuvertes, setDemandesOuvertes] = useState(null)
@@ -12,9 +15,7 @@ export default function App() {
   const [historique, setHistorique] = useState(null)
   const [demandesRetards, setDemandesRetards] = useState(null)
   const [historiqueAll, setHistoriqueAll] = useState(null)
-
-  // retourne un nbre random entre 100 & 900
-  const pauseCloppes = Math.floor(Math.random() * 100)
+  
   // récupérer le token pour les tt les requêtes au serveur
   const token = localStorage.getItem("token");
 
@@ -182,7 +183,7 @@ export default function App() {
               <CardsDashboard label="Factures à venir" value={facturesAFaire.length} color="is-danger" />
               {infosEmploye.roleEmploye === "commis" ? (
                 <>
-                  <CardsDashboard label="Pauses cloppes cette semaine" value={pauseCloppes} color="is-success" />
+                  <CardsDashboard label="Pauses clopes cette semaine" value={pauseCloppes} color="is-success" />
                 </>
               ) : (
                 <>
