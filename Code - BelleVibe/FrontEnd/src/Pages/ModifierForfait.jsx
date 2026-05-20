@@ -253,15 +253,16 @@ export function ModifierForfait() {
 											alignItems: "center",
 											padding: "0.75rem 1.25rem",
 											borderRadius: "8px",
-											border: `2px solid ${servicesSelection.includes(service.idService) ? "#62cf5fff" : "#dbdbdb"}`,
+											border: `2px solid ${servicesSelection.includes(service.idService) ? "var(--bulma-link)" : "#dbdbdb"}`,
 											backgroundColor: servicesSelection.includes(
 												service.idService,
 											)
-												? "#62cf5fff"
+												? "var(--bulma-link)"
 												: "white",
 											boxShadow: servicesSelection.includes(service.idService)
 												? "inset 0 2px 4px rgba(0,0,0,0.2)"
 												: "none",
+											color: servicesSelection.includes(service.idService) ? "white" : "inherit",
 											cursor: "pointer",
 											transition: "all 0.2s ease",
 											fontWeight: "bold",
