@@ -83,7 +83,7 @@ router.patch("/:idDossier", authentifier, async (req, res) => {
 
 
 // DELETE supprimer un forfait d’un dossier
-router.delete("/:idForfaitDossier", authentifierSupp, async (req, res) => {
+router.delete("/:idForfaitDossier", authentifier, async (req, res) => {
     try {
         const { idForfaitDossier } = req.params;
 
