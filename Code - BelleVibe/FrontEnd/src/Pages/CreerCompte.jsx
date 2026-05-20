@@ -178,12 +178,20 @@ export function CreerCompte() {
                                 textAlign: "left",
                                 transition: "all 0.2s ease",
                                 ...(clientSelection === client.idClient && {
-                                    backgroundColor: "#62cf5fff",
-                                    boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)"
+                                    backgroundColor: "var(--bulma-link)",
+                                    boxShadow: "inset 0 2px 4px rgba(0,0,0,0.2)",
+                                    color: "white"
                                 })
                             }}>
-                            <div className="subtitle is-5 mb-0 has-text-weight-bold">{client.prenomClient} {client.nomClient}</div>
-                            <div className="subtitle is-6 mb-0">{client.telephoneClient} - {client.courrielClient}</div>
+                            <div className="subtitle is-5 mb-0 has-text-weight-bold"
+                                style={{ color: clientSelection === client.idClient ? "white" : "inherit" }}>
+                                {client.prenomClient} {client.nomClient}
+                            </div>
+                            <div className="subtitle is-6 mb-0"
+                                style={{ color: clientSelection === client.idClient ? "white" : "inherit" }}>
+                                {client.courrielClient}
+                                {client.telephoneClient && ` - ${client.telephoneClient}`}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -203,9 +211,10 @@ export function CreerCompte() {
                                     gap: "0.5rem",
                                     padding: "0.75rem 1.25rem",
                                     borderRadius: "8px",
-                                    border: `2px solid ${typeCompte === type ? "#62cf5fff" : "#dbdbdb"}`,
-                                    backgroundColor: typeCompte === type ? "#62cf5fff" : "white",
+                                    border: `2px solid ${typeCompte === type ? "var(--bulma-link)" : "#dbdbdb"}`,
+                                    backgroundColor: typeCompte === type ? "var(--bulma-link)" : "white",
                                     boxShadow: typeCompte === type ? "inset 0 2px 4px rgba(0,0,0,0.2)" : "none",
+                                    color: typeCompte === type ? "white" : "inherit",
                                     cursor: "pointer",
                                     transition: "all 0.2s ease",
                                     fontWeight: "bold",
@@ -226,7 +235,7 @@ export function CreerCompte() {
 
                     <h3 className="title is-4">Choisir les services</h3>
                     <div className="subtitle is-5 mt-2">Sélectionner un ou plusieurs services</div>
-                    <div className="is-flex" style={{ gap: "1rem", flexWrap: "wrap" }}>
+                    <div className="is-flex {" style={{ gap: "1rem", flexWrap: "wrap" }}>
                         {services.map((service) => (
                             <div
                                 key={service.idService}
@@ -236,9 +245,10 @@ export function CreerCompte() {
                                     alignItems: "center",
                                     padding: "0.75rem 1.25rem",
                                     borderRadius: "8px",
-                                    border: `2px solid ${servicesSelection.includes(service.idService) ? "#62cf5fff" : "#dbdbdb"}`,
-                                    backgroundColor: servicesSelection.includes(service.idService) ? "#62cf5fff" : "white",
+                                    border: `2px solid ${servicesSelection.includes(service.idService) ? "var(--bulma-link)" : "#dbdbdb"}`,
+                                    backgroundColor: servicesSelection.includes(service.idService) ? "var(--bulma-link)" : "white",
                                     boxShadow: servicesSelection.includes(service.idService) ? "inset 0 2px 4px rgba(0,0,0,0.2)" : "none",
+                                    color: servicesSelection.includes(service.idService) ? "white" : "inherit",
                                     cursor: "pointer",
                                     transition: "all 0.2s ease",
                                     fontWeight: "bold",
@@ -264,15 +274,15 @@ export function CreerCompte() {
                 <div className="mt-2">
                     <h3 className="title is-4">Résumé et confirmation</h3>
                     <div className="subtitle is-5 mt-2">Confirmer les informations sélectionnées</div>
-                    <div className="box">
+                    <div className="box is-shadowless mb-0">
                         <div className="title is-4 mb-2">Client sélectionné</div>
-                        <div className="subtitle is-5">{client.prenomClient} {client.nomClient} - {client.telephoneClient}</div>
+                        <div className="subtitle is-5">{client.prenomClient} {client.nomClient} - {client.courrielClient}</div>
                     </div>
-                    <div className="box">
+                    <div className="box is-shadowless mb-0">
                         <div className="title is-4 mb-2">Type de compte sélectionné</div>
                         <div className="subtitle is-5">{typeCompte}</div>
                     </div>
-                    <div className="box">
+                    <div className="box is-shadowless">
                         <div className="title is-4 mb-3">Services et forfaits sélectionnés</div>
                         {services
                             .filter(s => servicesSelection.includes(s.idService))
@@ -418,7 +428,7 @@ export function CreerCompte() {
 
     return (
         <div className="section">
-            <div className="container is-centered mt-3" style={{maxWidth: 1100}}>
+            <div className="container is-centered mt-3" style={{ maxWidth: 1100 }}>
                 <h1 className="title">Créer un nouveau compte</h1>
                 <h2 className="subtitle is-5 is-spaced">Assistant de création du compte</h2>
                 <div className="columns is-centered">
