@@ -479,6 +479,72 @@ components:
           type: string
           format: date-time
           example: "2026-03-28T14:23:45Z"
+    
+    # ── Facturation ───────────────────────────────────────────────────────────
+    FactureCreate:
+      type: object
+      required: [idDossier, montant_total, dateEmission]
+      properties:
+        idDossier:
+          type: integer
+          example: 1
+        montant_total:
+          type: number
+          format: float
+          example: 100.00
+        dateEmission:
+          type: string
+          format: date
+          example: "2026-05-13"
+
+    FactureResponse:
+      allOf:
+        - $ref: '#/components/schemas/FactureCreate'
+        - type: object
+          properties:
+            idFacture:
+              type: integer
+              example: 1
+            statutFacture:
+              type: string
+              enum: [Emise, Payée, En retard]
+              example: Emise
+            paiement:
+              type: boolean
+              example: false
+
+    FactureUpdate:
+      type: object
+      description: >
+        Au moins un champ requis. Tous les champs sont optionnels
+        mais au moins un doit être présent.
+      properties:
+        statutFacture:
+          type: string
+          enum: [Emise, Payée, En retard]
+          example: Emise
+        paiement:
+          type: boolean
+          example: true
+        datePaiement:
+          type: string
+          format: date
+          example: "2026-05-25"
+    
+    FactureAdminUpdate:
+      type: object
+      description: >
+        Modification des données critiques — superviseur ou admin seulement.
+        Au moins un champ requis.
+      properties:
+        dateEmission:
+          type: string
+          format: date
+          example: "2026-06-01"
+        montantTotal:
+          type: number
+          format: float
+          example: 250.00
 
 security:
   - bearerAuth: []
@@ -506,6 +572,8 @@ tags:
     description: "Association forfaits et dossiers — lecture authentifier, écriture authentifierSupp"
   - name: Historique
     description: Historique des actions enregistrées automatiquement
+  - name: Facturation
+    description: Gestion des factures liées aux dossiers
 
 paths:
 
@@ -552,6 +620,25 @@ paths:
   # ══════════════════════════════════════════════
   # EMPLOYÉS
   # ══════════════════════════════════════════════
+  /employes/me:
+    get:
+      tags: [Employés]
+      summary: Obtenir son propre profil
+      description: >
+        Retourne les informations de l'employé actuellement connecté,
+        identifié via le token JWT. Accessible par tous les rôles.
+      responses:
+        '200':
+          description: Profil de l'employé connecté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeResponse'
+        '401':
+          description: Non authentifié
+        '404':
+          description: Employé non trouvé
+
   /employes/employes:
     get:
       tags: [Employés]
@@ -953,6 +1040,8 @@ paths:
           description: Liste des dossiers en attente
         '401':
           description: Non authentifié
+        '204':
+          description: Aucune dossier en attente
 
   /dossiers/creerDossier:
     post:
@@ -1158,6 +1247,8 @@ paths:
                   $ref: '#/components/schemas/DemandeResponse'
         '401':
           description: Non authentifié
+        '204':
+          description: Aucune demande ouverte
 
   /demandes/getDemandesEnRetard:
     get:
@@ -1177,6 +1268,8 @@ paths:
                   $ref: '#/components/schemas/DemandeResponse'
         '401':
           description: Non authentifié
+        '204':
+          description: Aucune demande en retard
 
   /demandes/getDemandesEnAttente:
     get:
@@ -1196,6 +1289,8 @@ paths:
                   $ref: '#/components/schemas/DemandeResponse'
         '401':
           description: Non authentifié
+        '204':
+          description: Aucune demande en attente
 
   /demandes/modifierDemande/{idDossier}:
     put:
@@ -2002,3 +2097,240 @@ paths:
           description: Non authentifié
         '404':
           description: Employé non trouvée
+
+
+  # ══════════════════════════════════════════════
+  # FACTURATION
+  # ══════════════════════════════════════════════
+  /facturation/nouvelleFacture:
+    post:
+      tags: [Facturation]
+      summary: Créer une facture
+      description: Crée une nouvelle facture liée à un dossier existant.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FactureCreate'
+      responses:
+        '201':
+          description: Facture créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FactureResponse'
+        '400':
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
+        '404':
+          description: Dossier non trouvé
+
+  /facturation/getFactures/{idDossier}:
+    get:
+      tags: [Facturation]
+      summary: Lister les factures d'un dossier
+      parameters:
+        - name: idDossier
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Liste des factures du dossier
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FactureResponse'
+        '400':
+          description: idDossier manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
+
+  /facturation/getFacture/{idFacture}:
+    get:
+      tags: [Facturation]
+      summary: Obtenir une facture
+      parameters:
+        - name: idFacture
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Données de la facture
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FactureResponse'
+        '400':
+          description: idFacture manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
+        '404':
+          description: Facture non trouvée
+
+  /facturation/updateFacture/{idFacture}:
+    patch:
+      tags: [Facturation]
+      summary: Mettre à jour le statut et le paiement d'une facture
+      parameters:
+        - name: idFacture
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FactureUpdate'
+      responses:
+        '200':
+          description: Facture mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Champs manquants ou invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
+        '404':
+          description: Facture non trouvée
+
+  /facturation/updateFactureSupp/{idFacture}:
+    patch:
+      tags: [Facturation]
+      summary: Modifier les données critiques d'une facture
+      description: >
+        Modifie la date d'émission et/ou le montant total d'une facture.
+        Au moins un champ requis. Superviseur ou admin seulement.
+      parameters:
+        - name: idFacture
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FactureAdminUpdate'
+      responses:
+        '200':
+          description: Données critiques de la facture mises à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: idFacture invalide ou aucun champ fourni
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
+        '403':
+          description: Accès refusé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsInvalides'
+        '404':
+          description: Facture non trouvée
+
+  /facturation/deleteFacture/{idFacture}:
+    delete:
+      tags: [Facturation]
+      summary: Supprimer une facture
+      parameters:
+        - name: idFacture
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Facture supprimée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: idFacture manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChampManquant'
+        '401':
+          description: Non authentifié
+        '404':
+          description: Facture non trouvée
+
+  /facturation/facturesRetards:
+    get:
+      tags: [Facturation]
+      summary: Lister les factures en retard
+      description: Retourne les factures dont le statut est "En retard".
+      responses:
+        '200':
+          description: Factures en retard
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FactureResponse'
+        '401':
+          description: Non authentifié
+        '204':
+          description: Aucune facture en retard
+
+  /facturation/facturesAFaire:
+    get:
+      tags: [Facturation]
+      summary: Lister les factures à faire
+      description: Retourne les factures à émettre d'ici 10 jours.
+      responses:
+        '200':
+          description: Factures à faire
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FactureResponse'
+        '401':
+          description: Non authentifié
+        '204':
+          description: Aucune facture à faire dans les 10 prochains jours
