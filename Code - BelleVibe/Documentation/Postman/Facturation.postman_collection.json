@@ -1,0 +1,1785 @@
+{
+  "info": {
+    "_postman_id": "88098949-76c5-403d-933b-c6c910335338",
+    "name": "Facturation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53455980",
+    "_collection_link": "https://go.postman.co/collection/53455980-88098949-76c5-403d-933b-c6c910335338?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var reponse = pm.response.json()",
+              "if (reponse.token) {",
+              "    pm.environment.set(\"access_token\", reponse.token)",
+              "}",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"admin@bellevibe.com\",\n    \"mdp\": \"123456789\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/employes/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "employes",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Nouvelle Facture",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"idDossier\": 100000, \n    \"montant_total\": 100, \n    \"dateEmission\": \"2026-5-13\" \n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/nouvelleFacture",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "nouvelleFacture"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "201 - Created",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"idDossier\": 1, \n    \"montant_total\": 100, \n    \"dateEmission\": \"2026-5-13\" \n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/nouvelleFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "nouvelleFacture"
+              ]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "157",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"9d-GdE40NejWSE0NHLpATGxmeyQMas\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 18:26:40 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"idDossier\": 1,\n    \"idEmploye\": 6,\n    \"statut_facture\": \"Emise\",\n    \"montant_total\": 100,\n    \"paiement_recu\": false,\n    \"date_emission\": \"2026-05-13T04:00:00.000Z\",\n    \"idFacturation\": 4\n}"
+        },
+        {
+          "name": "400 - Date dans le passé",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"idDossier\": 1, \n    \"montant_total\": 100, \n    \"dateEmission\": \"2020-5-13\" \n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/nouvelleFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "nouvelleFacture"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "81",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"51-peeVyeAMw2BRV5V18RfhP8Ejm0E\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 18:27:23 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"error\": \"La date de l'émission de la facture ne peux pas être dans le passé\"\n}"
+        },
+        {
+          "name": "404 - Id non trouvé",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"idDossier\": 100000, \n    \"montant_total\": 100, \n    \"dateEmission\": \"2026-5-13\" \n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/nouvelleFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "nouvelleFacture"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "42",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"2a-qsNLApQdN/BvCbv9cSWnD0O44UQ\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:37:24 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"error\": \"Numéro de dossier non trouvé\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "getFactures/:idDossier",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/getFactures/:idDossier",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "getFactures",
+            ":idDossier"
+          ],
+          "variable": [
+            {
+              "id": 0,
+              "key": "idDossier",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 - OK",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/getFactures/:idDossier",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "getFactures",
+                ":idDossier"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idDossier",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "929",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"3a1-v68K6R+5Z7xQyE0QGfl8FZYviXU\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 18:32:54 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "[\n    {\n        \"idFacturation\": 1,\n        \"idDossier\": 1,\n        \"idEmploye\": 6,\n        \"statut_facture\": \"Emise\",\n        \"montant_total\": 100,\n        \"paiement_recu\": 0,\n        \"date_emission\": 1778644800000,\n        \"date_paiement\": null,\n        \"created_at\": \"2026-05-13 18:15:39\",\n        \"updated_at\": \"2026-05-13 18:15:39\"\n    },\n    {\n        \"idFacturation\": 2,\n        \"idDossier\": 1,\n        \"idEmploye\": 6,\n        \"statut_facture\": \"Emise\",\n        \"montant_total\": 100,\n        \"paiement_recu\": 0,\n        \"date_emission\": 1777608000000,\n        \"date_paiement\": null,\n        \"created_at\": \"2026-05-13 18:16:00\",\n        \"updated_at\": \"2026-05-13 18:16:00\"\n    },\n    {\n        \"idFacturation\": 3,\n        \"idDossier\": 1,\n        \"idEmploye\": 6,\n        \"statut_facture\": \"Emise\",\n        \"montant_total\": 100,\n        \"paiement_recu\": 0,\n        \"date_emission\": 1778644800000,\n        \"date_paiement\": null,\n        \"created_at\": \"2026-05-13 18:26:36\",\n        \"updated_at\": \"2026-05-13 18:26:36\"\n    },\n    {\n        \"idFacturation\": 4,\n        \"idDossier\": 1,\n        \"idEmploye\": 6,\n        \"statut_facture\": \"Emise\",\n        \"montant_total\": 100,\n        \"paiement_recu\": 0,\n        \"date_emission\": 1778644800000,\n        \"date_paiement\": null,\n        \"created_at\": \"2026-05-13 18:26:40\",\n        \"updated_at\": \"2026-05-13 18:26:40\"\n    }\n]"
+        },
+        {
+          "name": "404 - Dossier non trouvé",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/getFactures/:idDossier",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "getFactures",
+                ":idDossier"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idDossier",
+                  "value": "1000",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "31",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"1f-7tUwhcCItn1hmflz3umyDfPyfJ0\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 18:33:32 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"error\": \"Dossier non trouvé\"\n}"
+        },
+        {
+          "name": "400 - Id Manquant",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/getFactures/:idDossier",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "getFactures",
+                ":idDossier"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idDossier",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "42",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"2a-450zvkC6qfHnc3dqRLdDgNhzDSw\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:20:09 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"error\": \"idDossier invalide ou manquant\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "getFacture/:idFacture",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/getFacture/:idFacture",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "getFacture",
+            ":idFacture"
+          ],
+          "variable": [
+            {
+              "id": 0,
+              "key": "idFacture",
+              "value": "200",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 - OK",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/getFacture/:idFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "getFacture",
+                ":idFacture"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idFacture",
+                  "value": "2",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "231",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"e7-+88lO6pzGkaU4EFeuuma4ATPe4A\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 18:47:48 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"idFacturation\": 2,\n    \"idDossier\": 1,\n    \"idEmploye\": 6,\n    \"statut_facture\": \"Emise\",\n    \"montant_total\": 100,\n    \"paiement_recu\": 0,\n    \"date_emission\": 1777608000000,\n    \"date_paiement\": null,\n    \"created_at\": \"2026-05-13 18:16:00\",\n    \"updated_at\": \"2026-05-13 18:16:00\"\n}"
+        },
+        {
+          "name": "404 - Facture non trouvé",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/getFacture/:idFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "getFacture",
+                ":idFacture"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idFacture",
+                  "value": "200",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "31",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"1f-8RPbbv+xh3wCEEtHtOr0q0hL1ig\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 18:53:50 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"error\": \"Facture non trouvé\"\n}"
+        },
+        {
+          "name": "400 - Id Manquant",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/getFacture/:idFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "getFacture",
+                ":idFacture"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idFacture",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "42",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"2a-Nj8Ho9rRyJj4KxLIGKSYdyBKTeA\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:19:49 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"error\": \"idFacture invalide ou manquant\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "/updateFacture/:idFacture",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"statutFacture\": \"Emise\",\n    \"paiement\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/updateFacture/:idFacture",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "updateFacture",
+            ":idFacture"
+          ],
+          "variable": [
+            {
+              "id": 0,
+              "key": "idFacture",
+              "value": "400",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 - OK",
+          "originalRequest": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"statutFacture\": \"Emise\",\n    \"paiement\": true,\n    \"datePaiement\" : \"2026-5-14\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/updateFacture/:idFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "updateFacture",
+                ":idFacture"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idFacture",
+                  "value": "2",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "76",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"4c-aUZUplqUuvbZUBpyYpFFDuqbc5U\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:03:35 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"message\": \"Infos de la facture mises à jour avec succès\",\n    \"idFacture\": \"2\"\n}"
+        },
+        {
+          "name": "400 - Id manquant",
+          "originalRequest": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"statutFacture\": \"Emise\",\n    \"paiement\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/updateFacture/:idFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "updateFacture",
+                ":idFacture"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idFacture",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "42",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"2a-Nj8Ho9rRyJj4KxLIGKSYdyBKTeA\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:17:36 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"error\": \"idFacture invalide ou manquant\"\n}"
+        },
+        {
+          "name": "404 - Non trouvé dans la BD",
+          "originalRequest": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"statutFacture\": \"Emise\",\n    \"paiement\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/updateFacture/:idFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "updateFacture",
+                ":idFacture"
+              ],
+              "variable": [
+                {
+                  "id": 0,
+                  "key": "idFacture",
+                  "value": "400",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "57",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"39-mpUWRqm986AQg6KWujWEJ1coDlI\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:18:14 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"error\": \"Facture non trouvée dans la base de données\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "/deleteFacture/:idFacture",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/deleteFacture/:idFacture",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "deleteFacture",
+            ":idFacture"
+          ],
+          "variable": [
+            {
+              "id": 0,
+              "key": "idFacture",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 - OK",
+          "originalRequest": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/deleteFacture/:idFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "deleteFacture",
+                ":idFacture"
+              ],
+              "variable": [
+                {
+                  "key": "idFacture",
+                  "value": "4",
+                  "type": "text",
+                  "id": 0
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "54",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"36-OUBzdnGBbRz5Y9Wet9iYvM2eU9U\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:23:23 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"message\": \"Facture supprimée avec succès\",\n    \"id\": \"4\"\n}"
+        },
+        {
+          "name": "404 - Id non trouvé",
+          "originalRequest": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/deleteFacture/:idFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "deleteFacture",
+                ":idFacture"
+              ],
+              "variable": [
+                {
+                  "key": "idFacture",
+                  "value": "600",
+                  "type": "text",
+                  "id": 0
+                }
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "57",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"39-mpUWRqm986AQg6KWujWEJ1coDlI\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:23:39 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"error\": \"Facture non trouvée dans la base de données\"\n}"
+        },
+        {
+          "name": "400 - Id Manquant",
+          "originalRequest": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/deleteFacture/:idFacture",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "deleteFacture",
+                ":idFacture"
+              ],
+              "variable": [
+                {
+                  "key": "idFacture",
+                  "value": "",
+                  "type": "text",
+                  "id": 0
+                }
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "42",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"2a-Nj8Ho9rRyJj4KxLIGKSYdyBKTeA\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:24:02 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"error\": \"idFacture invalide ou manquant\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "/facturesRetards",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/facturesRetards",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "facturesRetards"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "204 - Aucunes factures en retard",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/facturesRetards",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "facturesRetards"
+              ]
+            }
+          },
+          "status": "No Content",
+          "code": 204,
+          "_postman_previewlanguage": "Text",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"26-jQGhrkWKkhWCdVwJZHXF13/in48\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:27:50 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "200 - OK",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/facturesRetards",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "facturesRetards"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "465",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"1d1-t0eglGKVvdbJgd/0HcpJ9iPdZw0\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:48:13 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "[\n    {\n        \"idFacturation\": 11,\n        \"idDossier\": 1,\n        \"idEmploye\": 6,\n        \"statut_facture\": \"Emise\",\n        \"montant_total\": 100,\n        \"paiement_recu\": 0,\n        \"date_emission\": \"2025-05-13\",\n        \"date_paiement\": null,\n        \"created_at\": \"2026-05-13 19:44:19\",\n        \"updated_at\": \"2026-05-13 19:44:19\"\n    },\n    {\n        \"idFacturation\": 12,\n        \"idDossier\": 1,\n        \"idEmploye\": 6,\n        \"statut_facture\": \"Emise\",\n        \"montant_total\": 100,\n        \"paiement_recu\": 0,\n        \"date_emission\": \"2024-05-13\",\n        \"date_paiement\": null,\n        \"created_at\": \"2026-05-13 19:44:36\",\n        \"updated_at\": \"2026-05-13 19:44:36\"\n    }\n]"
+        }
+      ]
+    },
+    {
+      "name": "/facturesAFaire",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/facturesAFaire",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "facturesAFaire"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "204 - Aucunes factures à faire",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/facturesAFaire",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "facturesAFaire"
+              ]
+            }
+          },
+          "status": "No Content",
+          "code": 204,
+          "_postman_previewlanguage": "Text",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"42-J/jTK3JnzSTf2u2pbpU3HFVrQ5I\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 19:59:56 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "200 - Factures à faire",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/facturesAFaire",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "facturesAFaire"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "JSON",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, PUT, DELETE, OPTIONS",
+              "type": "text"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, Authorization",
+              "type": "text"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8",
+              "type": "text"
+            },
+            {
+              "key": "Content-Length",
+              "value": "49",
+              "type": "text"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"31-+0idv2Nh8wNriPGkQ0yRfo9Y7P0\"",
+              "type": "text"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 13 May 2026 20:01:17 GMT",
+              "type": "text"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "type": "text"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5",
+              "type": "text"
+            }
+          ],
+          "cookie": [],
+          "body": "[\n    {\n        \"idDossier\": 3,\n        \"derniere_facture\": \"2026-04-13\"\n    }\n]"
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "url",
+      "value": "http://localhost:3000/facturation",
+      "type": "string"
+    }
+  ]
+}

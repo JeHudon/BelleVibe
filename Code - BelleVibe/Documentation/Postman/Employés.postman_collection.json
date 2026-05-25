@@ -10,12 +10,28 @@
   "item": [
     {
       "name": "/login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var reponse = pm.response.json()\r",
+              "if (reponse.token) {\r",
+              "    pm.environment.set(\"access_token\", reponse.token)\r",
+              "}\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"email\": \"admin@bellevibe.com\",\n    \"mdp\": \"123456789\"\n}",
+          "raw": "{\n    \"email\": \"superviseur@bellevibe.com\",\n    \"mdp\": \"123456789\"\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -152,6 +168,23 @@
         "description": "Modification d'un employé pour des données plus sensibles. Modifie le mot de passe, le rôle et le statut de l'employé.  \nUtilisable seulement par un admin."
       },
       "response": []
+    },
+    {
+      "name": "/me",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/me",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "me"
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "auth": {
@@ -159,7 +192,7 @@
     "bearer": [
       {
         "key": "token",
-        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Niwicm9sZSI6ImFkbWluIiwic3RhdHV0IjoiYWN0aWYiLCJpYXQiOjE3NzQ1NjM0MTMsImV4cCI6MTc3NDU3MDYxM30.JEQxyCYYzZnj2fjhgBFrBZ91piiLu0McVO8a6FgNu_Q",
+        "value": "{{access_token}}",
         "type": "string"
       }
     ]
