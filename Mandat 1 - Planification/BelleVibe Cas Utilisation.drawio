@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36">
   <diagram name="Page-1" id="cKSj3qcZZ1lyWakqB6Ka">
-    <mxGraphModel dx="2862" dy="857" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2514" dy="989" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -31,7 +31,7 @@
         <mxCell id="QsVhqPuexdbIVvBPoxeV-22" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Admin" vertex="1">
           <mxGeometry height="60" width="30" x="80" y="660" as="geometry" />
         </mxCell>
-        <mxCell id="QsVhqPuexdbIVvBPoxeV-24" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Connecter a ladmin" vertex="1">
+        <mxCell id="QsVhqPuexdbIVvBPoxeV-24" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Connecter à l&#39;admin" vertex="1">
           <mxGeometry height="60" width="120" x="-90" y="180" as="geometry" />
         </mxCell>
         <mxCell id="QsVhqPuexdbIVvBPoxeV-49" edge="1" parent="1" source="QsVhqPuexdbIVvBPoxeV-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.3333333333333333;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="QsVhqPuexdbIVvBPoxeV-48">
