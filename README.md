@@ -1,4 +1,5 @@
 # BelleVibe
+Application web simulant une application interne pour une compagnie de télécommunications. Des comptes employés sont utilisés pour gérer les comptes des clients. Certaines actions nécéssitent des permissions plus élevées (superviseur ou administrateur). On y trouve des fonctionnalitées pour gérer des comptes clients, changer les forfaits, créer des factures, tracer l'historique de toutes les transactions, voir des documents comme des contrats ou même des factures directement dans l'application, et bien plus encore. 
 
 ---
 
